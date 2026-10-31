@@ -5,18 +5,25 @@ Defines the three pre-built layout branches used for the manual (non-AI) demo an
 ## ADDED Requirements
 
 ### Requirement: Three distinct layout branches
-The repository SHALL contain branches `layout/minimal`, `layout/magazine` and `layout/sidebar`, each rendering the same content with a visibly different layout.
+The repository SHALL contain branches `layout/minimal`, `layout/catalog` and `layout/showcase`, each rendering the same catalogue, cart and checkout with a visibly different layout.
 
 #### Scenario: Visual comparison
 - **WHEN** all three branches run side by side
-- **THEN** their home pages are distinguishable at a glance
+- **THEN** their home, category and product pages are distinguishable at a glance
 
 ### Requirement: Presentation-only diffs
-The diff between any layout branch and `main` SHALL touch only views, CSS and static assets.
+The diff between any layout branch and `main` SHALL touch only views (including cart, checkout and confirmation views), CSS and static assets.
 
 #### Scenario: Diff check
 - **WHEN** `git diff --name-only main...layout/<name>` is run
 - **THEN** every path is under the views or static asset directories
+
+### Requirement: Full flow works in every layout
+Each layout SHALL support the complete flow: browse category, view product, add to cart, checkout, confirmation.
+
+#### Scenario: Order in each layout
+- **WHEN** an order is placed in each of the three running layouts
+- **THEN** each shows a confirmation and each order exists only in that worktree's database
 
 ### Requirement: Responsive and legible
 Each layout SHALL render usably at laptop and projector resolutions with text readable from a distance.

@@ -19,7 +19,7 @@ Docs SHALL describe the manual demo: create three worktrees, start each, open al
 - **THEN** three isolated sites are running with distinct URLs
 
 ### Requirement: Agent flow
-Docs SHALL provide a ready-to-paste agent prompt that asks for three layouts in three parallel worktrees, including the constraints (presentation-only files, use the launcher, report URLs).
+Docs SHALL provide a ready-to-paste agent prompt that asks for three shop layouts in three parallel worktrees, including the constraints (presentation-only files, use the launcher, report URLs).
 
 #### Scenario: Agent run
 - **WHEN** the prompt is given to an agent that supports parallel worktrees
