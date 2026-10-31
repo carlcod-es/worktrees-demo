@@ -1,0 +1,10 @@
+{
+  "name": "worktrees-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "wt": "node scripts/worktrees.mjs",
+    "test": "node --test scripts/ports.test.mjs"
+  }
+}

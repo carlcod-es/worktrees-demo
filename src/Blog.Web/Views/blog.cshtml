@@ -1,0 +1,16 @@
+﻿@{
+    var posts = Model.Children()!.OrderByDescending(p => p.Value<DateTime>("published")).ToList();
+}
+<section class="post-list">
+    @foreach (var p in posts)
+    {
+        <article class="post-card">
+            <img src="@p.Value("image")" alt="">
+            <div>
+                <h2><a href="@p.Url()">@p.Value("title")</a></h2>
+                <p class="meta">@p.Value<DateTime>("published").ToString("d MMM yyyy") · @p.Value("author")</p>
+                <p>@p.Value("summary")</p>
+            </div>
+        </article>
+    }
+</section>

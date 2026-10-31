@@ -1,0 +1,37 @@
+## Purpose
+
+Defines the Aspire AppHost topology and the isolation guarantees that let several instances of the same app run concurrently from different git worktrees.
+
+## ADDED Requirements
+
+### Requirement: AppHost defines the full stack
+The AppHost SHALL define a SQL Server container, a database on it, and the Umbraco website, with the website waiting for and referencing the database. No resource outside the AppHost definition SHALL be required to run the site.
+
+#### Scenario: Cold start
+- **WHEN** the AppHost is started in a clean checkout with Docker running
+- **THEN** SQL Server starts, the database is created, and the Umbraco site starts and becomes reachable without manual configuration
+
+### Requirement: Per-instance data isolation
+Each AppHost instance SHALL use its own SQL Server container and database, with no persistent volume shared between instances or runs.
+
+#### Scenario: Two worktrees at once
+- **WHEN** AppHosts are running from two different worktrees
+- **THEN** each has a distinct SQL Server container and content created in one is not visible in the other
+
+#### Scenario: Restart is clean
+- **WHEN** an AppHost is stopped and started again
+- **THEN** the database is recreated empty and re-seeded
+
+### Requirement: Per-instance port isolation
+The AppHost dashboard, OTLP endpoint, resource service endpoint, website endpoint and SQL endpoint SHALL NOT be fixed to values shared across worktrees. Ports for the dashboard, OTLP, resource service and website SHALL be overridable by configuration; the SQL port SHALL be dynamically assigned.
+
+#### Scenario: Concurrent AppHosts
+- **WHEN** three AppHosts are started concurrently with distinct port configuration
+- **THEN** all three start successfully and each dashboard lists only its own resources
+
+### Requirement: Frictionless local access
+The dashboard and website SHALL be reachable over plain HTTP on localhost without login tokens or certificate trust prompts when started by the launcher.
+
+#### Scenario: Open dashboard
+- **WHEN** the launcher starts an AppHost
+- **THEN** its dashboard URL opens directly without a login prompt

@@ -1,0 +1,24 @@
+@{
+    var home = Model.AncestorOrSelf(1)!;
+    var branch = Environment.GetEnvironmentVariable("BLOG_BRANCH") ?? "unknown";
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@Model.Value("title", fallback: Model.Name) · @home.Value("siteTitle")</title>
+    <link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="/">@home.Value("siteTitle")</a>
+        <p class="tagline">@home.Value("tagline")</p>
+    </header>
+    <main class="site-main">
+        @RenderBody()
+    </main>
+    <footer class="site-footer">Layout: baseline</footer>
+    <div class="branch-badge">@branch</div>
+</body>
+</html>

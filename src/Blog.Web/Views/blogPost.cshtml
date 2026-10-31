@@ -1,0 +1,7 @@
+﻿<article class="post">
+    <img class="post-hero" src="@Model.Value("image")" alt="">
+    <h1>@Model.Value("title")</h1>
+    <p class="meta">@Model.Value<DateTime>("published").ToString("d MMM yyyy") · @Model.Value("author")</p>
+    <div class="post-body">@Html.Raw(Model.Value<string>("body"))</div>
+    <p><a href="/">&larr; All posts</a></p>
+</article>

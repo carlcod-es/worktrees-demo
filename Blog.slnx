@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Blog.AppHost/Blog.AppHost.csproj" />
+    <Project Path="src/Blog.Web/Blog.Web.csproj" />
+  </Folder>
+</Solution>
