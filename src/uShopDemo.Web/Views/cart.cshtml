@@ -1,0 +1,50 @@
+﻿@{
+    var cart = await Cart.GetCurrentAsync();
+    var home = Model.AncestorOrSelf(1)!;
+    var checkout = home.Children()!.FirstOrDefault(c => c.ContentType.Alias == "checkout");
+}
+<h1>@Model.Value("title")</h1>
+@if (cart.IsEmpty)
+{
+    <p class="empty">Your cart is empty. <a href="@home.Url()">Continue shopping</a></p>
+}
+else
+{
+    <table class="cart-table">
+        <thead>
+            <tr><th>Product</th><th class="num">Price</th><th>Quantity</th><th class="num">Total</th><th></th></tr>
+        </thead>
+        <tbody>
+            @foreach (var line in cart.Lines)
+            {
+                <tr>
+                    <td>@line.ProductName <span class="sku">@line.Sku</span></td>
+                    <td class="num">@Money.Format(line.UnitPrice)</td>
+                    <td>
+                        @using (Html.BeginUmbracoForm<CartSurfaceController>("Update", null, new { @class = "inline-form" }))
+                        {
+                            <input type="hidden" name="lineId" value="@line.Id">
+                            <input name="quantity" type="number" min="0" max="99" value="@line.Quantity" aria-label="Quantity for @line.ProductName">
+                            <button type="submit" class="button-link">Update</button>
+                        }
+                    </td>
+                    <td class="num">@Money.Format(line.LineTotal)</td>
+                    <td>
+                        @using (Html.BeginUmbracoForm<CartSurfaceController>("Remove", null, new { @class = "inline-form" }))
+                        {
+                            <input type="hidden" name="lineId" value="@line.Id">
+                            <button type="submit" class="button-link">Remove</button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr><th colspan="3">Total</th><th class="num">@Money.Format(cart.Total)</th><th></th></tr>
+        </tfoot>
+    </table>
+    @if (checkout is not null)
+    {
+        <p class="actions"><a class="button" href="@checkout.Url()">Checkout</a></p>
+    }
+}

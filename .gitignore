@@ -4,9 +4,9 @@ obj/
 *.user
 node_modules/
 # Umbraco runtime data
-src/Blog.Web/umbraco/Data/
-src/Blog.Web/umbraco/Logs/
-src/Blog.Web/wwwroot/media/
-src/Blog.Web/App_Data/
-src/Blog.Web/umbraco/models/
-src/Blog.Web/Views/Partials/blockgrid/
+src/uShopDemo.Web/umbraco/Data/
+src/uShopDemo.Web/umbraco/Logs/
+src/uShopDemo.Web/wwwroot/media/
+src/uShopDemo.Web/App_Data/
+src/uShopDemo.Web/umbraco/models/
+src/uShopDemo.Web/Views/Partials/blockgrid/

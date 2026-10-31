@@ -1,0 +1,42 @@
+@{
+    var home = Model.AncestorOrSelf(1)!;
+    var categories = home.Children()!.Where(c => c.ContentType.Alias == "category").ToList();
+    var cartPage = home.Children()!.FirstOrDefault(c => c.ContentType.Alias == "cart");
+    var section = Model.AncestorOrSelf(2);
+    var cart = await Cart.GetCurrentAsync();
+    var branch = Environment.GetEnvironmentVariable("USHOP_BRANCH") ?? "unknown";
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@(Model.Value<string>("title") ?? Model.Name) · @home.Value("siteTitle")</title>
+    <link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+    <div class="demo-notice" role="note">Demo shop: no real orders or payments are processed.</div>
+    <header class="site-header">
+        <div class="wrap header-row">
+            <a class="brand" href="@home.Url()">@home.Value("siteTitle")</a>
+            <nav class="site-nav" aria-label="Categories">
+                @foreach (var c in categories)
+                {
+                    <a href="@c.Url()" class="@(section?.Id == c.Id ? "active" : null)">@c.Name</a>
+                }
+            </nav>
+            @if (cartPage is not null)
+            {
+                <a class="cart-link" href="@cartPage.Url()">Cart <span class="cart-count">@cart.ItemCount</span></a>
+            }
+        </div>
+    </header>
+    <main class="wrap site-main">
+        @RenderBody()
+    </main>
+    <footer class="site-footer">
+        <div class="wrap">@home.Value("siteTitle") · @home.Value("tagline") · Layout: baseline</div>
+    </footer>
+    <div class="branch-badge" title="git branch">@branch</div>
+</body>
+</html>

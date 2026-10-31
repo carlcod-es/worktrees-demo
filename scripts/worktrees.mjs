@@ -7,7 +7,7 @@ import { git } from './lib/git.mjs';
 import { slotFor, blockPorts } from './lib/ports.mjs';
 
 const root = realpathSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'));
-const DEFAULTS = ['layout/minimal', 'layout/magazine', 'layout/sidebar'];
+const DEFAULTS = ['layout/minimal', 'layout/catalog', 'layout/showcase'];
 const [cmd, ...rest] = process.argv.slice(2);
 const branches = rest.length ? rest : DEFAULTS;
 

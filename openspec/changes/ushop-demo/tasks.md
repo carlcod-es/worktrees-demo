@@ -2,26 +2,26 @@ Note: an earlier apply pass produced uncommitted `Blog.*` code (see design.md Co
 
 ## 1. Repository foundation
 
-- [ ] 1.1 Rename `Blog.*` to `uShopDemo.*` (directories, csproj, `uShopDemo.slnx`, namespaces, `Projects.uShopDemo_Web`), `BLOG_*` env vars to `USHOP_*` in AppHost, views and scripts; verify `dotnet build uShopDemo.slnx` succeeds and `grep -ri blog src scripts` finds nothing
-- [ ] 1.2 (carry over) `.gitignore`, `global.json`, `package.json`, no AppHost `launchSettings.json`; add `.config/dotnet-tools.json` with `dotnet-ef`; verify `dotnet tool restore` succeeds and `git status` shows only intended files
+- [x] 1.1 Rename `Blog.*` to `uShopDemo.*` (directories, csproj, `uShopDemo.slnx`, namespaces, `Projects.uShopDemo_Web`), `BLOG_*` env vars to `USHOP_*` in AppHost, views and scripts; verify `dotnet build uShopDemo.slnx` succeeds and `grep -ri blog src scripts` finds nothing
+- [x] 1.2 (carry over) `.gitignore`, `global.json`, `package.json`, no AppHost `launchSettings.json`; add `.config/dotnet-tools.json` with `dotnet-ef`; verify `dotnet tool restore` succeeds and `git status` shows only intended files
 
 ## 2. AppHost
 
-- [ ] 2.1 (carry over) AppHost: SQL Server (no volume), `umbracoDbDSN` database, `web` project with reference/WaitFor, provider name env, `USHOP_WEB_PORT`, `USHOP_BRANCH`; verify the site responds on the configured port and `docker ps` shows one `sql-*` container for the instance
-- [ ] 2.2 Verify two AppHosts started from different directories run concurrently with separate SQL containers and separate databases
+- [x] 2.1 (carry over) AppHost: SQL Server (no volume), `umbracoDbDSN` database, `web` project with reference/WaitFor, provider name env, `USHOP_WEB_PORT`, `USHOP_BRANCH`; verify the site responds on the configured port and `docker ps` shows one `sql-*` container for the instance
+- [x] 2.2 Verify two AppHosts started from different directories run concurrently with separate SQL containers and separate databases
 
 ## 3. Umbraco shop
 
-- [ ] 3.1 (carry over) `Program.cs` and `appsettings.json` (unattended install, `ModelsMode: Nothing`, URL detection), views compiled at build; verify backoffice login with demo credentials after first boot
-- [ ] 3.2 Replace blog seeder with catalogue seeder: document types `shop`, `category`, `product`, `cart`, `checkout`, `orderConfirmation`; templates from on-disk views; `TemplateId` on every node; 4 categories, 12 products with SKU/price/summary/description/image; product images in `wwwroot/img`; verify home lists categories, every product page returns 200, restart against same DB creates no duplicates
-- [ ] 3.3 Add `Umbraco.Cms.Persistence.EFCore`, `ShopDbContext` (`Cart`, `CartLine`, `ushop` table prefix), design-time factory, initial migration via `dotnet ef migrations add Initial`, startup handler that migrates before seeding; verify `__EFMigrationsHistory` and `ushop*` tables exist in a fresh DB
-- [ ] 3.4 `CartService` (cookie id, get/create cart, add/update/remove, totals, place order with generated order number) and `CartSurfaceController` (add, update, remove, checkout with validation); verify add/remove/checkout via the browser and that an ordered cart row has status Ordered and customer fields set
+- [x] 3.1 (carry over) `Program.cs` and `appsettings.json` (unattended install, `ModelsMode: Nothing`, URL detection), views compiled at build; verify backoffice login with demo credentials after first boot
+- [x] 3.2 Replace blog seeder with catalogue seeder: document types `shop`, `category`, `product`, `cart`, `checkout`, `orderConfirmation`; templates from on-disk views; `TemplateId` on every node; 4 categories, 12 products with SKU/price/summary/description/image; product images in `wwwroot/img`; verify home lists categories, every product page returns 200, restart against same DB creates no duplicates
+- [x] 3.3 Add `Umbraco.Cms.Persistence.EFCore`, `ShopDbContext` (`Cart`, `CartLine`, `ushop` table prefix), design-time factory, initial migration via `dotnet ef migrations add Initial`, startup handler that migrates before seeding; verify `__EFMigrationsHistory` and `ushop*` tables exist in a fresh DB
+- [x] 3.4 `CartService` (cookie id, get/create cart, add/update/remove, totals, place order with generated order number) and `CartSurfaceController` (add, update, remove, checkout with validation); verify add/remove/checkout via the browser and that an ordered cart row has status Ordered and customer fields set
 - [ ] 3.5 Baseline views on `main`: `_Layout` (nav of categories, cart count, demo notice, branch badge), `shop`, `category`, `product`, `cart`, `checkout`, `orderConfirmation`, `site.css`; verify full flow (browse → add → cart → checkout → confirmation) at 1280x720 and that no shop logic lives in views beyond rendering
 
 ## 4. Launcher and worktree scripts
 
-- [ ] 4.1 (carry over) `scripts/lib/ports.mjs` and `scripts/ports.test.mjs`; verify `npm test` passes
-- [ ] 4.2 (carry over) `scripts/dev.mjs` with `USHOP_*` vars; verify two worktrees started from separate terminals get distinct, repeatable URLs
+- [x] 4.1 (carry over) `scripts/lib/ports.mjs` and `scripts/ports.test.mjs`; verify `npm test` passes
+- [x] 4.2 (carry over) `scripts/dev.mjs` with `USHOP_*` vars; verify two worktrees started from separate terminals get distinct, repeatable URLs
 - [ ] 4.3 `scripts/worktrees.mjs` `up`, `list`, `down`; verify the cycle once `main` has a commit (requires the user to commit the baseline)
 
 ## 5. Layout branches

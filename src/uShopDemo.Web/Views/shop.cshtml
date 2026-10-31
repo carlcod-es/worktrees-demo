@@ -1,0 +1,28 @@
+﻿@{
+    var categories = Model.Children()!.Where(c => c.ContentType.Alias == "category").ToList();
+    var featured = categories.Select(c => c.Children()!.FirstOrDefault()).OfType<IPublishedContent>().ToList();
+}
+<section class="hero">
+    <h1>@Model.Value("siteTitle")</h1>
+    <p>@Model.Value("tagline")</p>
+</section>
+
+<h2>Shop by category</h2>
+<section class="category-grid">
+    @foreach (var c in categories)
+    {
+        <a class="category-card" href="@c.Url()">
+            <img src="@c.Value("image")" alt="">
+            <span class="category-name">@c.Name</span>
+            <span class="category-intro">@c.Value("intro")</span>
+        </a>
+    }
+</section>
+
+<h2>Featured</h2>
+<section class="product-grid">
+    @foreach (var p in featured)
+    {
+        @await Html.PartialAsync("productCard", p)
+    }
+</section>

@@ -1,0 +1,46 @@
+﻿@{
+    var cart = await Cart.GetCurrentAsync();
+    var home = Model.AncestorOrSelf(1)!;
+    string? Attempted(string key) => ViewData.ModelState[key]?.AttemptedValue;
+}
+<h1>@Model.Value("title")</h1>
+@if (cart.IsEmpty)
+{
+    <p class="empty">Your cart is empty. <a href="@home.Url()">Continue shopping</a></p>
+}
+else
+{
+    <div class="checkout">
+        @using (Html.BeginUmbracoForm<CartSurfaceController>("Checkout", null, new { @class = "checkout-form", novalidate = "novalidate" }))
+        {
+            @Html.ValidationSummary(true, "", new { @class = "form-errors" })
+            <label for="Name">Name</label>
+            <input id="Name" name="Name" value="@Attempted("Name")" autocomplete="name">
+            @Html.ValidationMessage("Name", new { @class = "field-error" })
+
+            <label for="Email">Email</label>
+            <input id="Email" name="Email" type="email" value="@Attempted("Email")" autocomplete="email">
+            @Html.ValidationMessage("Email", new { @class = "field-error" })
+
+            <label for="Address">Address</label>
+            <textarea id="Address" name="Address" rows="3" autocomplete="street-address">@Attempted("Address")</textarea>
+            @Html.ValidationMessage("Address", new { @class = "field-error" })
+
+            <label for="CardNumber">Card number <small>(demo: type anything, nothing is charged or stored)</small></label>
+            <input id="CardNumber" name="CardNumber" autocomplete="off">
+            @Html.ValidationMessage("CardNumber", new { @class = "field-error" })
+
+            <button type="submit" class="button">Place order · @Money.Format(cart.Total)</button>
+        }
+        <aside class="order-summary">
+            <h2>Order summary</h2>
+            <ul>
+                @foreach (var line in cart.Lines)
+                {
+                    <li><span>@line.Quantity × @line.ProductName</span><span>@Money.Format(line.LineTotal)</span></li>
+                }
+            </ul>
+            <p class="total"><span>Total</span><span>@Money.Format(cart.Total)</span></p>
+        </aside>
+    </div>
+}

@@ -1,0 +1,21 @@
+﻿@{
+    var category = Model.Parent()!;
+}
+<p class="breadcrumb"><a href="@category.Url()">&larr; @category.Name</a></p>
+<article class="product-detail">
+    <img class="product-image" src="@Model.Value("image")" alt="">
+    <div class="product-info">
+        <h1>@Model.Value("title")</h1>
+        <p class="sku">SKU @Model.Value("sku")</p>
+        <p class="price price-large">@Money.Format(Model.Value<decimal>("price"))</p>
+        <p class="summary">@Model.Value("summary")</p>
+        @using (Html.BeginUmbracoForm<CartSurfaceController>("Add", null, new { @class = "add-form" }))
+        {
+            <input type="hidden" name="productKey" value="@Model.Key">
+            <label for="quantity">Quantity</label>
+            <input id="quantity" name="quantity" type="number" min="1" max="99" value="1">
+            <button type="submit" class="button">Add to cart</button>
+        }
+        <div class="description">@Html.Raw(Model.Value<string>("description"))</div>
+    </div>
+</article>

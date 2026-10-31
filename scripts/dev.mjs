@@ -27,11 +27,11 @@ const env = {
   ASPIRE_RESOURCE_SERVICE_ENDPOINT_URL: url(ports.resourceService),
   ASPIRE_ALLOW_UNSECURED_TRANSPORT: 'true',
   ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: 'true',
-  BLOG_WEB_PORT: String(ports.web),
-  BLOG_BRANCH: branch,
+  USHOP_WEB_PORT: String(ports.web),
+  USHOP_BRANCH: branch,
 };
 
-const child = spawn('dotnet', ['run', '--project', path.join(root, 'src', 'Blog.AppHost'), '--no-launch-profile'], {
+const child = spawn('dotnet', ['run', '--project', path.join(root, 'src', 'uShopDemo.AppHost'), '--no-launch-profile'], {
   cwd: root,
   env,
   stdio: 'inherit',

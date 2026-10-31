@@ -1,0 +1,24 @@
+﻿@{
+    var number = TempData["orderNumber"] as string ?? Context.Request.Query["order"].ToString();
+    var order = string.IsNullOrEmpty(number) ? null : await Cart.GetOrderAsync(number);
+    var home = Model.AncestorOrSelf(1)!;
+}
+@if (order is null)
+{
+    <h1>Order not found</h1>
+    <p><a href="@home.Url()">Back to the shop</a></p>
+}
+else
+{
+    <h1>@Model.Value("title")</h1>
+    <p class="confirmation">Order <strong class="order-number">@order.OrderNumber</strong> is placed. This is a demo: nothing is charged or shipped.</p>
+    <ul class="order-lines">
+        @foreach (var line in order.Lines)
+        {
+            <li><span>@line.Quantity × @line.ProductName</span><span>@Money.Format(line.LineTotal)</span></li>
+        }
+    </ul>
+    <p class="total"><span>Total</span><span>@Money.Format(order.Total)</span></p>
+    <p>Ship to @order.CustomerName, @order.Address</p>
+    <p><a class="button" href="@home.Url()">Continue shopping</a></p>
+}
