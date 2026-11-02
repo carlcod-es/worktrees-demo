@@ -18,6 +18,7 @@ console.log(`worktree  ${root}`);
 console.log(`branch    ${branch}`);
 console.log(`site      ${site}${shifted ? '  (default ports busy, shifted)' : ''}`);
 console.log(`backoffice ${site}/umbraco  admin@demo.local / Demo-Password-1234!`);
+console.log(`api       ${url(ports.api)}`);
 console.log(`dashboard ${url(ports.dashboard)}\n`);
 
 const env = {
@@ -30,6 +31,7 @@ const env = {
   // Anonymous dashboard access (no login token); transport is still TLS.
   ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: 'true',
   USHOP_WEB_PORT: String(ports.web),
+  USHOP_API_PORT: String(ports.api),
   USHOP_BRANCH: branch,
 };
 

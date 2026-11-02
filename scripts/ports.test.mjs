@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import net from 'node:net';
-import { slotFor, blockPorts, pickPorts, isFree } from './lib/ports.mjs';
+import { BASE, BLOCK, slotFor, blockPorts, pickPorts, isFree } from './lib/ports.mjs';
 
 test('slot is stable and case-insensitive', () => {
   assert.equal(slotFor('/a/b'), slotFor('/a/b'));
@@ -29,4 +29,19 @@ test('isFree detects a listening port', async () => {
   const port = srv.address().port;
   assert.equal(await isFree(port), false);
   srv.close();
+});
+
+test('api port is inside the block and distinct', () => {
+  const slot = slotFor('/some/worktree');
+  const ports = blockPorts(slot);
+  const start = BASE + slot * BLOCK;
+  assert.ok(ports.api >= start && ports.api < start + BLOCK);
+  assert.equal(new Set(Object.values(ports)).size, Object.keys(ports).length);
+});
+
+test('block probe covers the api port', async () => {
+  const slot = slotFor('/some/worktree');
+  const taken = blockPorts(slot).api;
+  const r = await pickPorts('/some/worktree', async (p) => p !== taken);
+  assert.equal(r.shifted, true);
 });

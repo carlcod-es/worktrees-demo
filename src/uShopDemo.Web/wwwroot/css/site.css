@@ -90,3 +90,10 @@ input[type=number] { width: 4.5rem; }
 @media (max-width: 48rem) {
   .product-detail, .checkout { grid-template-columns: 1fr; }
 }
+
+/* Cart script */
+[hidden] { display: none !important; }
+.cart-status { margin: 0 0 1rem; padding: .5rem .8rem; border-radius: .35rem; background: var(--notice); color: var(--notice-fg); }
+.cart-status:empty { display: none; }
+[aria-invalid="true"] { border-color: var(--error); }
+button[aria-busy="true"], button:disabled { opacity: .6; cursor: progress; }

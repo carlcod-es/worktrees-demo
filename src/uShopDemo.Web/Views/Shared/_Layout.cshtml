@@ -4,7 +4,6 @@
     var categories = home.Children()!.Where(c => c.ContentType.Alias == "category").ToList();
     var cartPage = home.Children()!.FirstOrDefault(c => c.ContentType.Alias == "cart");
     var section = Model.AncestorOrSelf(2);
-    var cart = await Cart.GetCurrentAsync();
     var branch = Config["USHOP_BRANCH"] ?? "unknown";
 }
 <!doctype html>
@@ -13,7 +12,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@(Model.Value<string>("title") ?? Model.Name) · @home.Value("siteTitle")</title>
+    <meta name="ushop-api" content="@Config["USHOP_API_URL"]">
     <link rel="stylesheet" href="/css/site.css" asp-append-version="true">
+    <script type="module" src="/js/cart.js" asp-append-version="true"></script>
 </head>
 <body>
     <div class="demo-notice" role="note">Demo shop: no real orders or payments are processed.</div>
@@ -28,11 +29,12 @@
             </nav>
             @if (cartPage is not null)
             {
-                <a class="cart-link" href="@cartPage.Url()" aria-label="Cart, @cart.ItemCount @(cart.ItemCount == 1 ? "item" : "items")">Cart <span class="cart-count">@cart.ItemCount</span></a>
+                <a class="cart-link" href="@cartPage.Url()" aria-label="Cart, 0 items">Cart <span class="cart-count" data-cart-count>0</span></a>
             }
         </div>
     </header>
     <main class="wrap site-main">
+        <p data-cart-status role="status" aria-live="polite" class="cart-status"></p>
         @RenderBody()
     </main>
     <footer class="site-footer">

@@ -1,4 +1,5 @@
-﻿@{
+﻿@using System.Globalization
+@{
     var category = Model.Parent()!;
 }
 <p class="breadcrumb"><a href="@category.Url()">&larr; @category.Name</a></p>
@@ -9,13 +10,11 @@
         <p class="sku">SKU @Model.Value("sku")</p>
         <p class="price price-large">@Money.Format(Model.Value<decimal>("price"))</p>
         <p class="summary">@Model.Value("summary")</p>
-        @using (Html.BeginUmbracoForm<CartSurfaceController>("Add", null, new { @class = "add-form" }))
-        {
-            <input type="hidden" name="productKey" value="@Model.Key">
+        <form class="add-form" data-cart-add data-product-key="@Model.Key" data-product-name="@Model.Value("title")" data-product-sku="@Model.Value("sku")" data-product-price="@(Model.Value<decimal>("price").ToString(CultureInfo.InvariantCulture))">
             <label for="quantity">Quantity</label>
-            <input id="quantity" name="quantity" type="number" min="1" max="99" value="1">
+            <input id="quantity" name="quantity" type="number" min="1" max="99" step="1" value="1" required>
             <button type="submit" class="button">Add to cart</button>
-        }
+        </form>
         @* Trusted editor HTML authored in the Umbraco backoffice; intentionally not encoded. *@
         <div class="description">@Html.Raw(Model.Value<string>("description"))</div>
     </div>

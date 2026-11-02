@@ -1,47 +1,40 @@
 ﻿@{
-    var cart = await Cart.GetCurrentAsync();
     var home = Model.AncestorOrSelf(1)!;
-    bool Invalid(string key) => ViewData.ModelState[key]?.Errors.Count > 0;
-    string? Attempted(string key) => ViewData.ModelState[key]?.AttemptedValue;
+    var confirmation = home.Children()!.FirstOrDefault(c => c.ContentType.Alias == "orderConfirmation");
 }
 <h1>@Model.Value("title")</h1>
-@if (cart.IsEmpty)
-{
-    <p class="empty">Your cart is empty. <a href="@home.Url()">Continue shopping</a></p>
-}
-else
-{
-    <div class="checkout">
-        @using (Html.BeginUmbracoForm<CartSurfaceController>("Checkout", null, new { @class = "checkout-form", novalidate = "novalidate" }))
-        {
-            @Html.ValidationSummary(true, "", new { @class = "form-errors" })
-            <label for="Name">Name</label>
-            <input id="Name" name="Name" aria-describedby="Name-error"@(Invalid("Name") ? " aria-invalid=\"true\"" : null) value="@Attempted("Name")" autocomplete="name">
-            @Html.ValidationMessage("Name", new { @class = "field-error", id = "Name-error" })
+<div data-cart>
+    <div data-cart-empty-target></div>
+    <div class="checkout" data-cart-requires-items hidden>
+        <form class="checkout-form" data-checkout data-confirmation-url="@confirmation?.Url()" novalidate>
+            <label for="name">Name</label>
+            <input id="name" name="name" aria-describedby="name-error" autocomplete="name">
+            <span class="field-error" id="name-error" data-error-for="name"></span>
 
-            <label for="Email">Email</label>
-            <input id="Email" name="Email" aria-describedby="Email-error"@(Invalid("Email") ? " aria-invalid=\"true\"" : null) type="email" value="@Attempted("Email")" autocomplete="email">
-            @Html.ValidationMessage("Email", new { @class = "field-error", id = "Email-error" })
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" aria-describedby="email-error" autocomplete="email">
+            <span class="field-error" id="email-error" data-error-for="email"></span>
 
-            <label for="Address">Address</label>
-            <textarea id="Address" name="Address" aria-describedby="Address-error"@(Invalid("Address") ? " aria-invalid=\"true\"" : null) rows="3" autocomplete="street-address">@Attempted("Address")</textarea>
-            @Html.ValidationMessage("Address", new { @class = "field-error", id = "Address-error" })
+            <label for="address">Address</label>
+            <textarea id="address" name="address" rows="3" aria-describedby="address-error" autocomplete="street-address"></textarea>
+            <span class="field-error" id="address-error" data-error-for="address"></span>
 
-            <label for="CardNumber">Card number <small>(demo: type anything, nothing is charged or stored)</small></label>
-            <input id="CardNumber" name="CardNumber" aria-describedby="CardNumber-error"@(Invalid("CardNumber") ? " aria-invalid=\"true\"" : null) autocomplete="off">
-            @Html.ValidationMessage("CardNumber", new { @class = "field-error", id = "CardNumber-error" })
+            <label for="cardNumber">Card number <small>(demo: type anything, nothing is charged or stored)</small></label>
+            <input id="cardNumber" name="cardNumber" aria-describedby="cardNumber-error" autocomplete="off">
+            <span class="field-error" id="cardNumber-error" data-error-for="cardNumber"></span>
 
-            <button type="submit" class="button">Place order · @Money.Format(cart.Total)</button>
-        }
+            <button type="submit" class="button">Place order · <span data-cart-total></span></button>
+        </form>
         <aside class="order-summary">
             <h2>Order summary</h2>
-            <ul>
-                @foreach (var line in cart.Lines)
-                {
-                    <li><span>@line.Quantity × @line.ProductName</span><span>@Money.Format(line.LineTotal)</span></li>
-                }
-            </ul>
-            <p class="total"><span>Total</span><span>@Money.Format(cart.Total)</span></p>
+            <ul data-cart-lines></ul>
+            <p class="total"><span>Total</span><span data-cart-total></span></p>
         </aside>
     </div>
-}
+    <template data-cart-line>
+        <li><span><span data-field="quantity"></span> × <span data-field="name"></span></span><span data-field="lineTotal"></span></li>
+    </template>
+    <template data-cart-empty>
+        <p class="empty">Your cart is empty. <a href="@home.Url()">Continue shopping</a></p>
+    </template>
+</div>

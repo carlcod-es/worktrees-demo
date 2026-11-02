@@ -35,6 +35,8 @@ Note: an earlier apply pass produced uncommitted `Blog.*` code (see design.md Co
 
 ## 5. Layout branches
 
+Note (from `add-cart-api`): cart, checkout, confirmation and the header count are rendered by `wwwroot/js/cart.js` from the cart API. Layout branches 5.1-5.3 must keep the data-attribute hooks and `<template>` elements documented in `docs/cart-hooks.md`; change markup and CSS around them, not the script. Create these branches after `add-cart-api` is merged.
+
 - [ ] 5.1 Create `layout/minimal` (clean single column, text-first) in a worktree; verify full flow works and `git diff --name-only main` lists only views/CSS/static assets
 - [ ] 5.2 Create `layout/catalog` (dense grid, category sidebar); same verification
 - [ ] 5.3 Create `layout/showcase` (large imagery, editorial hero); same verification

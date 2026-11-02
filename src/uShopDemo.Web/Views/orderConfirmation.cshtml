@@ -1,24 +1,29 @@
 ﻿@{
-    var number = TempData["orderNumber"] as string ?? Context.Request.Query["order"].ToString();
-    var order = string.IsNullOrEmpty(number) ? null : await Cart.GetOrderAsync(number);
     var home = Model.AncestorOrSelf(1)!;
 }
-@if (order is null)
-{
-    <h1>Order not found</h1>
-    <p><a href="@home.Url()">Back to the shop</a></p>
-}
-else
-{
-    <h1>@Model.Value("title")</h1>
-    <p class="confirmation">Order <strong class="order-number">@order.OrderNumber</strong> is placed. This is a demo: nothing is charged or shipped.</p>
-    <ul class="order-lines">
-        @foreach (var line in order.Lines)
-        {
-            <li><span>@line.Quantity × @line.ProductName</span><span>@Money.Format(line.LineTotal)</span></li>
-        }
-    </ul>
-    <p class="total"><span>Total</span><span>@Money.Format(order.Total)</span></p>
-    <p>Ship to @order.CustomerName, @order.Address</p>
-    <p><a class="button" href="@home.Url()">Continue shopping</a></p>
-}
+<h1>@Model.Value("title")</h1>
+<div data-order>
+    <div data-order-view aria-live="polite"></div>
+    <template data-order-pending>
+        <p class="confirmation">Order <strong class="order-number" data-field="orderNumber"></strong> is being processed. This page updates automatically.</p>
+    </template>
+    <template data-order-confirmed>
+        <p class="confirmation">Order <strong class="order-number" data-field="orderNumber"></strong> is placed. This is a demo: nothing is charged or shipped.</p>
+        <ul class="order-lines" data-order-lines></ul>
+        <template data-order-line>
+            <li><span><span data-field="quantity"></span> × <span data-field="name"></span></span><span data-field="lineTotal"></span></li>
+        </template>
+        <p class="total"><span>Total</span><span data-field="total"></span></p>
+        <p>Ship to <span data-field="name"></span>, <span data-field="address"></span></p>
+        <p>Ordered <span data-field="orderedUtc"></span></p>
+        <p><a class="button" href="@home.Url()">Continue shopping</a></p>
+    </template>
+    <template data-order-rejected>
+        <p class="confirmation">Order <strong class="order-number" data-field="orderNumber"></strong> could not be placed: <span data-field="reason"></span></p>
+        <p><a class="button" href="@home.Url()">Back to the shop</a></p>
+    </template>
+    <template data-order-notfound>
+        <p>Order not found.</p>
+        <p><a href="@home.Url()">Back to the shop</a></p>
+    </template>
+</div>

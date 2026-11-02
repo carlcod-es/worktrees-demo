@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace uShopDemo.Web.Migrations
+namespace uShopDemo.Api.Migrations
 {
     /// <inheritdoc />
     public partial class Initial : Migration
@@ -16,6 +16,7 @@ namespace uShopDemo.Web.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SessionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     OrderNumber = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
@@ -28,6 +29,20 @@ namespace uShopDemo.Web.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ushopCart", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ushopDataProtectionKeys",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FriendlyName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Xml = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ushopDataProtectionKeys", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -62,9 +77,15 @@ namespace uShopDemo.Web.Migrations
                 filter: "[OrderNumber] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ushopCartLine_CartId",
+                name: "IX_ushopCart_SessionId",
+                table: "ushopCart",
+                column: "SessionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ushopCartLine_CartId_ProductKey",
                 table: "ushopCartLine",
-                column: "CartId");
+                columns: new[] { "CartId", "ProductKey" },
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -72,6 +93,9 @@ namespace uShopDemo.Web.Migrations
         {
             migrationBuilder.DropTable(
                 name: "ushopCartLine");
+
+            migrationBuilder.DropTable(
+                name: "ushopDataProtectionKeys");
 
             migrationBuilder.DropTable(
                 name: "ushopCart");

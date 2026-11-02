@@ -62,7 +62,7 @@ function list() {
     let note = '';
     try { real = realpathSync(w.path); } catch { note = '  (missing)'; }
     const p = blockPorts(slotFor(real));
-    console.log(`${(w.branch ?? '(detached)').padEnd(20)} site https://localhost:${p.web}  dashboard https://localhost:${p.dashboard}  ${w.path}${note}`);
+    console.log(`${(w.branch ?? '(detached)').padEnd(20)} site https://localhost:${p.web}  api https://localhost:${p.api}  dashboard https://localhost:${p.dashboard}  ${w.path}${note}`);
   }
   return false;
 }

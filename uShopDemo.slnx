@@ -1,6 +1,10 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/uShopDemo.Api/uShopDemo.Api.csproj" />
     <Project Path="src/uShopDemo.AppHost/uShopDemo.AppHost.csproj" />
     <Project Path="src/uShopDemo.Web/uShopDemo.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/uShopDemo.Api.Tests/uShopDemo.Api.Tests.csproj" />
   </Folder>
 </Solution>

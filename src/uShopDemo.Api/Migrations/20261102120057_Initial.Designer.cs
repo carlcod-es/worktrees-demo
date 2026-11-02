@@ -5,14 +5,14 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using uShopDemo.Web.Shop.Data;
+using uShopDemo.Api.Data;
 
 #nullable disable
 
-namespace uShopDemo.Web.Migrations
+namespace uShopDemo.Api.Migrations
 {
-    [DbContext(typeof(ShopDbContext))]
-    [Migration("20261031150842_Initial")]
+    [DbContext(typeof(CartDbContext))]
+    [Migration("20261102120057_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -25,7 +25,26 @@ namespace uShopDemo.Web.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("uShopDemo.Web.Shop.Data.Cart", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FriendlyName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Xml")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ushopDataProtectionKeys", (string)null);
+                });
+
+            modelBuilder.Entity("uShopDemo.Api.Data.Cart", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -53,6 +72,9 @@ namespace uShopDemo.Web.Migrations
                     b.Property<DateTime?>("OrderedUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("SessionId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -66,10 +88,12 @@ namespace uShopDemo.Web.Migrations
                         .IsUnique()
                         .HasFilter("[OrderNumber] IS NOT NULL");
 
+                    b.HasIndex("SessionId");
+
                     b.ToTable("ushopCart", (string)null);
                 });
 
-            modelBuilder.Entity("uShopDemo.Web.Shop.Data.CartLine", b =>
+            modelBuilder.Entity("uShopDemo.Api.Data.CartLine", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -102,21 +126,22 @@ namespace uShopDemo.Web.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CartId");
+                    b.HasIndex("CartId", "ProductKey")
+                        .IsUnique();
 
                     b.ToTable("ushopCartLine", (string)null);
                 });
 
-            modelBuilder.Entity("uShopDemo.Web.Shop.Data.CartLine", b =>
+            modelBuilder.Entity("uShopDemo.Api.Data.CartLine", b =>
                 {
-                    b.HasOne("uShopDemo.Web.Shop.Data.Cart", null)
+                    b.HasOne("uShopDemo.Api.Data.Cart", null)
                         .WithMany("Lines")
                         .HasForeignKey("CartId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("uShopDemo.Web.Shop.Data.Cart", b =>
+            modelBuilder.Entity("uShopDemo.Api.Data.Cart", b =>
                 {
                     b.Navigation("Lines");
                 });

@@ -6,7 +6,7 @@ export const SLOTS = 100;
 export const BLOCK = 10;
 
 /** Offsets inside a block. */
-export const OFFSETS = { web: 0, dashboard: 1, otlp: 2, resourceService: 3 };
+export const OFFSETS = { web: 0, dashboard: 1, otlp: 2, resourceService: 3, api: 4 };
 
 /** Stable slot (0..SLOTS-1) derived from a path. Case-insensitive so Windows/macOS agree. */
 export function slotFor(path) {

@@ -4,6 +4,8 @@ Run several branches of one app side by side, each from its own git worktree wit
 
 The app is a small Umbraco 18 shop (catalogue, cart, dummy checkout) orchestrated by .NET Aspire, with a throwaway SQL Server container per instance. Layout branches differ only in views and CSS, so you can compare them in three browser tabs.
 
+Each instance runs two services: the Umbraco site and the cart API (`src/uShopDemo.Api`, ASP.NET Core minimal API). Both use one SQL Server database, `umbracoDbDSN`; site tables are Umbraco's, API tables are `ushop*`. The browser calls the API directly.
+
 Demo only: no payments, nothing is charged or shipped.
 
 ## Prerequisites
@@ -13,7 +15,7 @@ Demo only: no payments, nothing is charged or shipped.
 - Docker, with at least 8 GB memory if running three instances (each SQL Server uses ~2 GB)
 - Node.js 20+
 - git 2.5+
-- A trusted ASP.NET dev certificate: `dotnet dev-certs https --trust` (the site is HTTPS-only; the backoffice login needs it)
+- A trusted ASP.NET dev certificate: `dotnet dev-certs https --trust` (the site and API are HTTPS-only; the backoffice login needs it). The certificate covers the API port too, so nothing extra needs trusting
 
 Works on Windows, macOS and Linux.
 
@@ -25,7 +27,7 @@ Pull the SQL Server image once (~1.5 GB):
 docker pull mcr.microsoft.com/mssql/server:2022-latest
 ```
 
-The first start takes 1-2 minutes: it builds, starts SQL Server, installs Umbraco, applies migrations and imports the content model and catalogue from uSync. Stop with Ctrl+C; the SQL container is removed.
+The first start takes 1-2 minutes: it builds, starts SQL Server, applies the API's migrations, installs Umbraco, applies its migrations and imports the content model and catalogue from uSync. The site waits for the API to report healthy. Stop with Ctrl+C; the SQL container is removed.
 
 Backoffice login for every instance: `/umbraco`, `admin@demo.local` / `Demo-Password-1234!`.
 
@@ -35,7 +37,7 @@ Backoffice login for every instance: `/umbraco`, `admin@demo.local` / `Demo-Pass
 node scripts/dev.mjs
 ```
 
-Prints the site, backoffice and dashboard URLs before starting. Ports are stable per worktree path, and the dashboard opens without a login.
+Prints the site, backoffice, API and dashboard URLs before starting. Ports are stable per worktree path, and the dashboard opens without a login.
 
 ### Option B: the AppHost on its own
 
@@ -46,14 +48,14 @@ aspire run
 Run it from the repo root; it finds `src/uShopDemo.AppHost`. This uses Aspire's defaults:
 
 - The dashboard is HTTPS on a random port. Open it through the link with the login token that `aspire run` prints.
-- The site gets a random port each run. Find it on the `web` resource in the dashboard, or with `aspire describe web`.
+- The site gets a random port each run. Find it on the `web` resource in the dashboard, or with `aspire describe web`. The API also gets a random port, shown as the `api` resource.
 - A second `aspire run` in the same directory stops the first instance. To run several at once, use one worktree each.
 
 ## Run three layouts side by side
 
 ```sh
 node scripts/worktrees.mjs up      # creates ../<repo>.layout-minimal, -catalog, -showcase
-node scripts/worktrees.mjs list    # branch, site URL, dashboard URL, path per worktree
+node scripts/worktrees.mjs list    # branch, site URL, API URL, dashboard URL, path per worktree
 ```
 
 Then, in a separate terminal for each worktree (or use `aspire run` there instead):
@@ -74,24 +76,34 @@ node scripts/worktrees.mjs down    # removes the worktree directories, keeps the
 ## How isolation works
 
 - **Files**: each worktree has its own checkout and HEAD, sharing one `.git` object store.
-- **Ports**: `scripts/dev.mjs` derives a port block (15000-15999) from the worktree path, so the same worktree gets the same URLs every run. If a port is taken it moves to the next free block. Every endpoint (site, dashboard, OTLP, resource service) is HTTPS; the dev certificate is issued to `localhost` without a port, so one certificate covers every worktree.
-- **Database**: every AppHost run starts a new SQL Server container with no volume. Stopping the launcher removes it; the next start is a clean install.
+- **Ports**: `scripts/dev.mjs` derives a port block (15000-15999) from the worktree path, so the same worktree gets the same URLs every run. If a port is taken it moves to the next free block. Every endpoint (site, API, dashboard, OTLP, resource service) is HTTPS; the dev certificate is issued to `localhost` without a port, so one certificate covers every worktree.
+- **Database**: every AppHost run starts a new SQL Server container with no volume, one database per instance, shared by the site and the API. Stopping the launcher removes it; the next start is a clean install.
 - **Content**: the document types, templates and catalogue are uSync files in `src/uShopDemo.Web/uSync/v18`, imported into each fresh database on first boot (`ImportOnFirstBoot`).
-- **Schema**: shop tables (`ushopCart`, `ushopCartLine`) are EF Core migrations applied on startup, so a migration added on one branch affects only that worktree's database.
+- **Schema**: the API's EF Core migrations (history in `__ushopMigrationsHistory`) are applied when the API starts, so a migration added on one branch affects only that worktree's database.
+- **Cookies**: the API port is in the session cookie name, so instances on one `localhost` don't clash. `localStorage` is per origin, so carts don't mix.
+
+## How the cart works
+
+- Writes (add, update, remove) are validated, queued in-process and answered 202 with an operation id. The page polls the operation, then re-reads the cart.
+- Checkout returns an order number at once. The order reads `pending`, then `confirmed` or `rejected`; the confirmation page polls it.
+- Sessions: a signed HttpOnly cookie `__Host-ushop-session-<apiPort>`, 30 days. A cart belongs to the session that first wrote it; other sessions see it as empty and get 404 on writes, orders and operations.
+- CORS is limited to the site origin.
 
 ## Layout
 
 ```
-src/uShopDemo.AppHost/   Aspire topology: SQL Server, database, web
-src/uShopDemo.Web/       Umbraco site
-  Shop/                  cart service, surface controller, EF Core context, startup migrations
-  uSync/v18/             content model and catalogue (uSync export)
-  Migrations/            EF Core migrations
-  Views/, wwwroot/       everything a layout branch may change
-scripts/                 dev.mjs (launcher), worktrees.mjs (up|list|down)
+src/uShopDemo.AppHost/        Aspire topology: SQL Server, database, api, web
+src/uShopDemo.Api/            cart API: endpoints, queue and worker, sessions, EF Core context and migrations
+src/uShopDemo.Web/            Umbraco site
+  Shop/                       Money.cs (price formatting)
+  uSync/v18/                  content model and catalogue (uSync export)
+  Views/, wwwroot/            everything a layout branch may change
+  wwwroot/js/cart.js          cart client; layout branches don't edit it
+tests/uShopDemo.Api.Tests/    API tests (in-process, SQLite)
+scripts/                      dev.mjs (launcher), worktrees.mjs (up|list|down)
 ```
 
-To change a layout, edit only `Views/` and `wwwroot/`. View changes are compiled at build, so restart the launcher to see them.
+To change a layout, edit only `Views/` and `wwwroot/`, and keep the data-attribute hooks that `cart.js` binds to: see [docs/cart-hooks.md](docs/cart-hooks.md). View changes are compiled at build, so restart the launcher to see them.
 
 To change content or document types: on `main` only, edit in the backoffice, then run an export from the uSync dashboard (Settings > uSync > Export) and commit `uSync/v18`. Saves are not exported automatically (`ExportOnSave` is off, ADR-0017), so unexported edits are lost on the next fresh start. Layout worktrees never write `uSync/**`. Editing the `.config` files by hand also works.
 
@@ -99,6 +111,16 @@ To change content or document types: on `main` only, edit in the backoffice, the
 
 - **Stuck on startup**: check Docker is running and has enough memory; open the dashboard URL for per-resource logs.
 - **Ports busy**: the launcher shifts automatically and prints the URLs it picked.
-- **Add a migration**: `dotnet tool restore`, then `dotnet ef migrations add <Name> --project src/uShopDemo.Web --output-dir Migrations`.
+- **Add an API migration**: `dotnet tool restore`, then `dotnet ef migrations add <Name> --project src/uShopDemo.Api`.
+- **"Could not reach the cart service"**: the API is down or unhealthy. Check `aspire describe` and the `api` resource logs.
+- **Run the API tests**: `dotnet test` (in-process, SQLite, no Docker).
 - **Certificate warning or backoffice login loop**: run `dotnet dev-certs https --trust` and restart the browser.
 - The dashboard uses HTTPS but allows anonymous access (no login token). Don't expose these ports.
+
+## Demo limitations
+
+- Prices, names and SKUs come from the browser and are stored as given, with no catalogue lookup. A real shop would look them up server-side.
+- The queue and the operation/pending-order status are in memory, so they are lost if the API stops. After a restart, an order number that was never processed reads as not found.
+- Data Protection keys are stored unencrypted in `ushopDataProtectionKeys`. Anyone who can read the database could forge sessions, but could already read every cart.
+- Cart and checkout need JavaScript.
+- Prices display in GBP (`£1,234.56`), but the site language stays en-US.

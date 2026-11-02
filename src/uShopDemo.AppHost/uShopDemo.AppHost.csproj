@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\uShopDemo.Api\uShopDemo.Api.csproj" />
     <ProjectReference Include="..\uShopDemo.Web\uShopDemo.Web.csproj" />
   </ItemGroup>
 
