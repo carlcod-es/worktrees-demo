@@ -48,7 +48,7 @@ public class CartSurfaceController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Add(Guid productKey, int quantity = 1)
     {
-        await cart.AddAsync(productKey, quantity);
+        if (!await cart.AddAsync(productKey, quantity)) return BadRequest();
         return RedirectToShopPage("cart");
     }
 
@@ -72,15 +72,15 @@ public class CartSurfaceController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Checkout(CheckoutModel model)
     {
-        if ((await cart.GetCurrentAsync()).IsEmpty)
-        {
-            ModelState.AddModelError(string.Empty, "Your cart is empty.");
-        }
         if (!ModelState.IsValid)
         {
+            if ((await cart.GetCurrentAsync()).IsEmpty)
+                ModelState.AddModelError(string.Empty, "Your cart is empty.");
             return CurrentUmbracoPage();
         }
 
+        // Idempotent: a repeat submit for an already-ordered cart returns that order, never a new one.
+        // Null covers an empty cart and a repeat submit after the cookie was cleared.
         var orderNumber = await cart.PlaceOrderAsync(model.Name!, model.Email!, model.Address!);
         if (orderNumber is null)
         {

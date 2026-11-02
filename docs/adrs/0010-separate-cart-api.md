@@ -1,6 +1,6 @@
 # ADR-0010: Separate cart API service with its own database
 
-- Status: Accepted
+- Status: Accepted; database part superseded by ADR-0016
 - Date: 2026-11-02 (recorded retrospectively 2026-11-02)
 - Source: `openspec/changes/add-cart-api/design.md`
 - Supersedes: ADR-0008

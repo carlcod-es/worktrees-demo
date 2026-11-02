@@ -28,7 +28,8 @@ public record OrderView(string OrderNumber, string CustomerName, string Email, s
 public interface ICartService
 {
     Task<CartView> GetCurrentAsync();
-    Task AddAsync(Guid productKey, int quantity);
+    /// <summary>False when the key is not a published product; nothing is added.</summary>
+    Task<bool> AddAsync(Guid productKey, int quantity);
     Task UpdateAsync(int lineId, int quantity);
     Task RemoveAsync(int lineId);
     /// <summary>Converts the open cart to an order and clears the cookie. Null when there is nothing to order.</summary>
@@ -65,12 +66,12 @@ public class CartService(
         return _current = new CartView(lines);
     }
 
-    public async Task AddAsync(Guid productKey, int quantity)
+    public async Task<bool> AddAsync(Guid productKey, int quantity)
     {
         quantity = Math.Clamp(quantity, 1, MaxQuantity);
         var product = umbracoContext.GetRequiredUmbracoContext().Content?.GetById(productKey);
         if (product is null || product.ContentType.Alias != "product")
-            throw new InvalidOperationException($"Unknown product {productKey}");
+            return false;
 
         var cartId = await EnsureOpenCartAsync();
         await Run(async db =>
@@ -95,6 +96,7 @@ public class CartService(
             return await db.SaveChangesAsync();
         });
         _current = null;
+        return true;
     }
 
     public async Task UpdateAsync(int lineId, int quantity)
@@ -124,29 +126,72 @@ public class CartService(
         var cartId = CookieCartId();
         if (cartId is null) return null;
 
-        var orderNumber = await Run(async db =>
+        string? orderNumber = null;
+        // One retry on an order-number unique-index collision; each attempt gets a fresh scope.
+        for (var attempt = 0; attempt < 2; attempt++)
         {
-            var cart = await db.Carts.Include(c => c.Lines)
-                .FirstOrDefaultAsync(c => c.Id == cartId && c.Status == CartStatus.Open);
-            if (cart is null || cart.Lines.Count == 0) return null;
-
-            cart.Status = CartStatus.Ordered;
-            cart.OrderNumber = $"US-{DateTime.UtcNow:yyMMdd}-{RandomNumberGenerator.GetInt32(10000, 100000)}";
-            cart.CustomerName = customerName.Trim();
-            cart.Email = email.Trim();
-            cart.Address = address.Trim();
-            cart.OrderedUtc = DateTime.UtcNow;
-            cart.Total = cart.Lines.Sum(l => l.UnitPrice * l.Quantity);
-            await db.SaveChangesAsync();
-            return cart.OrderNumber;
-        });
+            try
+            {
+                orderNumber = await Run(db => TryPlaceOrderAsync(db, cartId.Value, customerName, email, address));
+                break;
+            }
+            catch (Exception ex) when (attempt == 0 && IsUniqueViolation(ex))
+            {
+            }
+        }
 
         if (orderNumber is not null)
         {
-            http.HttpContext?.Response.Cookies.Delete(CookieName);
+            http.HttpContext?.Response.Cookies.Delete(CookieName, new CookieOptions { Secure = true, SameSite = SameSiteMode.Lax });
             _current = CartView.Empty;
         }
         return orderNumber;
+    }
+
+    /// <summary>
+    /// Conditional update (Id match and Status == Open) so only one submit wins. A submit that loses the race, or arrives
+    /// after the cart was ordered, gets the existing order number back instead of creating a new one.
+    /// </summary>
+    private static async Task<string?> TryPlaceOrderAsync(ShopDbContext db, Guid cartId, string customerName, string email, string address)
+    {
+        var cart = await db.Carts.AsNoTracking()
+            .Where(c => c.Id == cartId)
+            .Select(c => new { c.Status, c.OrderNumber, Total = c.Lines.Sum(l => l.UnitPrice * l.Quantity), LineCount = c.Lines.Count })
+            .FirstOrDefaultAsync();
+        if (cart is null) return null;
+        if (cart.Status == CartStatus.Ordered) return cart.OrderNumber;
+        if (cart.LineCount == 0) return null;
+
+        var now = DateTime.UtcNow;
+        var number = $"US-{now:yyMMdd}-{RandomNumberGenerator.GetInt32(10000, 100000)}";
+        var name = customerName.Trim();
+        var mail = email.Trim();
+        var addr = address.Trim();
+        var rows = await db.Carts.Where(c => c.Id == cartId && c.Status == CartStatus.Open)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(c => c.Status, CartStatus.Ordered)
+                .SetProperty(c => c.OrderNumber, number)
+                .SetProperty(c => c.CustomerName, name)
+                .SetProperty(c => c.Email, mail)
+                .SetProperty(c => c.Address, addr)
+                .SetProperty(c => c.OrderedUtc, now)
+                .SetProperty(c => c.Total, cart.Total));
+        if (rows == 1) return number;
+
+        // Lost the race: another request ordered this cart between our read and update.
+        return await db.Carts.AsNoTracking()
+            .Where(c => c.Id == cartId && c.Status == CartStatus.Ordered)
+            .Select(c => c.OrderNumber)
+            .FirstOrDefaultAsync();
+    }
+
+    private static bool IsUniqueViolation(Exception ex)
+    {
+        for (Exception? e = ex; e is not null; e = e.InnerException)
+        {
+            if (e is Microsoft.Data.SqlClient.SqlException { Number: 2601 or 2627 }) return true;
+        }
+        return false;
     }
 
     public Task<OrderView?> GetOrderAsync(string orderNumber) =>
@@ -177,6 +222,7 @@ public class CartService(
         http.HttpContext?.Response.Cookies.Append(CookieName, cart.Id.ToString(), new CookieOptions
         {
             HttpOnly = true,
+            Secure = true,
             IsEssential = true,
             SameSite = SameSiteMode.Lax,
             Expires = DateTimeOffset.UtcNow.AddDays(30),

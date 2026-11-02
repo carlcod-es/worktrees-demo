@@ -1,58 +1,114 @@
 #!/usr/bin/env node
-// Manage demo worktrees.  node scripts/worktrees.mjs <up|list|down> [branch...]
+// Manage demo worktrees for the repo in the current directory.
+// node scripts/worktrees.mjs <up|list|down> [--force] [branch...]
 import { existsSync, realpathSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { git } from './lib/git.mjs';
 import { slotFor, blockPorts } from './lib/ports.mjs';
+import { BASE_BRANCH, DEFAULTS, parseArgs, parseWorktrees, siblingPath, normPath, isInside } from './lib/worktrees.mjs';
 
-const root = realpathSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'));
-const DEFAULTS = ['layout/minimal', 'layout/catalog', 'layout/showcase'];
-const [cmd, ...rest] = process.argv.slice(2);
-const branches = rest.length ? rest : DEFAULTS;
+const USAGE = 'usage: node scripts/worktrees.mjs <up|list|down> [--force] [branch...]\n' +
+  'default branches: ' + DEFAULTS.join(', ') + '\n' +
+  '--force (down): remove worktrees even with uncommitted changes';
 
-const slug = (b) => b.replace(/[\\/]+/g, '-');
-const wtPath = (b) => path.join(path.dirname(root), `${path.basename(root)}.${slug(b)}`);
+const cwd = process.cwd();
+const errText = (e) => (e.stderr?.toString().trim() || e.message);
+const worktrees = () => parseWorktrees(git(['worktree', 'list', '--porcelain'], cwd));
+// First porcelain entry is always the main worktree, whichever checkout we run from.
+const mainPath = () => worktrees()[0].path;
 const branchExists = (b) => {
-  try { git(['rev-parse', '--verify', '--quiet', `refs/heads/${b}`], root); return true; } catch { return false; }
+  try { git(['rev-parse', '--verify', '--quiet', `refs/heads/${b}`], cwd); return true; } catch { return false; }
 };
+const registered = (dir) => worktrees().find((w) => normPath(w.path) === normPath(dir));
 
-function up() {
+function up({ branches }) {
+  const main = mainPath();
+  let failed = false;
+  const ready = [];
   for (const b of branches) {
-    const dir = wtPath(b);
-    if (existsSync(dir)) { console.log(`exists   ${b} -> ${dir}`); continue; }
-    if (branchExists(b)) git(['worktree', 'add', dir, b], root);
-    else git(['worktree', 'add', '-b', b, dir], root); // new branch from current HEAD
-    console.log(`created  ${b} -> ${dir}`);
+    const dir = siblingPath(main, b);
+    try {
+      if (registered(dir)) {
+        console.log(`exists   ${b} -> ${dir}`);
+      } else if (existsSync(dir)) {
+        throw new Error(`${dir} exists but is not a registered worktree`);
+      } else if (branchExists(b)) {
+        git(['worktree', 'add', dir, b], cwd);
+        console.log(`created  ${b} -> ${dir}`);
+      } else {
+        try { git(['rev-parse', '--verify', '--quiet', `${BASE_BRANCH}^{commit}`], cwd); }
+        catch { throw new Error(`branch '${BASE_BRANCH}' has no commit; commit the baseline first`); }
+        git(['worktree', 'add', '-b', b, dir, BASE_BRANCH], cwd);
+        console.log(`created  ${b} -> ${dir} (new branch from ${BASE_BRANCH})`);
+      }
+      ready.push(dir);
+    } catch (e) {
+      failed = true;
+      console.error(`failed   ${b}: ${errText(e)}`);
+    }
   }
   list();
-  console.log('\nStart each in its own terminal:  cd <path> && node scripts/dev.mjs');
+  if (ready.length) {
+    console.log('\nStart each in its own terminal:');
+    for (const dir of ready) console.log(`  node ${path.join(dir, 'scripts', 'dev.mjs')}`);
+  }
+  return failed;
 }
 
 function list() {
-  const lines = git(['worktree', 'list', '--porcelain'], root).split('\n\n');
-  for (const block of lines) {
-    const wt = /^worktree (.+)$/m.exec(block)?.[1];
-    const br = /^branch refs\/heads\/(.+)$/m.exec(block)?.[1] ?? '(detached)';
-    if (!wt) continue;
-    const p = blockPorts(slotFor(realpathSync(wt)));
-    console.log(`${br.padEnd(20)} site https://localhost:${p.web}  dashboard https://localhost:${p.dashboard}  ${wt}`);
+  for (const w of worktrees()) {
+    // Same path form dev.mjs hashes (realpath); a missing dir falls back to the recorded path.
+    let real = w.path;
+    let note = '';
+    try { real = realpathSync(w.path); } catch { note = '  (missing)'; }
+    const p = blockPorts(slotFor(real));
+    console.log(`${(w.branch ?? '(detached)').padEnd(20)} site https://localhost:${p.web}  dashboard https://localhost:${p.dashboard}  ${w.path}${note}`);
   }
+  return false;
 }
 
-function down() {
+
+function down({ branches, force }) {
+  const main = mainPath();
+  let failed = false;
   for (const b of branches) {
-    const dir = wtPath(b);
-    if (!existsSync(dir)) { console.log(`absent   ${b}`); continue; }
-    git(['worktree', 'remove', '--force', dir], root);
-    console.log(`removed  ${dir} (branch ${b} kept)`);
+    const dir = siblingPath(main, b);
+    try {
+      if (!registered(dir)) {
+        console.log(existsSync(dir) ? `skipped  ${b}: ${dir} is not a registered worktree` : `absent   ${b}`);
+        continue;
+      }
+      if (isInside(dir, cwd)) throw new Error(`refusing to remove the worktree you are in (${dir})`);
+      try {
+        git(['worktree', 'remove', ...(force ? ['--force'] : []), dir], cwd);
+      } catch (e) {
+        if (!force && /modified or untracked|uncommitted/i.test(errText(e))) {
+          failed = true;
+          console.error(`skipped  ${b}: has uncommitted changes, skipped; use --force`);
+          continue;
+        }
+        throw e;
+      }
+      console.log(`removed  ${dir} (branch ${b} kept)`);
+    } catch (e) {
+      failed = true;
+      console.error(`failed   ${b}: ${errText(e)}`);
+    }
   }
-  git(['worktree', 'prune'], root);
+  git(['worktree', 'prune'], cwd);
+  return failed;
 }
 
 const commands = { up, list, down };
-if (!commands[cmd]) {
-  console.error('usage: node scripts/worktrees.mjs <up|list|down> [branch...]\ndefault branches: ' + DEFAULTS.join(', '));
+const args = parseArgs(process.argv.slice(2));
+if (!Object.hasOwn(commands, args.cmd) || args.unknown.length) {
+  if (args.unknown.length) console.error(`unknown option: ${args.unknown.join(' ')}`);
+  console.error(USAGE);
   process.exit(1);
 }
-try { commands[cmd](); } catch (e) { console.error(e.stderr?.toString() || e.message); process.exit(1); }
+try {
+  process.exitCode = commands[args.cmd](args) ? 1 : 0;
+} catch (e) {
+  console.error(errText(e));
+  process.exit(1);
+}

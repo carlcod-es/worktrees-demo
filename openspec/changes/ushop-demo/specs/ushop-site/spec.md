@@ -2,7 +2,7 @@
 
 Defines the Umbraco demo shop that is the subject of the talk: automatically installed and populated, with a working cart and dummy checkout, and presentation isolated to files that vary per layout.
 
-ADRs: ADR-0002, ADR-0006, ADR-0007, ADR-0008, ADR-0009 (`docs/adrs/`).
+ADRs: ADR-0002, ADR-0006, ADR-0007, ADR-0008, ADR-0009, ADR-0015 (`docs/adrs/`).
 
 ## ADDED Requirements
 
@@ -14,7 +14,7 @@ The site SHALL install Umbraco against the Aspire-provided database on first boo
 - **THEN** Umbraco is installed and the backoffice accepts the documented demo credentials
 
 ### Requirement: Seeded catalogue
-On startup against a database lacking shop content, the site SHALL create the shop content model, at least 4 categories and at least 12 products, each with name, SKU, price, summary, description and image. Seeding SHALL be idempotent.
+On first boot against an empty database, the site SHALL import the shop content model and catalogue from uSync files (ADR-0006): at least 4 categories and at least 12 products, each with name, SKU, price, summary, description and image. The import SHALL be idempotent.
 
 #### Scenario: Fresh database
 - **WHEN** the site starts with an empty database
@@ -39,7 +39,7 @@ Each product page SHALL show name, SKU, price, description, image and an add-to-
 - **THEN** the cart contains that product with quantity 2 and the header cart count reflects it
 
 ### Requirement: Persistent cart
-The cart SHALL be identified by a cookie and stored in the site database. Visitors SHALL be able to add, change quantity, remove lines and see line totals and a grand total. The unit price SHALL be captured when the line is added.
+The cart SHALL be identified by a cookie and stored in the site database. Visitors SHALL be able to add, change quantity, remove lines and see line totals and a grand total. The unit price SHALL be captured when the line is added. The cart cookie SHALL be HttpOnly and Secure.
 
 #### Scenario: Cart survives app restart
 - **WHEN** a visitor adds items and the web resource is restarted (database kept)
@@ -65,11 +65,30 @@ Checkout SHALL collect name, email, address and a fake card number, perform no p
 - **THEN** the form is shown again with validation messages and no order is created
 
 ### Requirement: Schema managed by migrations
-Shop tables SHALL be created and evolved only by EF Core migrations, applied automatically on startup before the site serves requests.
+Shop tables SHALL be created and evolved only by EF Core migrations, applied automatically at startup after Umbraco is installed. Requests that arrive before migrations finish are not guaranteed to succeed; the `add-cart-api` change tightens this to migrate before serving.
 
 #### Scenario: Fresh database
 - **WHEN** the site starts against a new database
 - **THEN** all shop tables exist with the latest migration applied
+
+### Requirement: Friendly error pages
+The site SHALL answer errors with friendly pages in every environment, including Development, and SHALL NOT show exception details in the browser. Unknown URLs SHALL return 404 with an Umbraco-managed not-found page rendered through the shared layout. Unhandled exceptions SHALL return 500 with a static error page. Other 4xx responses SHALL keep their status code and show a static error page. Adding an unknown or tampered product to the cart SHALL return 400 and change nothing. Static error pages SHALL show the demo notice and are exempt from the branch badge. Backoffice paths (`/umbraco`) SHALL keep Umbraco's own error handling.
+
+#### Scenario: Unknown URL
+- **WHEN** a visitor opens a URL that matches no content
+- **THEN** the response is 404 and the page shows the site navigation, demo notice and branch badge
+
+#### Scenario: Server error
+- **WHEN** a page request fails with an unhandled exception (for example the database is unavailable)
+- **THEN** the response is 500 and the page is the static error page with no stack trace
+
+#### Scenario: Tampered add-to-cart
+- **WHEN** an add-to-cart post carries a product key that is not a published product
+- **THEN** the response is 400 with the static error page and the cart is unchanged
+
+#### Scenario: Backoffice unaffected
+- **WHEN** the backoffice is used after these pages are configured
+- **THEN** login and editing work and backoffice API errors are returned by Umbraco unchanged
 
 ### Requirement: Clearly a demo
 Every page SHALL display a visible notice that this is a demo shop and no real orders or payments are processed.

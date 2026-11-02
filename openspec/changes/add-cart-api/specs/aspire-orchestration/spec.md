@@ -1,13 +1,13 @@
-ADRs: ADR-0003, ADR-0010 (`docs/adrs/`).
+ADRs: ADR-0003, ADR-0010, ADR-0016 (`docs/adrs/`).
 
 ## MODIFIED Requirements
 
 ### Requirement: AppHost defines the full stack
-The AppHost SHALL define a SQL Server container with two databases (Umbraco's and the cart API's), the Umbraco website and the cart API. The website SHALL wait for and reference Umbraco's database and SHALL start only after the cart API reports healthy; the cart API SHALL wait for and reference its own database and SHALL expose a health check that passes only when its database is reachable and migrated. The website SHALL receive the cart API's public URL and the cart API SHALL receive the website's origin. No resource outside the AppHost definition SHALL be required to run the stack.
+The AppHost SHALL define a SQL Server container with one database shared by the Umbraco website and the cart API, the website and the cart API. The website SHALL wait for and reference the database and SHALL start only after the cart API reports healthy; the cart API SHALL wait for and reference the same database and SHALL expose a health check that passes only when its database is reachable and migrated. The website SHALL receive the cart API's public URL and the cart API SHALL receive the website's origin. No resource outside the AppHost definition SHALL be required to run the stack.
 
 #### Scenario: Cold start
 - **WHEN** the AppHost is started in a clean checkout with Docker running
-- **THEN** SQL Server starts, both databases are created, and the site and cart API start and become reachable without manual configuration
+- **THEN** SQL Server starts, the database is created, and the site and cart API start and become reachable without manual configuration
 
 #### Scenario: Site waits for the API
 - **WHEN** the AppHost starts

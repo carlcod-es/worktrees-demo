@@ -1,6 +1,6 @@
 @* Model: a product node *@
 <article class="product-card">
-    <a href="@Model.Url()"><img src="@Model.Value("image")" alt="" loading="lazy"></a>
+    <a href="@Model.Url()" tabindex="-1" aria-hidden="true"><img src="@Model.Value("image")" alt="" loading="lazy"></a>
     <div class="product-card-body">
         <h3><a href="@Model.Url()">@Model.Value("title")</a></h3>
         <p class="summary">@Model.Value("summary")</p>

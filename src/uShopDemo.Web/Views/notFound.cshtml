@@ -1,0 +1,8 @@
+﻿@{
+    var heading = Model.Value<string>("title");
+    if (string.IsNullOrWhiteSpace(heading)) { heading = "Page not found"; }
+    var homeUrl = Model.AncestorOrSelf(1)?.Url() ?? "/";
+}
+<h1>@heading</h1>
+<p>Sorry, we couldn't find the page you were looking for.</p>
+<p><a class="button" href="@homeUrl">Back to the shop</a></p>

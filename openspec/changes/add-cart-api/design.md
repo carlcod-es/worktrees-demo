@@ -14,7 +14,7 @@ Current state (see proposal.md - Why for motivation):
 **Goals:**
 - API is a plain ASP.NET Core app with no Umbraco dependency; it could be deployed alone.
 - Layout branches keep full control of cart/checkout markup without touching the client script.
-- Same per-worktree isolation as today: every instance gets its own API, API database and port.
+- Same per-worktree isolation as today: every instance gets its own API, database and port. One database per instance, shared by site and API with disjoint tables (ADR-0016).
 
 **Non-Goals:**
 - Durable queue, retries, or exactly-once delivery. Queued writes are lost when the API process stops.
@@ -25,9 +25,9 @@ Current state (see proposal.md - Why for motivation):
 
 ## Decisions
 
-ADRs: ADR-0004, ADR-0010, ADR-0011, ADR-0012, ADR-0013, ADR-0014 (`docs/adrs/`). This section keeps the implementation detail.
+ADRs: ADR-0004, ADR-0010, ADR-0011, ADR-0012, ADR-0013, ADR-0014, ADR-0016 (`docs/adrs/`). This section keeps the implementation detail.
 
-**Project shape.** `src/uShopDemo.Api`, ASP.NET Core minimal API, .NET 10, added to `uShopDemo.slnx` and referenced by the AppHost. EF Core SQL Server via the Aspire client integration `Aspire.Microsoft.EntityFrameworkCore.SqlServer` (`AddSqlServerDbContext<CartDbContext>("shopdb")`): picks up the connection string from the AppHost reference and adds a DB health check. Alternative: plain `AddDbContext` with `GetConnectionString`: works, but repeats what the integration gives for free.
+**Project shape.** `src/uShopDemo.Api`, ASP.NET Core minimal API, .NET 10, added to `uShopDemo.slnx` and referenced by the AppHost. EF Core SQL Server via the Aspire client integration `Aspire.Microsoft.EntityFrameworkCore.SqlServer` (`AddSqlServerDbContext<CartDbContext>("umbracoDbDSN")`, the instance's single database): picks up the connection string from the AppHost reference and adds a DB health check. Alternative: plain `AddDbContext` with `GetConnectionString`: works, but repeats what the integration gives for free.
 
 **Endpoints.**
 
@@ -49,7 +49,7 @@ Every endpoint except `/session` and `/health` requires a valid session (401 oth
 - The port is in the name because browsers don't separate `localhost` cookies by port. Without it, two worktrees would keep overwriting each other's session, and each instance would reject the other's signature.
 - `localhost:<web>` and `localhost:<api>` are same-site (same scheme and host; the port is ignored), so SameSite=Strict cookies are sent on the page's `fetch` calls.
 - Stateless: no sessions table and no write when a session is issued, so the "writes are asynchronous" rule holds. The protected payload carries the session id. Expiry is enforced by the protector.
-- Data Protection keys are persisted to `shopdb` with `PersistKeysToDbContext<CartDbContext>` (`DataProtectionKeys` table, application name `uShopDemo.Api`), so sessions survive an API restart. Each instance has its own database and therefore its own keys.
+- Data Protection keys are persisted with `PersistKeysToDbContext<CartDbContext>` (`ushopDataProtectionKeys` table, application name `uShopDemo.Api`), so sessions survive an API restart. Each instance has its own database and therefore its own keys.
 - An endpoint filter resolves the session for every cart, operation and order endpoint into a scoped `SessionContext` and returns 401 without one. It never writes the session id to logs or responses.
 
 Alternative: bearer token kept in `localStorage` and sent in a header. Simpler CORS, but any script on the page can read the token (the user chose the cookie). Alternative: a sessions table. Revocable, but every new visitor would need a synchronous write.
@@ -65,9 +65,9 @@ Alternative: bearer token kept in `localStorage` and sent in a header. Simpler C
 
 **Order number at acceptance.** `US-yyMMdd-NNNNN` (random 5 digits) generated when checkout is accepted so it can be returned in the 202. Unique filtered index on `OrderNumber`; a collision during processing fails the operation (rejected).
 
-**Data model.** `CartDbContext` in the API with `Cart` and `CartLine`, the same shape as today's entities plus `Cart.SessionId`, a unique index on `(CartId, ProductKey)`, and the Data Protection `DataProtectionKeys` table (`IDataProtectionKeyContext`). Tables `Carts` and `CartLines` (no `ushop` prefix: the database is the API's alone). The cart row is created by the worker on the first add. Writes to a cart whose status is Ordered fail with "cart already ordered"; reads of it return empty. Fresh `Initial` migration generated in the API project with `dotnet ef migrations add Initial --project src/uShopDemo.Api`. The site's migrations are deleted, not moved: every run starts on an empty database, so there is no data to carry over.
+**Data model.** `CartDbContext` in the API with `Cart` and `CartLine`, the same shape as today's entities plus `Cart.SessionId`, a unique index on `(CartId, ProductKey)`, and the Data Protection keys table (`IDataProtectionKeyContext`). Tables `ushopCart`, `ushopCartLine` and `ushopDataProtectionKeys`: the database is shared with Umbraco, so the prefix marks ownership. The API reads and writes only `ushop*` tables; the site never touches them. Migrations history in `__ushopMigrationsHistory` (`MigrationsHistoryTable`), separate from any EF history Umbraco keeps. The cart row is created by the worker on the first add. Writes to a cart whose status is Ordered fail with "cart already ordered"; reads of it return empty. Fresh `Initial` migration generated in the API project with `dotnet ef migrations add Initial --project src/uShopDemo.Api`. The site's migrations are deleted, not moved: every run starts on an empty database, so there is no data to carry over.
 
-**Migrations at startup.** `Program.cs` applies `MigrateAsync()` in a scope after `Build()` and before `Run()`, so the API does not listen until the schema is current. Under Aspire, `WaitFor(shopDb)` guarantees the database exists first. For SQLite (tests), `EnsureCreatedAsync()` instead, because the migrations are SQL Server-specific.
+**Migrations at startup.** `Program.cs` applies `MigrateAsync()` in a scope after `Build()` and before `Run()`, so the API does not listen until the schema is current. Under Aspire, `WaitFor(umbracoDb)` guarantees the database exists first. Because `web.WaitFor(api)`, the API creates its tables before Umbraco's unattended install runs on the same database; task 4.2 verifies the install still succeeds. For SQLite (tests), `EnsureCreatedAsync()` instead, because the migrations are SQL Server-specific.
 
 **Caller-supplied product data.** The add endpoint stores the name, SKU and price it is given. A comment on the endpoint and a README line state this is a demo simplification. The site renders these values into `data-*` attributes on the product form.
 
@@ -84,9 +84,8 @@ Because the session is a cookie, cross-site request forgery has to be addressed,
 **AppHost wiring.**
 ```
 var umbracoDb = sql.AddDatabase("umbracoDbDSN");
-var shopDb    = sql.AddDatabase("shopdb");
 var api = builder.AddProject<Projects.uShopDemo_Api>("api")
-    .WithReference(shopDb).WaitFor(shopDb)
+    .WithReference(umbracoDb).WaitFor(umbracoDb)
     .WithHttpsEndpoint(port: apiPort, name: "https").WithExternalHttpEndpoints()
     .WithHttpHealthCheck("/health", endpointName: "https");
 var web = builder.AddProject<Projects.uShopDemo_Web>("web") /* as today */
@@ -117,14 +116,15 @@ Alternative: server-side site calls the API via `HttpClient` (rejected by the us
 - [Read-after-write lag: cart reads may not include a just-accepted write] → Client always waits for the operation to complete before re-reading.
 - [Queued commands lost on API stop or crash] → Accepted for the demo; documented in README. Operation and pending-order status are also in-memory and lost.
 - [Single worker is a throughput ceiling] → Irrelevant at demo scale; partitioning is the upgrade path.
-- [Data Protection keys lost → every session invalid] → Keys are stored in `shopdb`. Losing that database also loses every cart, so nothing extra is lost.
+- [Data Protection keys lost → every session invalid] → Keys are stored in `ushopDataProtectionKeys`. Losing the database also loses every cart, so nothing extra is lost.
 - [Session cookies clash between worktrees on `localhost`] → The port is in the cookie name.
 - [Visitor clears cookies → cart unreachable] → Accepted: the old cart id then reads as empty and writes to it return 404; the script replaces the cart id with a new one on a 404.
 - [Stateless sessions can't be revoked before expiry] → Acceptable for anonymous carts. Rotating the Data Protection key ring revokes all sessions.
 - [Site doesn't start while the API is unhealthy] → Intended. `aspire logs api` shows why.
 - [Browser must trust the dev cert for a second port] → Same `localhost` dev cert as the site; nothing extra to trust.
 - [Layout branches created before this change post to `CartSurfaceController`] → Branches 5.1-5.3 in `ushop-demo` are not created yet; build them after this change, or rebase and adopt the data-attribute hooks.
-- [Second database adds startup time] → Same SQL container; database creation is seconds.
+- [API tables exist before Umbraco installs into the same database] → Task 4.2 verifies the unattended install succeeds. If it does not, the fallback is `api.WaitFor(web)`, which changes the aspire-orchestration requirement; escalate to the Product Owner before switching.
+- [Shared database couples site and API schema] → Disjoint, prefixed tables and a separate migrations history table; neither side references the other's tables.
 
 ## Migration Plan
 

@@ -1,10 +1,11 @@
+@inject Microsoft.Extensions.Configuration.IConfiguration Config
 @{
     var home = Model.AncestorOrSelf(1)!;
     var categories = home.Children()!.Where(c => c.ContentType.Alias == "category").ToList();
     var cartPage = home.Children()!.FirstOrDefault(c => c.ContentType.Alias == "cart");
     var section = Model.AncestorOrSelf(2);
     var cart = await Cart.GetCurrentAsync();
-    var branch = Environment.GetEnvironmentVariable("USHOP_BRANCH") ?? "unknown";
+    var branch = Config["USHOP_BRANCH"] ?? "unknown";
 }
 <!doctype html>
 <html lang="en">
@@ -27,7 +28,7 @@
             </nav>
             @if (cartPage is not null)
             {
-                <a class="cart-link" href="@cartPage.Url()">Cart <span class="cart-count">@cart.ItemCount</span></a>
+                <a class="cart-link" href="@cartPage.Url()" aria-label="Cart, @cart.ItemCount @(cart.ItemCount == 1 ? "item" : "items")">Cart <span class="cart-count">@cart.ItemCount</span></a>
             }
         </div>
     </header>

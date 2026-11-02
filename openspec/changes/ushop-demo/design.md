@@ -24,7 +24,7 @@ Aspire randomises container name suffixes and SQL host ports and proxies project
 
 ## Decisions
 
-ADRs: ADR-0002, ADR-0003, ADR-0004, ADR-0005, ADR-0006, ADR-0007, ADR-0008, ADR-0009 (`docs/adrs/`). This section keeps the implementation detail.
+ADRs: ADR-0002, ADR-0003, ADR-0004, ADR-0005, ADR-0006, ADR-0007, ADR-0008, ADR-0009, ADR-0015 (`docs/adrs/`). This section keeps the implementation detail.
 
 **Naming.** Solution `uShopDemo.slnx`, projects `uShopDemo.AppHost` / `uShopDemo.Web`, namespaces `uShopDemo.*`, env vars `USHOP_WEB_PORT` / `USHOP_BRANCH`. Aspire generates `Projects.uShopDemo_Web`.
 
@@ -41,14 +41,16 @@ ADRs: ADR-0002, ADR-0003, ADR-0004, ADR-0005, ADR-0006, ADR-0007, ADR-0008, ADR-
 **Cart storage: EF Core in the Umbraco database.** `ShopDbContext` registered with Umbraco's EF Core integration (`AddUmbracoDbContext<ShopDbContext>(... UseUmbracoDatabaseProvider ...)`), sharing the Umbraco connection. Entities:
 - `Cart`: `Id` (Guid, also the cookie value), `CreatedUtc`, `Status` (Open/Ordered), `OrderNumber`, `CustomerName`, `Email`, `Address`, `OrderedUtc`, `Total`.
 - `CartLine`: `Id`, `CartId`, `ProductKey` (Umbraco content Guid), `ProductName`, `Sku`, `UnitPrice`, `Quantity`.
-Tables prefixed `ushop` to sit clearly beside Umbraco's. Unit price and name captured at add time. Fake card number is validated for presence only and never stored.
+Tables prefixed `ushop` to sit clearly beside Umbraco's. Unit price and name captured at add time. Fake card number is validated for presence only and never stored. Cart cookie: HttpOnly, Secure, SameSite=Lax.
 Alternatives: session cart (not persisted, user asked for DB), orders as Umbraco content (mixes transactional data with content, slower), raw NPoco/Umbraco migrations (EF Core requested).
 
-**Migrations.** Code-first, `Migrations/` in `uShopDemo.Web`, generated with `dotnet ef` from a local tool manifest. Applied via `Database.MigrateAsync()` in a startup notification handler that runs after Umbraco install and before seeding. EF design-time uses an `IDesignTimeDbContextFactory` with a dummy SQL Server connection string so `dotnet ef migrations add` works without a running stack.
+**Migrations.** Code-first, `Migrations/` in `uShopDemo.Web`, generated with `dotnet ef` from a local tool manifest. Applied via `Database.MigrateAsync()` in a startup notification handler that runs after Umbraco install (`UmbracoApplicationStartedNotification`); the uSync import does not touch shop tables, so their order is irrelevant. Accepted gap: that notification may fire after the server accepts requests, so a request in the first seconds can hit missing tables; `add-cart-api` moves migrations to the API and applies them before it listens. EF design-time uses an `IDesignTimeDbContextFactory` with a dummy SQL Server connection string so `dotnet ef migrations add` works without a running stack.
 
 **Cart and checkout endpoints.** A `SurfaceController` (`CartSurfaceController`) handles POSTs: add, update quantity, remove, checkout. A small `CartService` encapsulates cookie handling and EF access; views get the current cart via an injected service (`@inject ICartService`). Cart/checkout/confirmation are Umbraco content pages so they get URLs and templates like every other page; confirmation reads the order number from TempData or query. Anti-forgery via Umbraco's form helpers.
 
-**Layouts live in `Views/` and `wwwroot/`.** `Shared/_Layout.cshtml`, `shop.cshtml`, `category.cshtml`, `product.cshtml`, `cart.cshtml`, `checkout.cshtml`, `orderConfirmation.cshtml`, partials under `Views/Partials/`, `wwwroot/css/site.css`. Branch badge reads `USHOP_BRANCH`. Demo notice lives in `_Layout.cshtml` and must remain in every layout.
+**Error pages.** 404: `notFound` document type, template `notFound` (`Views/notFound.cshtml`, uses `_Layout`) and a uSync content node under the root, set as the 404 page via `Umbraco:CMS:Content:Error404Collection`. 500: `UseExceptionHandler` with a handler that sets 500 and sends `wwwroot/errors/500.html`, registered before `UseUmbraco()` in every environment (no developer exception page for site paths). Other 4xx: `UseStatusCodePages` with a handler that sends `wwwroot/errors/4xx.html` and keeps the original status, for responses without a body. Both are skipped for `/umbraco/*`. Path re-execution is not used: the static file middleware would reset the status to 200. Static pages in `wwwroot/errors/` use `site.css` and the demo notice; they cannot read the branch, so they omit the badge. `CartSurfaceController.Add` returns `BadRequest()` for a product key that is not a published product. Alternatives: Razor/Umbraco 500 page (can fail on the same fault it reports), static 404 (no nav or badge, layout branches edit it separately). See ADR-0015.
+
+**Layouts live in `Views/` and `wwwroot/`.** Contract for layout branches: `wwwroot/errors/500.html`, `wwwroot/errors/4xx.html` and `Views/notFound.cshtml` keep their paths (Program.cs and the `notFound` template reference them); restyle, do not rename or move. `Shared/_Layout.cshtml`, `shop.cshtml`, `category.cshtml`, `product.cshtml`, `cart.cshtml`, `checkout.cshtml`, `orderConfirmation.cshtml`, `notFound.cshtml`, `wwwroot/errors/*.html`, partials under `Views/Partials/`, `wwwroot/css/site.css`. Branch badge reads `USHOP_BRANCH`. Demo notice lives in `_Layout.cshtml` and must remain in every layout.
 
 **Layout branches.** `layout/minimal` (clean single column, text-first), `layout/catalog` (dense grid, category sidebar, filters look), `layout/showcase` (large imagery, editorial hero). Branched from `main` after the user commits the baseline. Commits are made by the user.
 
@@ -56,7 +58,7 @@ Alternatives: session cart (not persisted, user asked for DB), orders as Umbraco
 
 ## Risks / Trade-offs
 
-- [Cold start slow (SQL boot + install + migrate + seed ~1-2 min), three at once heavier] → Pre-start before the talk; docs checklist.
+- [Cold start slow (SQL boot + install + migrate + uSync import ~1-2 min), three at once heavier] → Pre-start before the talk; docs checklist.
 - [Umbraco EF Core integration API differs in v18] → Task 3.3 verifies registration and migrations first; fall back to plain `AddDbContext` with the Umbraco connection string if needed.
 - [Docker memory with three SQL Servers (~2 GB each)] → Document Docker memory ≥ 8 GB.
 - [A migration added in one worktree only affects that worktree's DB] → Intended; call it out in the talk as a benefit.

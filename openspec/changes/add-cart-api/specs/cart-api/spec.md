@@ -1,21 +1,21 @@
 ## Purpose
 
-Independently hosted HTTP API that owns cart and order data for the demo shop, accepting writes asynchronously through a queue and serving reads from its own database.
+Independently hosted HTTP API that owns cart and order data for the demo shop, accepting writes asynchronously through a queue and serving reads from its own tables in the instance's database.
 
-ADRs: ADR-0010, ADR-0011, ADR-0012, ADR-0014 (`docs/adrs/`).
+ADRs: ADR-0010, ADR-0011, ADR-0012, ADR-0014, ADR-0016 (`docs/adrs/`).
 
 ## ADDED Requirements
 
 ### Requirement: Independent service
-The cart API SHALL run as a separate process from the Umbraco site, on its own HTTPS endpoint, with its own database. It SHALL NOT read or write Umbraco's database, and the site SHALL NOT read or write the API's database.
+The cart API SHALL run as a separate process from the Umbraco site, on its own HTTPS endpoint. It SHALL store its data in `ushop`-prefixed tables in the instance's single database, shared with Umbraco, with its own migrations history table. It SHALL NOT read or write Umbraco's tables, and the site SHALL NOT read or write the API's tables.
 
 #### Scenario: Site stopped
 - **WHEN** the web resource is stopped and the API keeps running
 - **THEN** cart reads and writes against the API still succeed
 
-#### Scenario: Separate databases
+#### Scenario: Separate tables in one database
 - **WHEN** an instance is running
-- **THEN** cart and order tables exist only in the API's database, not in Umbraco's
+- **THEN** the instance has one database, cart and order tables in it are `ushop`-prefixed and created by the API's migrations, and the site has no code that accesses them
 
 ### Requirement: Cart identified by caller
 Carts SHALL be addressed by a caller-supplied GUID in the URL. For a request with a valid session, a cart that has never been written SHALL read as empty, not as an error.

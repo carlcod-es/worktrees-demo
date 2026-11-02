@@ -1,6 +1,7 @@
 ﻿@{
     var cart = await Cart.GetCurrentAsync();
     var home = Model.AncestorOrSelf(1)!;
+    bool Invalid(string key) => ViewData.ModelState[key]?.Errors.Count > 0;
     string? Attempted(string key) => ViewData.ModelState[key]?.AttemptedValue;
 }
 <h1>@Model.Value("title")</h1>
@@ -15,20 +16,20 @@ else
         {
             @Html.ValidationSummary(true, "", new { @class = "form-errors" })
             <label for="Name">Name</label>
-            <input id="Name" name="Name" value="@Attempted("Name")" autocomplete="name">
-            @Html.ValidationMessage("Name", new { @class = "field-error" })
+            <input id="Name" name="Name" aria-describedby="Name-error"@(Invalid("Name") ? " aria-invalid=\"true\"" : null) value="@Attempted("Name")" autocomplete="name">
+            @Html.ValidationMessage("Name", new { @class = "field-error", id = "Name-error" })
 
             <label for="Email">Email</label>
-            <input id="Email" name="Email" type="email" value="@Attempted("Email")" autocomplete="email">
-            @Html.ValidationMessage("Email", new { @class = "field-error" })
+            <input id="Email" name="Email" aria-describedby="Email-error"@(Invalid("Email") ? " aria-invalid=\"true\"" : null) type="email" value="@Attempted("Email")" autocomplete="email">
+            @Html.ValidationMessage("Email", new { @class = "field-error", id = "Email-error" })
 
             <label for="Address">Address</label>
-            <textarea id="Address" name="Address" rows="3" autocomplete="street-address">@Attempted("Address")</textarea>
-            @Html.ValidationMessage("Address", new { @class = "field-error" })
+            <textarea id="Address" name="Address" aria-describedby="Address-error"@(Invalid("Address") ? " aria-invalid=\"true\"" : null) rows="3" autocomplete="street-address">@Attempted("Address")</textarea>
+            @Html.ValidationMessage("Address", new { @class = "field-error", id = "Address-error" })
 
             <label for="CardNumber">Card number <small>(demo: type anything, nothing is charged or stored)</small></label>
-            <input id="CardNumber" name="CardNumber" autocomplete="off">
-            @Html.ValidationMessage("CardNumber", new { @class = "field-error" })
+            <input id="CardNumber" name="CardNumber" aria-describedby="CardNumber-error"@(Invalid("CardNumber") ? " aria-invalid=\"true\"" : null) autocomplete="off">
+            @Html.ValidationMessage("CardNumber", new { @class = "field-error", id = "CardNumber-error" })
 
             <button type="submit" class="button">Place order · @Money.Format(cart.Total)</button>
         }

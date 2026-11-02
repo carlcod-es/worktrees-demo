@@ -1,6 +1,6 @@
 # ADR-0012: Stateless signed session cookie with cart ownership
 
-- Status: Accepted
+- Status: Accepted; key storage location superseded by ADR-0016
 - Date: 2026-11-02 (recorded retrospectively 2026-11-02)
 - Source: `openspec/changes/add-cart-api/design.md`
 
