@@ -5,7 +5,7 @@ import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DEFAULTS, parseArgs, parseWorktrees, siblingPath, slug } from './lib/worktrees.mjs';
+import { DEFAULTS, isInside, parseArgs, parseWorktrees, siblingPath, slug } from './lib/worktrees.mjs';
 
 const script = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'worktrees.mjs');
 
@@ -37,6 +37,19 @@ test('parseArgs treats --force as a flag, not a branch', () => {
   assert.deepEqual(parseArgs(['down', 'a/b', '--force', 'c']).branches, ['a/b', 'c']);
   assert.deepEqual(parseArgs(['up']).branches, DEFAULTS);
   assert.deepEqual(parseArgs(['up', '--bogus']).unknown, ['--bogus']);
+});
+
+test('isInside: self and descendants yes; siblings and ..foo-named children handled', (t) => {
+  const root = realpathSync(mkdtempSync(path.join(os.tmpdir(), 'wt-inside-')));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const parent = path.join(root, 'p');
+  mkdirSync(path.join(parent, '..foo'), { recursive: true });
+  mkdirSync(path.join(root, 'sibling'));
+  assert.ok(isInside(parent, parent));
+  assert.ok(isInside(parent, path.join(parent, '..foo')), '..foo is a child, not a parent escape');
+  assert.ok(isInside(parent, path.join(parent, '..foo', 'x')));
+  assert.ok(!isInside(parent, path.join(root, 'sibling')));
+  assert.ok(!isInside(parent, root));
 });
 
 test('CLI without args prints usage and exits 1', () => {

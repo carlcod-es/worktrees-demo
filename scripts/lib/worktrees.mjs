@@ -29,17 +29,22 @@ export function parseWorktrees(porcelain) {
     .filter(Boolean);
 }
 
-/** Path comparison key: realpath when it exists, else resolved; case-insensitive (as slotFor). */
+/**
+ * Path comparison key: realpath when it exists, else resolved.
+ * Lowercased only on win32/darwin, whose default filesystems are case-insensitive; on Linux
+ * two paths differing by case are distinct. Used for comparisons only. slotFor (ports.mjs)
+ * lowercases on every platform by design (stable ports) and must not change.
+ */
 export function normPath(p) {
   let r;
   try { r = realpathSync(p); } catch { r = path.resolve(p); }
-  return r.toLowerCase();
+  return process.platform === 'win32' || process.platform === 'darwin' ? r.toLowerCase() : r;
 }
 
 /** True when `child` is `parent` or inside it. */
 export function isInside(parent, child) {
   const rel = path.relative(normPath(parent), normPath(child));
-  return rel === '' || (!rel.startsWith('..') && !path.isAbsolute(rel));
+  return rel === '' || (rel !== '..' && !rel.startsWith('..' + path.sep) && !path.isAbsolute(rel));
 }
 
 /** argv (without node/script) -> { cmd, branches, force, unknown }. Flags are never branch names. */

@@ -67,6 +67,9 @@ function list() {
   return false;
 }
 
+// Locale-independent: any porcelain output (modified or untracked) means dirty.
+// A deleted worktree directory has nothing to lose; let `worktree remove` handle it.
+const isDirty = (dir) => existsSync(dir) && git(['-C', dir, 'status', '--porcelain'], cwd).trim() !== '';
 
 function down({ branches, force }) {
   const main = mainPath();
@@ -79,16 +82,12 @@ function down({ branches, force }) {
         continue;
       }
       if (isInside(dir, cwd)) throw new Error(`refusing to remove the worktree you are in (${dir})`);
-      try {
-        git(['worktree', 'remove', ...(force ? ['--force'] : []), dir], cwd);
-      } catch (e) {
-        if (!force && /modified or untracked|uncommitted/i.test(errText(e))) {
-          failed = true;
-          console.error(`skipped  ${b}: has uncommitted changes, skipped; use --force`);
-          continue;
-        }
-        throw e;
+      if (!force && isDirty(dir)) {
+        failed = true;
+        console.error(`skipped  ${b}: has uncommitted changes, skipped; use --force`);
+        continue;
       }
+      git(['worktree', 'remove', ...(force ? ['--force'] : []), dir], cwd);
       console.log(`removed  ${dir} (branch ${b} kept)`);
     } catch (e) {
       failed = true;

@@ -1,6 +1,6 @@
 # ADR-0006: Content model and catalogue in uSync files
 
-- Status: Accepted
+- Status: Accepted; export mechanism superseded by ADR-0017
 - Date: 2026-10-31 (recorded retrospectively 2026-11-02)
 - Source: `openspec/changes/ushop-demo/design.md`
 

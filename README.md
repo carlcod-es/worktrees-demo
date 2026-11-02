@@ -93,7 +93,7 @@ scripts/                 dev.mjs (launcher), worktrees.mjs (up|list|down)
 
 To change a layout, edit only `Views/` and `wwwroot/`. View changes are compiled at build, so restart the launcher to see them.
 
-To change content or document types: edit in the backoffice. uSync writes each save to `uSync/v18` (`ExportOnSave`); commit those files. The next fresh start imports them. Editing the `.config` files by hand also works.
+To change content or document types: on `main` only, edit in the backoffice, then run an export from the uSync dashboard (Settings > uSync > Export) and commit `uSync/v18`. Saves are not exported automatically (`ExportOnSave` is off, ADR-0017), so unexported edits are lost on the next fresh start. Layout worktrees never write `uSync/**`. Editing the `.config` files by hand also works.
 
 ## Troubleshooting
 

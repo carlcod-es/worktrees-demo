@@ -2,7 +2,7 @@
 
 Backlog for later. Not planned or scheduled. Promote an item to an OpenSpec change before building it.
 
-Content model and catalogue live in uSync (`src/uShopDemo.Web/uSync/v18`). Change them in the backoffice so uSync exports them, then commit the exported files. Layout branches change only `Views/` and `wwwroot/`.
+Content model and catalogue live in uSync (`src/uShopDemo.Web/uSync/v18`). Change them in the backoffice on `main`, run a uSync export, then commit the exported files (ADR-0017). Layout branches change only `Views/` and `wwwroot/`.
 
 ## FR-1: Block List for page content
 

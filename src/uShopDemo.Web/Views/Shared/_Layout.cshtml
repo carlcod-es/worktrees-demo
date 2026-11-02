@@ -13,7 +13,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@(Model.Value<string>("title") ?? Model.Name) · @home.Value("siteTitle")</title>
-    <link rel="stylesheet" href="/css/site.css">
+    <link rel="stylesheet" href="/css/site.css" asp-append-version="true">
 </head>
 <body>
     <div class="demo-notice" role="note">Demo shop: no real orders or payments are processed.</div>

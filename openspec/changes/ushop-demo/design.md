@@ -24,7 +24,7 @@ Aspire randomises container name suffixes and SQL host ports and proxies project
 
 ## Decisions
 
-ADRs: ADR-0002, ADR-0003, ADR-0004, ADR-0005, ADR-0006, ADR-0007, ADR-0008, ADR-0009, ADR-0015 (`docs/adrs/`). This section keeps the implementation detail.
+ADRs: ADR-0002, ADR-0003, ADR-0004, ADR-0005, ADR-0006, ADR-0007, ADR-0008, ADR-0009, ADR-0015, ADR-0017 (`docs/adrs/`). This section keeps the implementation detail.
 
 **Naming.** Solution `uShopDemo.slnx`, projects `uShopDemo.AppHost` / `uShopDemo.Web`, namespaces `uShopDemo.*`, env vars `USHOP_WEB_PORT` / `USHOP_BRANCH`. Aspire generates `Projects.uShopDemo_Web`.
 
@@ -36,7 +36,7 @@ ADRs: ADR-0002, ADR-0003, ADR-0004, ADR-0005, ADR-0006, ADR-0007, ADR-0008, ADR-
 
 **Umbraco wiring.** Connection string from `WithReference(db)`; provider name via `ConnectionStrings__umbracoDbDSN_ProviderName`. Unattended install, `ModelsMode: Nothing` and `ApplicationUrlDetection: FirstRequest` in `appsettings.json`. Views compiled at build; view edits require restarting the launcher. Views read properties with `Value<T>()`, no generated models.
 
-**Content model and seeding.** Document types: `shop` (root; site title, tagline), `category` (title, intro), `product` (title, SKU, price as decimal, summary, description, image path), `cart`, `checkout`, `orderConfirmation` (singleton pages under root, no properties beyond title). Content model, templates and catalogue are uSync 18 files in `src/uShopDemo.Web/uSync/v18`, imported on first boot (`uSync:Settings:ImportOnFirstBoot`). They were generated once from the former code seeder via `ExportOnSave`; edits in the backoffice re-export them. Alternative: code seeder via `IContentService` — replaced, because content changes needed C# edits and could not be round-tripped from the backoffice. Images are static SVG/PNG files in `wwwroot/img` referenced by path, not Umbraco media (no media upload code, layout branches can restyle freely).
+**Content model and seeding.** Document types: `shop` (root; site title, tagline), `category` (title, intro), `product` (title, SKU, price as decimal, summary, description, image path), `cart`, `checkout`, `orderConfirmation` (singleton pages under root, no properties beyond title). Content model, templates and catalogue are uSync 18 files in `src/uShopDemo.Web/uSync/v18`, imported on first boot (`uSync:Settings:ImportOnFirstBoot`). They were generated once from the former code seeder via `ExportOnSave`. `ExportOnSave` is now off (`None`): a backoffice save in a layout worktree must not rewrite `uSync/**` (layout branches differ only in views and static assets). To change content deliberately, edit in the backoffice and run an explicit uSync export, on `main` only (ADR-0017). Alternative: code seeder via `IContentService` — replaced, because content changes needed C# edits and could not be round-tripped from the backoffice. Images are static SVG/PNG files in `wwwroot/img` referenced by path, not Umbraco media (no media upload code, layout branches can restyle freely).
 
 **Cart storage: EF Core in the Umbraco database.** `ShopDbContext` registered with Umbraco's EF Core integration (`AddUmbracoDbContext<ShopDbContext>(... UseUmbracoDatabaseProvider ...)`), sharing the Umbraco connection. Entities:
 - `Cart`: `Id` (Guid, also the cookie value), `CreatedUtc`, `Status` (Open/Ordered), `OrderNumber`, `CustomerName`, `Email`, `Address`, `OrderedUtc`, `Total`.
@@ -58,6 +58,7 @@ Alternatives: session cart (not persisted, user asked for DB), orders as Umbraco
 
 ## Risks / Trade-offs
 
+- [`System.Security.Cryptography.Pkcs` 10.0.12 pulled transitively into the AppHost has advisories GHSA-846f-f764-76mx (high) and GHSA-2fmv-rv2c-59x7 (moderate)] → Pinned to a patched version in the AppHost project (Product Owner approved 2026-11-02); remove the pin when Aspire ships a patched dependency.
 - [Cold start slow (SQL boot + install + migrate + uSync import ~1-2 min), three at once heavier] → Pre-start before the talk; docs checklist.
 - [Umbraco EF Core integration API differs in v18] → Task 3.3 verifies registration and migrations first; fall back to plain `AddDbContext` with the Umbraco connection string if needed.
 - [Docker memory with three SQL Servers (~2 GB each)] → Document Docker memory ≥ 8 GB.
