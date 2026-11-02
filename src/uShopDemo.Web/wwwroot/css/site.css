@@ -92,6 +92,7 @@ input[type=number] { width: 4.5rem; }
 /* Cart script */
 [hidden] { display: none !important; }
 .cart-status { margin: 0 0 1rem; padding: .5rem .8rem; border-radius: .35rem; background: var(--notice); color: var(--notice-fg); }
-.cart-status:empty { display: none; }
+/* Stays rendered when empty so screen readers keep the live region; only the visible styling goes. */
+.cart-status:empty { margin: 0; padding: 0; background: none; }
 [aria-invalid="true"] { border-color: var(--error); }
 button[aria-busy="true"], button:disabled { opacity: .6; cursor: progress; }

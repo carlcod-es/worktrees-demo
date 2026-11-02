@@ -16,8 +16,13 @@ Contract between `src/uShopDemo.Web/wwwroot/js/cart.js` and the views. `cart.js`
 |---|---|
 | `<meta name="ushop-api" content="...">` | API base URL (`USHOP_API_URL`). Required. |
 | `[data-cart-count]` | Text set to the cart item count. If inside `a[aria-label]`, the label becomes `Cart, N item(s)`. |
-| `[data-cart-status]` | Live region (`role="status"`). Receives status and error messages; cleared before each update. |
-| `[data-field="name"]` | Inside a cloned template: text set from the value for that field name (see below). Unknown fields are left alone. |
+| `[data-cart-status]` | Live region (`role="status"`). Receives status and error messages; cleared before each update. Don't hide it with `display: none` when empty (screen readers may then miss the next message); restyle the empty state instead. |
+
+## Templates
+
+| Hook | Script behaviour |
+|---|---|
+| `[data-field="name"]` | Only inside a cloned template: text set from the value for that field name (fields are listed per template below). Unknown fields are left alone. |
 
 ## Within a `[data-cart]` container
 
@@ -34,14 +39,14 @@ Used on the cart and checkout views. Each container is rendered independently.
 | `template[data-cart-line]` | Line template. Fields: `name`, `sku`, `unitPrice`, `quantity`, `lineTotal`. |
 | `template[data-cart-empty]` | Shown when the cart has no lines. |
 
-Within a line template (cart view). The line-form hooks (`[data-line-form]`, `[data-line-update]`, `[data-line-remove]`) are optional. `[data-line-quantity]` must sit inside the line template, and the form's submit handler calls `reportValidity()` on it:
+Within a line template (cart view). All line hooks are optional, with one dependency: `form[data-line-form]` needs a `[data-line-quantity]` in the same template, otherwise its submit is ignored. When the last line is removed, focus moves to the page's first `h1` (given `tabindex="-1"`), so keep an `h1` on the cart view.
 
 | Hook | Script behaviour |
 |---|---|
 | `[data-line-quantity]` | Number input; value set to the line quantity, `aria-label` set. Quantity 0 removes the line. |
 | `form[data-line-form]` | Submit sends the quantity update. |
 | `[data-line-update]` | Submit button, disabled while busy. |
-| `[data-line-remove]` | Click removes the line. |
+| `[data-line-remove]` | Click removes the line; `aria-label` set to `Remove <name>`. The script calls `preventDefault()` on the click, so it is safe as a plain `<button>` inside the line form (it won't also submit the update). |
 
 ## Product
 

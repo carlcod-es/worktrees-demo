@@ -23,7 +23,7 @@ Every open `add-cart-api` task is built and approved by the reviewer and supervi
 - **Site** `src/uShopDemo.Web`: the server-side cart code is removed.
   - `wwwroot/js/cart.js` calls the API from the browser and fills view-owned `<template>`s via data attributes (`docs/cart-hooks.md`).
   - Prices are formatted as GBP, `£1,234.56`, on both server and client.
-- **Aspire**: new `api` resource; `web` starts only after the API's `/health` passes.
+- **Aspire**: new `ushop-api` resource; `ushop-web` starts only after the API's `/health` passes.
 - **Launcher** `scripts/dev.mjs`: prints the API URL. Ctrl+C handling rewritten (`add-cart-api` task 4.4):
   - one Ctrl+C stops the whole stack and removes the SQL container;
   - a second Ctrl+C forces exit (may leave the container);
@@ -74,7 +74,7 @@ It prints `site`, `api` and `dashboard` URLs. Below, `<site>` and `<api>` mean t
 8. **Database check**, with the stack still running:
 
    ```powershell
-   docker ps --format "{{.Names}}" | Select-String sql        # macOS/Linux: docker ps --format '{{.Names}}' | grep sql
+   docker ps --format "{{.Names}}" | Select-String ushop-sql  # macOS/Linux: docker ps --format '{{.Names}}' | grep ushop-sql
    $c = "<container name>"
    $pw = docker exec $c printenv MSSQL_SA_PASSWORD
    docker exec $c /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P $pw -C -Q "SELECT name FROM sys.databases; SELECT OrderNumber, Status, Email, Total FROM umbracoDbDSN.dbo.ushopCart WHERE OrderNumber IS NOT NULL"
@@ -92,15 +92,15 @@ It prints `site`, `api` and `dashboard` URLs. Below, `<site>` and `<api>` mean t
 3. Then run `GET /carts/{cartId}` with any GUID (for example `00000000-0000-0000-0000-000000000001`).
    - Expected: 200 with an empty cart.
 4. Stop the stack (Ctrl+C), run `aspire run` from the repo root, then repeat steps 1-3:
-   - find the API URL on the `api` resource in the dashboard (`aspire run` prints the dashboard link with its login token);
+   - find the API URL on the `ushop-api` resource in the dashboard (`aspire run` prints the dashboard link with its login token);
    - a 403 on `POST /session` here means Aspire's proxy changes the scheme. Report it.
    - Stop with Ctrl+C.
 
 ### 4. API down (`add-cart-api` task 6.2)
-1. With `node scripts/dev.mjs` running and the site open, stop the API: in the dashboard, `api` resource > Stop. Or, in a second terminal at the repo root, run `aspire resource api stop`.
+1. With `node scripts/dev.mjs` running and the site open, stop the API: in the dashboard, `ushop-api` resource > Stop. Or, in a second terminal at the repo root, run `aspire resource ushop-api stop`.
 2. Click Add to cart on a product.
    - Expected: the page shows "Could not reach the cart service" and the count doesn't change.
-3. Start the API again (dashboard Start, or `aspire resource api start`).
+3. Start the API again (dashboard Start, or `aspire resource ushop-api start`).
 
 ### 5. Ctrl+C on Windows (`add-cart-api` task 4.4)
 1. In Windows Terminal (PowerShell), run `node scripts/dev.mjs` and wait until the site loads.
@@ -110,7 +110,7 @@ It prints `site`, `api` and `dashboard` URLs. Below, `<site>` and `<api>` mean t
    ```powershell
    $LASTEXITCODE                                                   # expected: 130
    Get-Process dotnet, uShopDemo* -ErrorAction SilentlyContinue    # expected: nothing
-   docker ps                                                       # expected: no sql container
+   docker ps                                                       # expected: no ushop-sql container
    ```
 
 4. Optional: the same in a macOS terminal (`echo $?` → 130, `pgrep -fl uShopDemo` → nothing).

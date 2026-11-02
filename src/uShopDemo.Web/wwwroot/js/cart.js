@@ -4,6 +4,10 @@ const GENERIC_MESSAGE = 'Something went wrong with the cart. Please try again.';
 const money = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' });
 const dateFormat = new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' });
 const CART_KEY = 'ushop.cartId';
+const REQUEST_TIMEOUT_MS = 10000;
+const TIMEOUT_MESSAGE = 'The cart service is taking too long to respond. Check your cart before trying again.';
+const OPERATION_TIMEOUT_MESSAGE = 'The cart update is taking too long. Check your cart before trying again.';
+const OPERATION_DEADLINE_MS = 15000;
 
 const base = (document.querySelector('meta[name="ushop-api"]')?.content ?? '').trim().replace(/\/+$/, '');
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -58,30 +62,38 @@ function getCartId() {
 const session = (async () => {
   let res;
   try {
-    res = await fetch(`${base}/session`, { method: 'POST', credentials: 'include' });
+    res = await fetch(`${base}/session`, { method: 'POST', credentials: 'include', signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
   } catch {
+    // Timeouts are reported as 'network' too. `session` is a one-shot promise, so the page needs a reload to recover.
     throw new CartError('network', NETWORK_MESSAGE);
   }
   if (!res.ok) throw new CartError('unexpected', NETWORK_MESSAGE);
 })();
 session.catch(() => {}); // handled in init
 
-async function send(method, path, body) {
+/** `timeoutMs` bounds the request, including reading the response body. */
+async function send(method, path, body, { timeoutMs = REQUEST_TIMEOUT_MS } = {}) {
   await session;
-  const init = { method, credentials: 'include' };
+  const init = { method, credentials: 'include', signal: AbortSignal.timeout(timeoutMs) };
   if (body !== undefined) {
     init.headers = { 'Content-Type': 'application/json' };
     init.body = JSON.stringify(body);
   }
   try {
     return await fetch(base + path, init);
-  } catch {
+  } catch (error) {
+    if (error?.name === 'TimeoutError') throw new CartError('timeout', TIMEOUT_MESSAGE);
     throw new CartError('network', NETWORK_MESSAGE);
   }
 }
 
 async function readJson(res) {
-  try { return await res.json(); } catch { throw new CartError('unexpected', GENERIC_MESSAGE); }
+  try {
+    return await res.json();
+  } catch (error) {
+    if (error?.name === 'TimeoutError') throw new CartError('timeout', TIMEOUT_MESSAGE);
+    throw new CartError('unexpected', GENERIC_MESSAGE);
+  }
 }
 
 /** Throws CartError for any non-202 write response. Returns the parsed 202 body. */
@@ -90,24 +102,39 @@ async function accept(res) {
   if (res.status === 404) throw new CartError('notfound', 'Your cart was reset. Please try again.');
   if (res.status === 400) {
     let errors = {};
-    try { errors = (await res.json()).errors ?? {}; } catch { /* ignore */ }
+    try {
+      errors = (await res.json()).errors ?? {};
+    } catch (error) {
+      if (error?.name === 'TimeoutError') throw new CartError('timeout', TIMEOUT_MESSAGE);
+      /* otherwise ignore an unreadable body */
+    }
     throw new CartError('validation', 'Please check the details and try again.', errors);
   }
   throw new CartError('unexpected', GENERIC_MESSAGE);
 }
 
 async function waitForOperation(operationId) {
-  const deadline = Date.now() + 15000;
+  const deadline = Date.now() + OPERATION_DEADLINE_MS;
   while (Date.now() < deadline) {
-    const res = await send('GET', `/operations/${encodeURIComponent(operationId)}`);
-    if (!res.ok) throw new CartError('unexpected', GENERIC_MESSAGE);
-    const op = await readJson(res);
+    const timeoutMs = Math.min(REQUEST_TIMEOUT_MS, Math.max(deadline - Date.now(), 1000));
+    let op;
+    try {
+      const res = await send('GET', `/operations/${encodeURIComponent(operationId)}`, undefined, { timeoutMs });
+      if (!res.ok) throw new CartError('unexpected', GENERIC_MESSAGE);
+      op = await readJson(res);
+    } catch (error) {
+      // A timeout clamped by the operation deadline is the operation running out of time.
+      if (error instanceof CartError && error.kind === 'timeout' && timeoutMs < REQUEST_TIMEOUT_MS) {
+        throw new CartError('timeout', OPERATION_TIMEOUT_MESSAGE);
+      }
+      throw error;
+    }
     if (op.status === 'completed') return;
     if (op.status === 'failed') throw new CartError('failed', op.error || 'The cart update failed.');
     if (op.status !== 'queued') throw new CartError('unexpected', GENERIC_MESSAGE);
     await sleep(250);
   }
-  throw new CartError('timeout', 'The cart update is taking too long. Please try again.');
+  throw new CartError('timeout', OPERATION_TIMEOUT_MESSAGE);
 }
 
 /** build(cartId) -> [method, path, body?]. Sends, then polls until the operation completes. */
@@ -213,6 +240,7 @@ function bindLine(node, line) {
     input.value = String(line.quantity);
     input.setAttribute('aria-label', `Quantity for ${line.name}`);
   }
+  node.querySelector('[data-line-remove]')?.setAttribute('aria-label', `Remove ${line.name}`);
   const form = node.querySelector('[data-line-form]');
   const update = node.querySelector('[data-line-update]');
   const remove = node.querySelector('[data-line-remove]');
@@ -232,7 +260,7 @@ function bindLine(node, line) {
         setStatus(doneMessage);
       } catch (error) {
         reportError(error);
-        if (error instanceof CartError && error.kind === 'notfound') await refreshCart().catch(() => {});
+        if (error instanceof CartError && (error.kind === 'notfound' || error.kind === 'timeout')) await refreshCart().catch(() => {});
       }
       return () => refocus(index);
     });
@@ -240,12 +268,13 @@ function bindLine(node, line) {
 
   form?.addEventListener('submit', (event) => {
     event.preventDefault();
-    if (!input.reportValidity()) return;
+    if (!input || !input.reportValidity()) return;
     const quantity = Number(input.value);
     run(event.submitter ?? update, form, (id) => ['PUT', `/carts/${encodeURIComponent(id)}/lines/${key}`, { quantity }], 'Cart updated.',
       (index) => (focusQuantity(line.productKey) || focusNear(index)));
   });
-  remove?.addEventListener('click', () => {
+  remove?.addEventListener('click', (event) => {
+    event.preventDefault(); // a plain <button> inside the line form would also submit it
     run(remove, form ?? null, (id) => ['DELETE', `/carts/${encodeURIComponent(id)}/lines/${key}`], `Removed ${line.name} from the cart.`,
       (index) => {
         if (remove.isConnected) return remove.focus(); // removal failed, row untouched
@@ -296,6 +325,7 @@ function initAddForms() {
           setStatus('Added to cart.');
         } catch (error) {
           reportError(error);
+          if (error instanceof CartError && error.kind === 'timeout') await refreshCart().catch(() => {});
         }
       });
     });
@@ -314,14 +344,15 @@ function initCheckout() {
       const data = new FormData(form);
       const payload = Object.fromEntries(['name', 'email', 'address', 'cardNumber'].map((k) => [k, String(data.get(k) ?? '')]));
 
-      busy(event.submitter ?? form.querySelector('[type="submit"]'), form, async () => {
+      const trigger = event.submitter ?? form.querySelector('[type="submit"]');
+      busy(trigger, form, async () => {
         try {
           const res = await send('POST', `/carts/${encodeURIComponent(getCartId())}/checkout`, payload);
           if (res.status === 400) {
             let errors = {};
-            try { errors = (await res.json()).errors ?? {}; } catch { /* ignore */ }
+            try { errors = (await res.json()).errors ?? {}; } catch (error) { if (error?.name === 'TimeoutError') throw new CartError('timeout', TIMEOUT_MESSAGE); }
             // Runs after busy() re-enables the controls, so focus() takes effect.
-            return () => showCheckoutErrors(form, errors);
+            return () => showCheckoutErrors(form, errors, trigger);
           }
           const accepted = await accept(res);
           if (!accepted?.orderNumber) throw new CartError('unexpected', GENERIC_MESSAGE);
@@ -339,7 +370,7 @@ function initCheckout() {
       });
     });
 
-    function showCheckoutErrors(formEl, errors) {
+    function showCheckoutErrors(formEl, errors, trigger) {
       const unmatched = [];
       const invalid = new Set();
       for (const [key, messages] of Object.entries(errors)) {
@@ -351,8 +382,9 @@ function initCheckout() {
         invalid.add(name);
       }
       if (unmatched.length) setStatus(unmatched.join(' '));
+      else if (!invalid.size) setStatus(GENERIC_MESSAGE);
       const first = [...formEl.elements].find((el) => el.name && invalid.has(el.name));
-      first?.focus();
+      (first ?? trigger)?.focus();
     }
   }
 }

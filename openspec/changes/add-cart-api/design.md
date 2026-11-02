@@ -87,16 +87,16 @@ Because the session is a cookie, cross-site request forgery has to be addressed,
 **AppHost wiring.**
 ```
 var umbracoDb = sql.AddDatabase("umbracoDbDSN");
-var api = builder.AddProject<Projects.uShopDemo_Api>("api")
+var api = builder.AddProject<Projects.uShopDemo_Api>("ushop-api")
     .WithReference(umbracoDb).WaitFor(umbracoDb)
     .WithHttpsEndpoint(port: apiPort, name: "https").WithExternalHttpEndpoints()
     .WithHttpHealthCheck("/health", endpointName: "https");
-var web = builder.AddProject<Projects.uShopDemo_Web>("web") /* as today */
+var web = builder.AddProject<Projects.uShopDemo_Web>("ushop-web") /* as today */
     .WaitFor(api)
     .WithEnvironment("USHOP_API_URL", api.GetEndpoint("https"));
 api.WithEnvironment("USHOP_WEB_ORIGIN", web.GetEndpoint("https"));
 ```
-`WaitFor(api)` with `WithHttpHealthCheck` means the web process starts only once `/health` passes, so the first page load never sees a missing API. The services stay independent processes. If the API stops later, the site keeps running and the browser shows the "could not reach the cart service" message. The cross-reference (web → api URL, api → web origin) uses endpoint references only, so it does not create a startup dependency cycle. `apiPort` comes from `USHOP_API_PORT` (null = dynamic for plain `aspire run`; endpoint references then resolve to Aspire's proxied URLs, which are browser-reachable).
+Resource names share the prefix `ushop-` (`ushop-sql`, `ushop-api`, `ushop-web`; added by Product Owner decision, 2026-11-02) so the SQL container (`ushop-sql-<suffix>`) and dashboard entries are recognisable as this demo's; the database resource stays `umbracoDbDSN` (it is the connection string name Umbraco reads). `WaitFor(api)` with `WithHttpHealthCheck` means the web process starts only once `/health` passes, so the first page load never sees a missing API. The services stay independent processes. If the API stops later, the site keeps running and the browser shows the "could not reach the cart service" message. The cross-reference (web → api URL, api → web origin) uses endpoint references only, so it does not create a startup dependency cycle. `apiPort` comes from `USHOP_API_PORT` (null = dynamic for plain `aspire run`; endpoint references then resolve to Aspire's proxied URLs, which are browser-reachable).
 
 **Ports.** Add `api: 4` to `OFFSETS` in `scripts/lib/ports.mjs`. Block size stays 10. `dev.mjs` passes `USHOP_API_PORT` and prints the API URL; `worktrees.mjs list` prints it too. The block-availability probe covers the new port automatically.
 
@@ -104,7 +104,7 @@ api.WithEnvironment("USHOP_WEB_ORIGIN", web.GetEndpoint("https"));
 - Session: `POST /session` once per page load, before any other call; every request uses `credentials: 'include'`. The script never sees the session id.
 - Cart id: `localStorage["ushop.cartId"]`, created with `crypto.randomUUID()` on first use, replaced with a new id when checkout is accepted. `localStorage` is per origin (including port), so worktrees don't share carts.
 - Write helper: send request → on 202 poll `GET /operations/{id}` every 250 ms up to 15 s → resolve on `completed`, reject on `failed`/timeout. Buttons get `aria-busy` and are disabled while pending.
-- Binding by data attributes, so views own markup: `[data-cart-count]` (header), `form[data-cart-add]` with `data-product-key/name/sku/price` (product page), `[data-cart]` with child `<template data-cart-line>`, `<template data-cart-empty>`, and `[data-field=...]` slots (cart page), `form[data-checkout]` with `[data-error-for=...]` (checkout), `[data-order]` with `<template data-order-pending|confirmed|rejected>` (confirmation, order number from `?order=`).
+- Binding by data attributes, so views own markup: `[data-cart-count]` (header), `form[data-cart-add]` with `data-product-key/name/sku/price` (product page), `[data-cart]` with child `<template data-cart-line>`, `<template data-cart-empty>`, and `[data-field=...]` slots (cart page), `form[data-checkout]` with `[data-error-for=...]` (checkout), `[data-order]` with `<template data-order-pending|confirmed|rejected>` (confirmation, order number from `?order=`). The authoritative, complete hook list is `docs/cart-hooks.md`.
 - Money formatting: `Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' })`, matching `Money.Format` (both give `£1,234.56`).
 - Errors: a `[data-cart-status]` live region (role="status") per page receives messages such as "Could not reach the cart service."
 
@@ -123,7 +123,7 @@ Alternative: server-side site calls the API via `HttpClient` (rejected by the us
 - [Session cookies clash between worktrees on `localhost`] → The port is in the cookie name.
 - [Visitor clears cookies → cart unreachable] → Accepted: the old cart id then reads as empty and writes to it return 404; the script replaces the cart id with a new one on a 404.
 - [Stateless sessions can't be revoked before expiry] → Acceptable for anonymous carts. Rotating the Data Protection key ring revokes all sessions.
-- [Site doesn't start while the API is unhealthy] → Intended. `aspire logs api` shows why.
+- [Site doesn't start while the API is unhealthy] → Intended. `aspire logs ushop-api` shows why.
 - [Browser must trust the dev cert for a second port] → Same `localhost` dev cert as the site; nothing extra to trust.
 - [Layout branches created before this change post to `CartSurfaceController`] → Branches 5.1-5.3 in `ushop-demo` are not created yet; build them after this change, or rebase and adopt the data-attribute hooks.
 - [API tables exist before Umbraco installs into the same database] → Task 4.2 verifies the unattended install succeeds. If it does not, the fallback is `api.WaitFor(web)`, which changes the aspire-orchestration requirement; escalate to the Product Owner before switching.

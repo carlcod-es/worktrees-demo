@@ -27,7 +27,7 @@ Pull the SQL Server image once (~1.5 GB):
 docker pull mcr.microsoft.com/mssql/server:2022-latest
 ```
 
-The first start takes 1-2 minutes: it builds, starts SQL Server, applies the API's migrations, installs Umbraco, applies its migrations and imports the content model and catalogue from uSync. The site waits for the API to report healthy. Stop with Ctrl+C; the SQL container is removed. A second Ctrl+C forces an immediate exit: the AppHost can't clean up, so the SQL container may be left running. Remove it with `docker rm -f <name>` (find the name with `docker ps`).
+The first start takes 1-2 minutes: it builds, starts SQL Server, applies the API's migrations, installs Umbraco, applies its migrations and imports the content model and catalogue from uSync. The site waits for the API to report healthy. Stop with Ctrl+C; the SQL container is removed.
 
 Backoffice login for every instance: `/umbraco`, `admin@demo.local` / `Demo-Password-1234!`.
 
@@ -37,7 +37,7 @@ Backoffice login for every instance: `/umbraco`, `admin@demo.local` / `Demo-Pass
 node scripts/dev.mjs
 ```
 
-Prints the site, backoffice, API and dashboard URLs before starting. Ports are stable per worktree path, and the dashboard opens without a login. Exit code is 130 after Ctrl+C, 143 after SIGTERM and 129 after a hang-up (macOS/Linux), so scripts can tell an interrupted run from a clean one. (macOS/Linux) Without a terminal (CI, IDE task, piped output) the launcher forwards signals to the child's process group; in a terminal, and on Windows, Ctrl+C reaches the whole stack directly.
+Prints the site, backoffice, API and dashboard URLs before starting. Ports are stable per worktree path, and the dashboard opens without a login. Exit code is 130 after Ctrl+C, 143 after SIGTERM and 129 after a hang-up (macOS/Linux), so scripts can tell an interrupted run from a clean one. (macOS/Linux) Without a terminal (CI, IDE task, piped output) the launcher forwards signals to the child's process group; in a terminal, and on Windows, Ctrl+C reaches the whole stack directly. A second Ctrl+C makes the launcher exit at once: the AppHost can't clean up, so the SQL container (`ushop-sql-<suffix>`) may be left running; remove it with `docker rm -f <name>` (`docker ps` lists it).
 
 ### Option B: the AppHost on its own
 
@@ -48,7 +48,7 @@ aspire run
 Run it from the repo root; it finds `src/uShopDemo.AppHost`. This uses Aspire's defaults:
 
 - The dashboard is HTTPS on a random port. Open it through the link with the login token that `aspire run` prints.
-- The site gets a random port each run. Find it on the `web` resource in the dashboard, or with `aspire describe web`. The API also gets a random port, shown as the `api` resource.
+- The site gets a random port each run. Find it on the `ushop-web` resource in the dashboard, or with `aspire describe ushop-web`. The API also gets a random port, shown as the `ushop-api` resource.
 - A second `aspire run` in the same directory stops the first instance. To run several at once, use one worktree each.
 
 ## Run three layouts side by side
@@ -67,7 +67,7 @@ node scripts/dev.mjs
 
 Each instance shows its branch in a badge in the bottom-right corner. Place an order in one: it exists only in that instance's database.
 
-Teardown: stop each launcher with Ctrl+C (once; after a forced exit, remove the leftover SQL container as described under "Run one instance"), then
+Teardown: stop each launcher with Ctrl+C (once; after a forced exit, remove the leftover SQL container as described under "Option A"), then
 
 ```sh
 node scripts/worktrees.mjs down    # removes the worktree directories, keeps the branches
@@ -113,7 +113,7 @@ To change content or document types: on `main` only, edit in the backoffice, the
 - **Stuck on startup**: check Docker is running and has enough memory; open the dashboard URL for per-resource logs.
 - **Ports busy**: the launcher shifts automatically and prints the URLs it picked.
 - **Add an API migration**: `dotnet tool restore`, then `dotnet ef migrations add <Name> --project src/uShopDemo.Api`.
-- **"Could not reach the cart service"**: the API is down or unhealthy. Check `aspire describe` and the `api` resource logs.
+- **"Could not reach the cart service"**: the API is down or unhealthy. Check `aspire describe` and the `ushop-api` resource logs.
 - **Run the API tests**: `dotnet test` (in-process, SQLite, no Docker).
 - **Certificate warning or backoffice login loop**: run `dotnet dev-certs https --trust` and restart the browser.
 - The dashboard uses HTTPS but allows anonymous access (no login token). Don't expose these ports.

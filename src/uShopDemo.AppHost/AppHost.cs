@@ -4,7 +4,7 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 // No volume, no persistent lifetime: every AppHost run gets its own SQL Server container
 // (random name suffix, dynamic host port) and an empty database.
-var sql = builder.AddSqlServer("sql");
+var sql = builder.AddSqlServer("ushop-sql");
 var db = sql.AddDatabase("umbracoDbDSN");
 
 // Fixed web/API ports supplied by scripts/dev.mjs; null = dynamic (plain `aspire run`).
@@ -15,14 +15,14 @@ int? apiPort = int.TryParse(builder.Configuration["USHOP_API_PORT"], out var ap)
 var branch = builder.Configuration["USHOP_BRANCH"] ?? CurrentGitBranch(builder.AppHostDirectory) ?? "unknown";
 
 // Cart API shares the Umbraco database (own ushop* tables, own migrations history). The browser calls it directly.
-var api = builder.AddProject<Projects.uShopDemo_Api>("api")
+var api = builder.AddProject<Projects.uShopDemo_Api>("ushop-api")
     .WithReference(db)
     .WaitFor(db)
     .WithHttpsEndpoint(port: apiPort, name: "https")
     .WithExternalHttpEndpoints()
     .WithHttpHealthCheck("/health", endpointName: "https");
 
-var web = builder.AddProject<Projects.uShopDemo_Web>("web")
+var web = builder.AddProject<Projects.uShopDemo_Web>("ushop-web")
     .WithReference(db)
     .WaitFor(db)
     // Web starts only once the API health check passes. Endpoint references create no cycle with the api -> web origin below.
