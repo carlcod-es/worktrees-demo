@@ -11,11 +11,12 @@ const root = realpathSync(path.resolve(path.dirname(fileURLToPath(import.meta.ur
 const branch = currentBranch(root);
 const { ports, shifted } = await pickPorts(root);
 const url = (p) => `http://localhost:${p}`;
+const site = `https://localhost:${ports.web}`;
 
 console.log(`worktree  ${root}`);
 console.log(`branch    ${branch}`);
-console.log(`site      ${url(ports.web)}${shifted ? '  (default ports busy, shifted)' : ''}`);
-console.log(`backoffice ${url(ports.web)}/umbraco  admin@demo.local / Demo-Password-1234!`);
+console.log(`site      ${site}${shifted ? '  (default ports busy, shifted)' : ''}`);
+console.log(`backoffice ${site}/umbraco  admin@demo.local / Demo-Password-1234!`);
 console.log(`dashboard ${url(ports.dashboard)}\n`);
 
 const env = {

@@ -7,7 +7,6 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 using uShopDemo.Web.Shop.Data;
-using uShopDemo.Web.Shop.Seeding;
 
 namespace uShopDemo.Web.Shop;
 
@@ -18,12 +17,12 @@ public class ShopComposer : IComposer
         // Shares Umbraco's connection string and provider (SQL Server under Aspire).
         builder.Services.AddUmbracoDbContext<ShopDbContext>((sp, options, _, _) => options.UseUmbracoDatabaseProvider(sp), shareUmbracoConnection: true);
         builder.Services.AddScoped<ICartService, CartService>();
-        builder.Services.AddTransient<CatalogueSeeder>();
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, ShopStartup>();
     }
 }
 
-/// <summary>Runs after Umbraco is installed and before requests are served: apply EF Core migrations, then seed.</summary>
+/// <summary>Runs after Umbraco is installed and before requests are served: apply EF Core migrations.
+/// Content model and catalogue come from uSync files (uSync/v18), imported on first boot.</summary>
 public class ShopStartup(
     IRuntimeState runtimeState,
     IServiceScopeFactory scopeFactory,
@@ -33,7 +32,7 @@ public class ShopStartup(
     {
         if (runtimeState.Level != RuntimeLevel.Run)
         {
-            logger.LogWarning("Umbraco runtime level is {Level}; skipping shop migrations and seeding", runtimeState.Level);
+            logger.LogWarning("Umbraco runtime level is {Level}; skipping shop migrations", runtimeState.Level);
             return;
         }
 
@@ -45,7 +44,5 @@ public class ShopStartup(
             logger.LogInformation("Applying shop migrations: {Migrations}", string.Join(", ", pending));
             await db.Database.MigrateAsync(cancellationToken);
         }
-
-        await scope.ServiceProvider.GetRequiredService<CatalogueSeeder>().SeedAsync();
     }
 }

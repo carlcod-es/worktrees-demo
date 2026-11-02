@@ -13,6 +13,7 @@ Aspire randomises container name suffixes and SQL host ports and proxies project
 ## Goals / Non-Goals
 
 **Goals:**
+- Site is HTTPS-only (backoffice login requires it); the ASP.NET dev cert covers `localhost` on every port, so per-worktree ports are unchanged.
 - `node scripts/dev.mjs` in any worktree yields a working, isolated, seeded, migrated shop.
 - Layout work touches only views/CSS, so branches diff cleanly.
 
@@ -33,7 +34,7 @@ Aspire randomises container name suffixes and SQL host ports and proxies project
 
 **Umbraco wiring.** Connection string from `WithReference(db)`; provider name via `ConnectionStrings__umbracoDbDSN_ProviderName`. Unattended install, `ModelsMode: Nothing` and `ApplicationUrlDetection: FirstRequest` in `appsettings.json`. Views compiled at build; view edits require restarting the launcher. Views read properties with `Value<T>()`, no generated models.
 
-**Content model and seeding.** Document types: `shop` (root; site title, tagline), `category` (title, intro), `product` (title, SKU, price as decimal, summary, description, image path), `cart`, `checkout`, `orderConfirmation` (singleton pages under root, no properties beyond title). A composer-registered `UmbracoApplicationStartedNotification` handler seeds if no `shop` root exists: templates created from on-disk view content, `TemplateId` set on every node, publish all. Images are static SVG/PNG files in `wwwroot/img` referenced by path, not Umbraco media (no media upload code, layout branches can restyle freely).
+**Content model and seeding.** Document types: `shop` (root; site title, tagline), `category` (title, intro), `product` (title, SKU, price as decimal, summary, description, image path), `cart`, `checkout`, `orderConfirmation` (singleton pages under root, no properties beyond title). Content model, templates and catalogue are uSync 18 files in `src/uShopDemo.Web/uSync/v18`, imported on first boot (`uSync:Settings:ImportOnFirstBoot`). They were generated once from the former code seeder via `ExportOnSave`; edits in the backoffice re-export them. Alternative: code seeder via `IContentService` — replaced, because content changes needed C# edits and could not be round-tripped from the backoffice. Images are static SVG/PNG files in `wwwroot/img` referenced by path, not Umbraco media (no media upload code, layout branches can restyle freely).
 
 **Cart storage: EF Core in the Umbraco database.** `ShopDbContext` registered with Umbraco's EF Core integration (`AddUmbracoDbContext<ShopDbContext>(... UseUmbracoDatabaseProvider ...)`), sharing the Umbraco connection. Entities:
 - `Cart`: `Id` (Guid, also the cookie value), `CreatedUtc`, `Status` (Open/Ordered), `OrderNumber`, `CustomerName`, `Email`, `Address`, `OrderedUtc`, `Total`.

@@ -36,7 +36,7 @@ function list() {
     const br = /^branch refs\/heads\/(.+)$/m.exec(block)?.[1] ?? '(detached)';
     if (!wt) continue;
     const p = blockPorts(slotFor(realpathSync(wt)));
-    console.log(`${br.padEnd(20)} site http://localhost:${p.web}  dashboard http://localhost:${p.dashboard}  ${wt}`);
+    console.log(`${br.padEnd(20)} site https://localhost:${p.web}  dashboard http://localhost:${p.dashboard}  ${wt}`);
   }
 }
 
