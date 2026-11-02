@@ -6,6 +6,7 @@ import { realpathSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { pickPorts } from './lib/ports.mjs';
 import { currentBranch } from './lib/git.mjs';
+import { createShutdown, shouldForward } from './lib/shutdown.mjs';
 
 const root = realpathSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'));
 const branch = currentBranch(root);
@@ -35,12 +36,43 @@ const env = {
   USHOP_BRANCH: branch,
 };
 
+// Two modes, chosen by shouldForward (lib/shutdown.mjs):
+// - Interactive (stdin and stdout are TTYs, any OS) and Windows: the child is NOT detached. It stays in the terminal's
+//   foreground group, so the terminal/console delivers Ctrl+C, Ctrl+Z and SIGHUP to the whole tree (dotnet run -> AppHost).
+//   Detaching here would put it in a background group: SIGTTOU/SIGTTIN on tty access, and Ctrl+Z would not reach it.
+//   We forward nothing except a lone external SIGTERM on POSIX (see lib/shutdown.mjs); anything more would double-signal
+//   or only hit the `dotnet run` wrapper. Otherwise we wait for the child.
+// - Non-interactive POSIX (background, CI, wrapper): own process group so the whole tree can be signalled. A detached
+//   group gets no terminal signals, so our forward of SIGINT/SIGTERM/SIGHUP is the single delivery; on exit we SIGTERM the group.
+const interactive = Boolean(process.stdin.isTTY && process.stdout.isTTY);
+const forward = shouldForward({ platform: process.platform, interactive });
 const child = spawn('dotnet', ['run', '--project', path.join(root, 'src', 'uShopDemo.AppHost'), '--no-launch-profile'], {
   cwd: root,
   env,
   stdio: 'inherit',
+  detached: forward,
 });
 
-// Ctrl+C reaches the child through the shared TTY; make sure termination signals do too.
-for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => child.kill(sig));
-child.on('exit', (code) => process.exit(code ?? 0));
+child.on('error', (err) => {
+  console.error(`Failed to start 'dotnet': ${err.message}. Is the .NET SDK installed and on PATH?`);
+  process.exit(1);
+});
+
+// SIGHUP exists on POSIX only.
+const signals = process.platform === 'win32' ? ['SIGINT', 'SIGTERM'] : ['SIGINT', 'SIGTERM', 'SIGHUP'];
+const { onSignal, onChildExit, onProcessExit } = createShutdown({
+  platform: process.platform,
+  interactive,
+  pid: child.pid,
+  killGroup: (pid, sig) => {
+    try { process.kill(-pid, sig); } catch { /* group already gone */ }
+  },
+  killChild: (sig) => {
+    try { child.kill(sig); } catch { /* child already gone */ }
+  },
+  removeHandlers: () => signals.forEach((s) => process.removeAllListeners(s)),
+  exit: (code) => process.exit(code),
+});
+signals.forEach((sig) => process.on(sig, () => onSignal(sig)));
+child.on('exit', onChildExit);
+process.on('exit', onProcessExit);

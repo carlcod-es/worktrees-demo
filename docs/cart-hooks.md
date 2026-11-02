@@ -34,7 +34,7 @@ Used on the cart and checkout views. Each container is rendered independently.
 | `template[data-cart-line]` | Line template. Fields: `name`, `sku`, `unitPrice`, `quantity`, `lineTotal`. |
 | `template[data-cart-empty]` | Shown when the cart has no lines. |
 
-Within a line template (cart view):
+Within a line template (cart view). The line-form hooks (`[data-line-form]`, `[data-line-update]`, `[data-line-remove]`) are optional. `[data-line-quantity]` must sit inside the line template, and the form's submit handler calls `reportValidity()` on it:
 
 | Hook | Script behaviour |
 |---|---|
@@ -52,7 +52,7 @@ Within a line template (cart view):
 | `data-product-name` | Product title. |
 | `data-product-sku` | SKU. |
 | `data-product-price` | Invariant-culture decimal (`1234.56`), not formatted. Sent as the unit price. |
-| `input[name=quantity]` | Optional; defaults to 1 if absent. `min=1 max=99`. |
+| `input[name=quantity]` | Optional; defaults to 1 if absent. The API accepts 1-99. The input's `min`/`max`/`step`/`required` attributes drive the browser validity check (`reportValidity()`) before sending; set them to match. |
 
 ## Checkout
 
@@ -70,7 +70,7 @@ The checkout view also uses `[data-cart]`, `[data-cart-empty-target]`, `[data-ca
 | Hook | Notes |
 |---|---|
 | `[data-order]` | Container. The script reads `?order=` from the URL. |
-| `[data-order-view]` | Replaced with the clone of the template for the current state. |
+| `[data-order-view]` | Children replaced with the clone of the template for the current state. Required inside `[data-order]`. |
 | `template[data-order-pending]` | Field: `orderNumber`. Polled every 500 ms for up to 30 s. |
 | `template[data-order-confirmed]` | Fields: `orderNumber`, `name`, `email`, `address`, `total`, `orderedUtc`. |
 | `[data-order-lines]` | Inside the confirmed template. Receives one clone of `template[data-order-line]` per line. |

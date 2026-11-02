@@ -5,6 +5,6 @@
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "wt": "node scripts/worktrees.mjs",
-    "test": "node --test scripts/ports.test.mjs scripts/worktrees.test.mjs"
+    "test": "node --test scripts/ports.test.mjs scripts/worktrees.test.mjs scripts/shutdown.test.mjs"
   }
 }

@@ -7,9 +7,8 @@ var builder = DistributedApplication.CreateBuilder(args);
 var sql = builder.AddSqlServer("sql");
 var db = sql.AddDatabase("umbracoDbDSN");
 
-// Fixed web port supplied by scripts/dev.mjs; null = dynamic (plain `aspire run`).
+// Fixed web/API ports supplied by scripts/dev.mjs; null = dynamic (plain `aspire run`).
 int? webPort = int.TryParse(builder.Configuration["USHOP_WEB_PORT"], out var p) ? p : null;
-
 int? apiPort = int.TryParse(builder.Configuration["USHOP_API_PORT"], out var ap) ? ap : null;
 
 // Branch from scripts/dev.mjs, else ask git so a plain `aspire run` still shows the badge.
