@@ -30,8 +30,12 @@ The AppHost dashboard, OTLP endpoint, resource service endpoint, website endpoin
 - **THEN** all three start successfully and each dashboard lists only its own resources
 
 ### Requirement: Frictionless local access
-The dashboard and website SHALL be reachable over plain HTTP on localhost without login tokens or certificate trust prompts when started by the launcher.
+When started by the launcher, the dashboard, website and every Aspire endpoint SHALL use HTTPS on localhost with the trusted ASP.NET development certificate, in every worktree, and the dashboard SHALL open without a login token. No endpoint SHALL accept plain HTTP.
 
 #### Scenario: Open dashboard
 - **WHEN** the launcher starts an AppHost
-- **THEN** its dashboard URL opens directly without a login prompt
+- **THEN** its HTTPS dashboard URL opens directly without a login prompt or certificate warning
+
+#### Scenario: Any worktree
+- **WHEN** AppHosts run from several worktrees on different port blocks
+- **THEN** each site and dashboard is served over HTTPS with the same trusted certificate

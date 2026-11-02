@@ -10,8 +10,9 @@ import { currentBranch } from './lib/git.mjs';
 const root = realpathSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'));
 const branch = currentBranch(root);
 const { ports, shifted } = await pickPorts(root);
-const url = (p) => `http://localhost:${p}`;
-const site = `https://localhost:${ports.web}`;
+// Everything is HTTPS: the ASP.NET dev cert (CN=localhost) is valid on any port, so every worktree's block works.
+const url = (p) => `https://localhost:${p}`;
+const site = url(ports.web);
 
 console.log(`worktree  ${root}`);
 console.log(`branch    ${branch}`);
@@ -26,7 +27,7 @@ const env = {
   ASPNETCORE_URLS: url(ports.dashboard),
   ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL: url(ports.otlp),
   ASPIRE_RESOURCE_SERVICE_ENDPOINT_URL: url(ports.resourceService),
-  ASPIRE_ALLOW_UNSECURED_TRANSPORT: 'true',
+  // Anonymous dashboard access (no login token); transport is still TLS.
   ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: 'true',
   USHOP_WEB_PORT: String(ports.web),
   USHOP_BRANCH: branch,

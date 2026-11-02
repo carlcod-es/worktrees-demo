@@ -26,7 +26,7 @@ Aspire randomises container name suffixes and SQL host ports and proxies project
 
 **Naming.** Solution `uShopDemo.slnx`, projects `uShopDemo.AppHost` / `uShopDemo.Web`, namespaces `uShopDemo.*`, env vars `USHOP_WEB_PORT` / `USHOP_BRANCH`. Aspire generates `Projects.uShopDemo_Web`.
 
-**Port isolation via env, not launchSettings.** The launcher computes ports and sets `ASPNETCORE_URLS` (dashboard), `ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL`, `ASPIRE_RESOURCE_SERVICE_ENDPOINT_URL`, `ASPIRE_ALLOW_UNSECURED_TRANSPORT=true`, `ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true`, `USHOP_WEB_PORT`, then runs `dotnet run --project src/uShopDemo.AppHost --no-launch-profile`. Alternatives: per-worktree launchSettings edits (dirty git state), fully dynamic ports (unstable URLs on stage).
+**Port isolation via env, not launchSettings.** The launcher computes ports and sets `ASPNETCORE_URLS` (dashboard), `ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL`, `ASPIRE_RESOURCE_SERVICE_ENDPOINT_URL`, `ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true` (all URLs HTTPS via the dev cert, which covers `localhost` on any port), `USHOP_WEB_PORT`, then runs `dotnet run --project src/uShopDemo.AppHost --no-launch-profile`. Alternatives: per-worktree launchSettings edits (dirty git state), fully dynamic ports (unstable URLs on stage).
 
 **Port block derivation.** SHA-1 of the real, lower-cased worktree path → slot 0..99; block = 15000 + slot*10 (web +0, dashboard +1, OTLP +2, resource service +3). Probe by binding; on conflict move to the next slot. No state file.
 
@@ -59,5 +59,5 @@ Alternatives: session cart (not persisted, user asked for DB), orders as Umbraco
 - [Docker memory with three SQL Servers (~2 GB each)] → Document Docker memory ≥ 8 GB.
 - [A migration added in one worktree only affects that worktree's DB] → Intended; call it out in the talk as a benefit.
 - [Port probe race] → Acceptable; relaunch is stable.
-- [Dashboard unsecured mode] → Localhost demo only, documented.
+- [Dashboard anonymous access] → HTTPS transport, but no login token; localhost demo only, documented.
 - [Templates rewritten by Umbraco on creation (BOM)] → Content identical; `.gitattributes`/editor ignore BOM; verify `git status` clean after a run.

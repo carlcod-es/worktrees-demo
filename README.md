@@ -74,7 +74,7 @@ node scripts/worktrees.mjs down    # removes the worktree directories, keeps the
 ## How isolation works
 
 - **Files**: each worktree has its own checkout and HEAD, sharing one `.git` object store.
-- **Ports**: `scripts/dev.mjs` derives a port block (15000-15999) from the worktree path, so the same worktree gets the same URLs every run. If a port is taken it moves to the next free block. The site is HTTPS on the block's first port; the dev certificate is issued to `localhost` without a port, so one certificate covers every worktree.
+- **Ports**: `scripts/dev.mjs` derives a port block (15000-15999) from the worktree path, so the same worktree gets the same URLs every run. If a port is taken it moves to the next free block. Every endpoint (site, dashboard, OTLP, resource service) is HTTPS; the dev certificate is issued to `localhost` without a port, so one certificate covers every worktree.
 - **Database**: every AppHost run starts a new SQL Server container with no volume. Stopping the launcher removes it; the next start is a clean install.
 - **Content**: the document types, templates and catalogue are uSync files in `src/uShopDemo.Web/uSync/v18`, imported into each fresh database on first boot (`ImportOnFirstBoot`).
 - **Schema**: shop tables (`ushopCart`, `ushopCartLine`) are EF Core migrations applied on startup, so a migration added on one branch affects only that worktree's database.
@@ -101,4 +101,4 @@ To change content or document types: edit in the backoffice. uSync writes each s
 - **Ports busy**: the launcher shifts automatically and prints the URLs it picked.
 - **Add a migration**: `dotnet tool restore`, then `dotnet ef migrations add <Name> --project src/uShopDemo.Web --output-dir Migrations`.
 - **Certificate warning or backoffice login loop**: run `dotnet dev-certs https --trust` and restart the browser.
-- The dashboard runs unsecured on localhost. Don't expose these ports.
+- The dashboard uses HTTPS but allows anonymous access (no login token). Don't expose these ports.
