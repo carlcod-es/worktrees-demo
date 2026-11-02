@@ -25,7 +25,7 @@ Current state (see proposal.md - Why for motivation):
 
 ## Decisions
 
-ADRs: ADR-0004, ADR-0010, ADR-0011, ADR-0012, ADR-0013, ADR-0014, ADR-0016 (`docs/adrs/`). This section keeps the implementation detail.
+ADRs: ADR-0004, ADR-0010, ADR-0011, ADR-0012, ADR-0013, ADR-0014, ADR-0016, ADR-0018 (`docs/adrs/`). This section keeps the implementation detail.
 
 **Project shape.** `src/uShopDemo.Api`, ASP.NET Core minimal API, .NET 10, added to `uShopDemo.slnx` and referenced by the AppHost. EF Core SQL Server via the Aspire client integration `Aspire.Microsoft.EntityFrameworkCore.SqlServer` (`AddSqlServerDbContext<CartDbContext>("umbracoDbDSN")`, the instance's single database): picks up the connection string from the AppHost reference and adds a DB health check. Alternative: plain `AddDbContext` with `GetConnectionString`: works, but repeats what the integration gives for free.
 
@@ -77,10 +77,12 @@ Because the session is a cookie, cross-site request forgery has to be addressed,
 - SameSite=Strict: browsers don't send the cookie on requests started by another site.
 - Writes with a body must be `Content-Type: application/json` (otherwise 415, after the session check: minimal-API body binding rejects non-JSON content types, and an endpoint filter also rejects `application/*+json` variants; the write endpoints carry "any content type" accepts metadata so routing does not reject the content type with its own 415 before the session middleware runs). A cross-origin JSON request always triggers a CORS preflight, and the preflight fails for any origin except the site's.
 - DELETE always triggers a preflight.
-- `POST /session` returns 403 when the request carries an `Origin` header other than `USHOP_WEB_ORIGIN`, so another site can't reset a visitor's session with a cross-site form post (the browser would otherwise accept the new cookie on the navigation response).
+- `POST /session` returns 403 when the request carries an `Origin` header other than `USHOP_WEB_ORIGIN` or the API's own origin (same-origin, used by the Scalar UI; not cross-site, so CSRF-neutral), so another site can't reset a visitor's session with a cross-site form post (the browser would otherwise accept the new cookie on the navigation response).
 - No write endpoint uses GET.
 
 **Health.** `/health` returns healthy only after migrations are applied (startup applies them before `Run()`) and the database check from the Aspire integration passes.
+
+**API docs (added by Product Owner decision, 2026-11-02; ADR-0018).** Development only: `AddOpenApi()` + `MapOpenApi()` (`/openapi/v1.json`, OpenAPI 3.1) and Scalar `MapScalarApiReference()` (`/scalar`). Not session-protected. `/scalar` redirects to `/scalar/v1`. `/health` is added to the document by a document transformer, because health checks are not visible to ApiExplorer. Scalar can call `POST /session` (same origin, allowed by the `/session` origin rule under CORS and CSRF), so the other endpoints can be tried there. Every endpoint in the table above appears in the document; write endpoints document an `application/json` request body despite their "any content type" accepts metadata. Alternatives: Swashbuckle, SwaggerUI, Redoc, document only (see ADR-0018).
 
 **AppHost wiring.**
 ```

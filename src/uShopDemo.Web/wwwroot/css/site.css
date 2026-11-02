@@ -13,8 +13,6 @@ h1 { font-size: 1.8rem; line-height: 1.2; margin: 0 0 .5rem; }
 h2 { font-size: 1.25rem; margin: 2rem 0 .75rem; }
 .wrap { max-width: 64rem; margin: 0 auto; padding: 0 1.25rem; }
 
-.demo-notice { background: var(--notice); color: var(--notice-fg); text-align: center; font-size: .9rem; font-weight: 600; padding: .35rem 1rem; }
-
 .site-header { background: var(--card); border-bottom: 1px solid var(--line); }
 .header-row { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; padding-top: .75rem; padding-bottom: .75rem; }
 .brand { font-size: 1.4rem; font-weight: 800; text-decoration: none; color: var(--fg); }

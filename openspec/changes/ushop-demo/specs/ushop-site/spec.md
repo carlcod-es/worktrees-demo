@@ -72,11 +72,11 @@ Shop tables SHALL be created and evolved only by EF Core migrations, applied aut
 - **THEN** all shop tables exist with the latest migration applied
 
 ### Requirement: Friendly error pages
-The site SHALL answer errors with friendly pages in every environment, including Development, and SHALL NOT show exception details in the browser. Unknown URLs SHALL return 404 with an Umbraco-managed not-found page rendered through the shared layout. Unhandled exceptions SHALL return 500 with a static error page. Other 4xx responses SHALL keep their status code and show a static error page. Adding an unknown or tampered product to the cart SHALL return 400 and change nothing. Static error pages SHALL show the demo notice and are exempt from the branch badge. Backoffice paths (`/umbraco`) SHALL keep Umbraco's own error handling.
+The site SHALL answer errors with friendly pages in every environment, including Development, and SHALL NOT show exception details in the browser. Unknown URLs SHALL return 404 with an Umbraco-managed not-found page rendered through the shared layout. Unhandled exceptions SHALL return 500 with a static error page. Other 4xx responses SHALL keep their status code and show a static error page. Adding an unknown or tampered product to the cart SHALL return 400 and change nothing. Static error pages are exempt from the branch badge. Backoffice paths (`/umbraco`) SHALL keep Umbraco's own error handling.
 
 #### Scenario: Unknown URL
 - **WHEN** a visitor opens a URL that matches no content
-- **THEN** the response is 404 and the page shows the site navigation, demo notice and branch badge
+- **THEN** the response is 404 and the page shows the site navigation and branch badge
 
 #### Scenario: Server error
 - **WHEN** a page request fails with an unhandled exception (for example the database is unavailable)
@@ -89,13 +89,6 @@ The site SHALL answer errors with friendly pages in every environment, including
 #### Scenario: Backoffice unaffected
 - **WHEN** the backoffice is used after these pages are configured
 - **THEN** login and editing work and backoffice API errors are returned by Umbraco unchanged
-
-### Requirement: Clearly a demo
-Every page SHALL display a visible notice that this is a demo shop and no real orders or payments are processed.
-
-#### Scenario: Any page
-- **WHEN** any shop page is viewed
-- **THEN** the demo notice is visible
 
 ### Requirement: Presentation confined to views and static assets
 The shop's appearance SHALL be defined only by Razor views and static CSS/assets. Seeding, content model, cart logic, migrations and application code SHALL NOT change between layouts.

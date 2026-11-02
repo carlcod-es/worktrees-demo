@@ -1,6 +1,6 @@
 # ADR-0015: Friendly error pages in every environment
 
-- Status: Accepted
+- Status: Accepted; demo notice on static pages superseded by ADR-0019
 - Date: 2026-11-02
 - Source: `openspec/changes/ushop-demo/design.md`
 

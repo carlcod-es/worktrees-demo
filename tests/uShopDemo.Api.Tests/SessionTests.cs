@@ -195,6 +195,25 @@ public sealed class SessionTests : IDisposable
     }
 
     [Fact]
+    public async Task Own_origin_gets_204_with_a_cookie()
+    {
+        // The test clients' base address is https://localhost.
+        var response = await PostSessionAsync("https://localhost");
+
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        Assert.True(response.Headers.Contains("Set-Cookie"));
+    }
+
+    [Fact]
+    public async Task Own_host_on_a_different_port_gets_403_without_a_cookie()
+    {
+        var response = await PostSessionAsync("https://localhost:8080");
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.False(response.Headers.Contains("Set-Cookie"));
+    }
+
+    [Fact]
     public async Task No_origin_gets_204()
     {
         var response = await PostSessionAsync(null);

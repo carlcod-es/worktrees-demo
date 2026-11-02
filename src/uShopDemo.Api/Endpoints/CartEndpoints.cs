@@ -12,17 +12,38 @@ public static class CartEndpoints
     {
         var secured = app.MapGroup("").WithMetadata(RequiresSessionMetadata.Instance);
 
-        var carts = secured.MapGroup("/carts");
-        carts.MapGet("/{cartId:guid}", GetCart);
+        var carts = secured.MapGroup("/carts").WithTags("Carts");
+        carts.MapGet("/{cartId:guid}", GetCart)
+            .WithName("GetCart").WithSummary("Get the cart (empty if unknown or not owned by this session)")
+            .Produces<CartResponse>().Produces(StatusCodes.Status401Unauthorized);
 
         // Caller-supplied product data - demo only: a real shop would look up name/SKU/price server-side.
-        carts.MapPost("/{cartId:guid}/lines", AddLine).AddEndpointFilter<JsonBodyFilter>().WithAnyContentType();
-        carts.MapPut("/{cartId:guid}/lines/{productKey:guid}", UpdateLine).AddEndpointFilter<JsonBodyFilter>().WithAnyContentType();
-        carts.MapDelete("/{cartId:guid}/lines/{productKey:guid}", RemoveLine);
-        carts.MapPost("/{cartId:guid}/checkout", CheckoutCart).AddEndpointFilter<JsonBodyFilter>().WithAnyContentType();
+        carts.MapPost("/{cartId:guid}/lines", AddLine).AddEndpointFilter<JsonBodyFilter>().WithAnyContentType()
+            .WithName("AddCartLine").WithSummary("Add a line to the cart (queued)")
+            .Produces<OperationAccepted>(StatusCodes.Status202Accepted).ProducesValidationProblem()
+            .Produces(StatusCodes.Status401Unauthorized).Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status415UnsupportedMediaType);
+        carts.MapPut("/{cartId:guid}/lines/{productKey:guid}", UpdateLine).AddEndpointFilter<JsonBodyFilter>().WithAnyContentType()
+            .WithName("SetCartLineQuantity").WithSummary("Set a line quantity; 0 removes it (queued)")
+            .Produces<OperationAccepted>(StatusCodes.Status202Accepted).ProducesValidationProblem()
+            .Produces(StatusCodes.Status401Unauthorized).Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status415UnsupportedMediaType);
+        carts.MapDelete("/{cartId:guid}/lines/{productKey:guid}", RemoveLine)
+            .WithName("RemoveCartLine").WithSummary("Remove a line from the cart (queued)")
+            .Produces<OperationAccepted>(StatusCodes.Status202Accepted)
+            .Produces(StatusCodes.Status401Unauthorized).Produces(StatusCodes.Status404NotFound);
+        carts.MapPost("/{cartId:guid}/checkout", CheckoutCart).AddEndpointFilter<JsonBodyFilter>().WithAnyContentType()
+            .WithName("Checkout").WithSummary("Check out the cart; returns the order number at once (queued)")
+            .Produces<CheckoutAccepted>(StatusCodes.Status202Accepted).ProducesValidationProblem()
+            .Produces(StatusCodes.Status401Unauthorized).Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status415UnsupportedMediaType).ProducesProblem(StatusCodes.Status503ServiceUnavailable);
 
-        secured.MapGet("/operations/{operationId:guid}", GetOperation);
-        secured.MapGet("/orders/{orderNumber}", GetOrder);
+        secured.MapGet("/operations/{operationId:guid}", GetOperation).WithTags("Operations")
+            .WithName("GetOperation").WithSummary("Get the status of a queued operation")
+            .Produces<OperationResponse>().Produces(StatusCodes.Status401Unauthorized).Produces(StatusCodes.Status404NotFound);
+        secured.MapGet("/orders/{orderNumber}", GetOrder).WithTags("Orders")
+            .WithName("GetOrder").WithSummary("Get an order: pending, confirmed or rejected")
+            .Produces<OrderResponse>().Produces(StatusCodes.Status401Unauthorized).Produces(StatusCodes.Status404NotFound);
     }
 
     private static CartLineResponse ToResponse(CartLine l) =>

@@ -1,6 +1,6 @@
 # ADR-0007: Layout variants confined to views and static assets
 
-- Status: Accepted
+- Status: Accepted; demo notice clause superseded by ADR-0019
 - Date: 2026-10-31 (recorded retrospectively 2026-11-02)
 - Source: `openspec/changes/ushop-demo/design.md`
 

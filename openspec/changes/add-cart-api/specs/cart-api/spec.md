@@ -2,7 +2,7 @@
 
 Independently hosted HTTP API that owns cart and order data for the demo shop, accepting writes asynchronously through a queue and serving reads from its own tables in the instance's database.
 
-ADRs: ADR-0010, ADR-0011, ADR-0012, ADR-0014, ADR-0016 (`docs/adrs/`).
+ADRs: ADR-0010, ADR-0011, ADR-0012, ADR-0014, ADR-0016, ADR-0018 (`docs/adrs/`).
 
 ## ADDED Requirements
 
@@ -46,6 +46,10 @@ The API SHALL issue each browser a session: a random identifier of at least 128 
 #### Scenario: Two instances on one machine
 - **WHEN** one browser uses the shops of two worktrees
 - **THEN** each instance sets and reads its own session cookie and neither invalidates the other
+
+#### Scenario: Session request from another site
+- **WHEN** a page on another site's origin (neither the shop site nor the API itself) posts to the session endpoint
+- **THEN** the API returns 403 and sets no cookie
 
 ### Requirement: Cart ownership
 A cart SHALL belong to the session of its first accepted write. Reading a cart owned by another session SHALL return an empty cart, identical to reading an unknown cart id. Writing to a cart owned by another session SHALL return 404 and queue nothing. Orders and operations SHALL be readable only by the session that created them; for any other session they SHALL return 404, identical to an unknown id. If two sessions race to create the same cart id, exactly one SHALL own it and the other's operation SHALL fail.
@@ -160,3 +164,18 @@ The API SHALL allow cross-origin browser requests, including credentials, only f
 #### Scenario: Form post from another site
 - **WHEN** a cross-site HTML form posts to a cart write endpoint
 - **THEN** the API rejects it (no session cookie is sent and the content type is not JSON) and nothing is queued
+
+### Requirement: Development API description (added by Product Owner decision, 2026-11-02)
+In the Development environment the API SHALL publish a machine-readable description of every endpoint and a browsable reference page, both without a session; from the reference page a developer SHALL be able to start a session and call the cart endpoints. Outside Development neither SHALL be served.
+
+#### Scenario: Development
+- **WHEN** the API runs in Development
+- **THEN** the description lists every endpoint with its method, path and JSON request bodies, and the reference page loads without a session cookie
+
+#### Scenario: Try it from the reference page
+- **WHEN** a developer starts a session from the reference page and then reads a cart
+- **THEN** both calls succeed
+
+#### Scenario: Other environments
+- **WHEN** the API runs in any other environment
+- **THEN** the description and the reference page return 404

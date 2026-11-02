@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
 using uShopDemo.Api.Carts;
 using uShopDemo.Api.Data;
 using uShopDemo.Api.Endpoints;
@@ -12,6 +13,7 @@ builder.AddSqlServerDbContext<CartDbContext>(
     configureDbContextOptions: options => options.UseSqlServer(CartDbContext.ConfigureSqlServer));
 
 builder.Services.AddHealthChecks();
+builder.Services.AddApiDocument();
 
 builder.Services.ConfigureHttpJsonOptions(o =>
     o.SerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull);
@@ -55,6 +57,12 @@ app.UseMiddleware<SessionMiddleware>();
 app.MapSessionEndpoints();
 app.MapShopEndpoints();
 app.MapHealthChecks("/health");
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
 
 await app.RunAsync();
 

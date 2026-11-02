@@ -88,6 +88,7 @@ node scripts/worktrees.mjs down    # removes the worktree directories, keeps the
 - Checkout returns an order number at once. The order reads `pending`, then `confirmed` or `rejected`; the confirmation page polls it.
 - Sessions: a signed HttpOnly cookie `__Host-ushop-session-<apiPort>`, 30 days. A cart belongs to the session that first wrote it; other sessions see it as empty and get 404 on writes, orders and operations.
 - CORS is limited to the site origin.
+- API docs (Development only, no session needed): `<API URL>/scalar` (Scalar UI) and `<API URL>/openapi/v1.json` (OpenAPI document).
 
 ## Layout
 
