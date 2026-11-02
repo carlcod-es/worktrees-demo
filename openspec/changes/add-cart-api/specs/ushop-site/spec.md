@@ -1,3 +1,12 @@
+## ADDED Requirements
+
+### Requirement: Price display
+All prices and totals SHALL display in pounds sterling in English format (`£1,234.56`): product cards, product and category pages, cart lines and totals, checkout and order confirmation. Server-rendered and script-rendered amounts SHALL format identically. Stored prices SHALL NOT change; only the currency shown changes. The site language SHALL remain `en-US`.
+
+#### Scenario: Server and client agree
+- **WHEN** a product priced 1234.5 is shown on its product page and then added to the cart
+- **THEN** both the product page and the cart line show `£1,234.50`
+
 ## MODIFIED Requirements
 
 ### Requirement: Product detail

@@ -13,6 +13,7 @@ Cart and checkout live inside the Umbraco site as form posts that reload the pag
 - Product name, SKU and unit price are sent by the browser and stored as given. Demo only: noted in code and docs that a real shop would look them up server-side.
 - **BREAKING** (within this repo): `CartService`, `CartSurfaceController`, `ShopDbContext`, the site's EF Core migrations, the `Umbraco.Cms.Persistence.EFCore` reference and the site's shop migration step are removed. Existing carts in Umbraco's database are not migrated (every run starts on an empty database anyway).
 - Cart, checkout, confirmation views and the header cart count render from API data through a shared script (`wwwroot/js/cart.js`) that fills `<template>` markup defined in the views, so layout branches keep control of markup and CSS.
+- Prices display in pounds sterling, English format (`£1,234.56`), on both server-rendered and script-rendered pages. Only the symbol changes; stored catalogue prices are unchanged. The Umbraco site language stays `en-US`.
 - AppHost: the site waits for the API to report healthy before it starts.
 - Launcher: the port block gains an API port; `dev.mjs` and `worktrees.mjs list` print the API URL.
 
@@ -31,7 +32,7 @@ Dependency: these modify capabilities introduced by the unarchived `ushop-demo` 
 ## Impact
 
 - New project `src/uShopDemo.Api` added to `uShopDemo.slnx`; AppHost references it.
-- `src/uShopDemo.Web`: shop C# code, `Migrations/`, EF Core packages removed; `Views/_Layout`, `product`, `cart`, `checkout`, `orderConfirmation` and `_ViewImports` change; new `wwwroot/js/cart.js`.
+- `src/uShopDemo.Web`: shop C# code, `Migrations/`, EF Core packages removed; `Shop/Money.cs` formats GBP; `Views/_Layout`, `product`, `cart`, `checkout`, `orderConfirmation` and `_ViewImports` change; new `wwwroot/js/cart.js`.
 - `src/uShopDemo.AppHost/AppHost.cs`: second database, API resource, cross-wired URLs.
 - `scripts/lib/ports.mjs` (+ test), `scripts/dev.mjs`, `scripts/worktrees.mjs`, `README.md`.
 - Queued writes are lost if the API process stops before the worker processes them; acceptable for a demo with ephemeral databases.

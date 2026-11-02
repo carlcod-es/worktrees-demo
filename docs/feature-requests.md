@@ -26,3 +26,7 @@ The header shows `siteTitle` as text (`Views/Shared/_Layout.cshtml`, `.brand`). 
 
 - Render the logo with `siteTitle` as alt text, and fall back to the text title when no logo is set.
 - Each layout branch may size and position the logo, but uses the same media item.
+
+## FR-4: Prices in pounds sterling: moved
+
+Moved into the `add-cart-api` change (GBP, English format, symbol only, site language stays `en-US`). See its `ushop-site` spec, requirement "Price display".
