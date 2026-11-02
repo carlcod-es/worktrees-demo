@@ -2,6 +2,8 @@
 
 Defines the three pre-built layout branches used for the manual (non-AI) demo and the rules that keep them comparable.
 
+ADRs: ADR-0007 (`docs/adrs/`).
+
 ## ADDED Requirements
 
 ### Requirement: Three distinct layout branches

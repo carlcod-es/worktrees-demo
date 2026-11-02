@@ -24,6 +24,8 @@ Aspire randomises container name suffixes and SQL host ports and proxies project
 
 ## Decisions
 
+ADRs: ADR-0002, ADR-0003, ADR-0004, ADR-0005, ADR-0006, ADR-0007, ADR-0008, ADR-0009 (`docs/adrs/`). This section keeps the implementation detail.
+
 **Naming.** Solution `uShopDemo.slnx`, projects `uShopDemo.AppHost` / `uShopDemo.Web`, namespaces `uShopDemo.*`, env vars `USHOP_WEB_PORT` / `USHOP_BRANCH`. Aspire generates `Projects.uShopDemo_Web`.
 
 **Port isolation via env, not launchSettings.** The launcher computes ports and sets `ASPNETCORE_URLS` (dashboard), `ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL`, `ASPIRE_RESOURCE_SERVICE_ENDPOINT_URL`, `ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true` (all URLs HTTPS via the dev cert, which covers `localhost` on any port), `USHOP_WEB_PORT`, then runs `dotnet run --project src/uShopDemo.AppHost --no-launch-profile`. Alternatives: per-worktree launchSettings edits (dirty git state), fully dynamic ports (unstable URLs on stage).

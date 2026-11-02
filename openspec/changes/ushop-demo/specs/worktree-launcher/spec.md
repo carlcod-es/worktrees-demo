@@ -2,6 +2,8 @@
 
 Defines the Node scripts that make running and managing parallel worktrees one command each, on Windows, macOS and Linux.
 
+ADRs: ADR-0004 (`docs/adrs/`).
+
 ## ADDED Requirements
 
 ### Requirement: Stable per-worktree ports

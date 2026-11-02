@@ -2,6 +2,8 @@
 
 Independently hosted HTTP API that owns cart and order data for the demo shop, accepting writes asynchronously through a queue and serving reads from its own database.
 
+ADRs: ADR-0010, ADR-0011, ADR-0012, ADR-0014 (`docs/adrs/`).
+
 ## ADDED Requirements
 
 ### Requirement: Independent service

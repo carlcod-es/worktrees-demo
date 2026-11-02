@@ -1,3 +1,5 @@
+ADRs: ADR-0003, ADR-0010 (`docs/adrs/`).
+
 ## MODIFIED Requirements
 
 ### Requirement: AppHost defines the full stack

@@ -2,6 +2,8 @@
 
 Defines the Aspire AppHost topology and the isolation guarantees that let several instances of the same app run concurrently from different git worktrees.
 
+ADRs: ADR-0003, ADR-0004, ADR-0005 (`docs/adrs/`).
+
 ## ADDED Requirements
 
 ### Requirement: AppHost defines the full stack

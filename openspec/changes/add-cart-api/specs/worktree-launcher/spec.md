@@ -1,3 +1,5 @@
+ADRs: ADR-0004 (`docs/adrs/`).
+
 ## MODIFIED Requirements
 
 ### Requirement: Launcher output

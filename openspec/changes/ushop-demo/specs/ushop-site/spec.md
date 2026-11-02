@@ -2,6 +2,8 @@
 
 Defines the Umbraco demo shop that is the subject of the talk: automatically installed and populated, with a working cart and dummy checkout, and presentation isolated to files that vary per layout.
 
+ADRs: ADR-0002, ADR-0006, ADR-0007, ADR-0008, ADR-0009 (`docs/adrs/`).
+
 ## ADDED Requirements
 
 ### Requirement: Unattended install

@@ -25,6 +25,8 @@ Current state (see proposal.md - Why for motivation):
 
 ## Decisions
 
+ADRs: ADR-0004, ADR-0010, ADR-0011, ADR-0012, ADR-0013, ADR-0014 (`docs/adrs/`). This section keeps the implementation detail.
+
 **Project shape.** `src/uShopDemo.Api`, ASP.NET Core minimal API, .NET 10, added to `uShopDemo.slnx` and referenced by the AppHost. EF Core SQL Server via the Aspire client integration `Aspire.Microsoft.EntityFrameworkCore.SqlServer` (`AddSqlServerDbContext<CartDbContext>("shopdb")`): picks up the connection string from the AppHost reference and adds a DB health check. Alternative: plain `AddDbContext` with `GetConnectionString`: works, but repeats what the integration gives for free.
 
 **Endpoints.**
