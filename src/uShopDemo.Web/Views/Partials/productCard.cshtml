@@ -1,6 +1,10 @@
 @* Model: a product node *@
+@{ var cardImage = Model.Value<IEnumerable<IPublishedContent>>("images")?.FirstOrDefault()?.Url(); }
 <article class="product-card">
-    <a href="@Model.Url()" tabindex="-1" aria-hidden="true"><img src="@Model.Value("image")" alt="" loading="lazy"></a>
+    @if (!string.IsNullOrEmpty(cardImage))
+    {
+        <a href="@Model.Url()" tabindex="-1" aria-hidden="true"><img src="@cardImage" alt="" loading="lazy"></a>
+    }
     <div class="product-card-body">
         <h3><a href="@Model.Url()">@Model.Value("title")</a></h3>
         <p class="summary">@Model.Value("summary")</p>

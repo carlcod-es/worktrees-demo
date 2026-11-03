@@ -12,20 +12,13 @@ Replace the plain textarea `description` (product) and `intro` (category) proper
 - Views render blocks through partials under `Views/Partials/blocklist/`, so layout branches can restyle each block.
 - Move the existing seeded description HTML into rich-text blocks.
 
-## FR-2: Multiple images per product
+## FR-2: Multiple images per product: moved
 
-Each product currently has one `image` text property holding a path to an SVG in `wwwroot/img/products`. Replace it with a multiple media picker and add 3-4 images per product.
+Moved into the `add-shop-media` change (SVG media, 3-4 images per product, gallery on the product page, first image on cards). Image cropper presets are dropped: SVG scales without crops (ADR-0020). See its `ushop-site` spec, requirement "Product gallery".
 
-- Store the images as Umbraco media. uSync then needs media and content exports, and the media files must ship with the repo.
-- Product page: main image plus thumbnails. Category cards: first image.
-- Use image cropper presets for card and detail sizes.
+## FR-3: Site logo: moved
 
-## FR-3: Site logo
-
-The header shows `siteTitle` as text (`Views/Shared/_Layout.cshtml`, `.brand`). Add a logo media picker on the `shop` root with an SVG logo.
-
-- Render the logo with `siteTitle` as alt text, and fall back to the text title when no logo is set.
-- Each layout branch may size and position the logo, but uses the same media item.
+Moved into the `add-shop-media` change (SVG logo media picker on the `shop` root, `siteTitle` alt text, text fallback, static copy on error pages). See its `ushop-site` spec, requirement "Site logo".
 
 ## FR-4: Prices in pounds sterling: moved
 

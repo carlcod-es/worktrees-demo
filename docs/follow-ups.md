@@ -1,6 +1,8 @@
 # Follow-ups
 
-Non-blocking items logged during `add-cart-api` reviews. Promote an item to an OpenSpec change or task before fixing it.
+Non-blocking items logged during reviews, grouped by change. Promote an item to an OpenSpec change or task before fixing it.
+
+## `add-cart-api`
 
 - Remove the `System.Security.Cryptography.Pkcs` and `.Xml` version pins once upstream packages are patched.
 - Tests:
@@ -17,3 +19,12 @@ Non-blocking items logged during `add-cart-api` reviews. Promote an item to an O
   - a comment in `shutdown.mjs` wraps unevenly;
   - the 500 ms duplicate-Ctrl+C window uses `Date.now` (`performance.now` would be steadier);
   - label padding in `dev.mjs` output.
+
+## `add-shop-media`
+
+- Gallery thumbnails load the full-size SVG (`Views/product.cshtml`); fine for small SVGs, revisit if raster images arrive.
+- The current-thumbnail rule in `wwwroot/css/site.css` hard-codes `4px` in both the border and the `calc()`; changing one makes the thumbnail jump. Use a custom property.
+- Product artwork bakes the product name and SKU into each SVG, so renaming a product leaves stale image text.
+- `gallery.js` finds the main image with `gallery.querySelector`, which can match a nested gallery's main image; thumbnails already guard against nesting. Filter by `closest('[data-gallery]') === gallery`.
+- Deleting a seeded media item (and emptying the recycle bin) or replacing its file in the backoffice deletes the tracked file under `wwwroot/media/ushop/`. Restore with `git checkout -- src/uShopDemo.Web/wwwroot/media/ushop`.
+- The first uSync export (ADR-0017) of the hand-authored media and data type files will likely add `umbracoWidth`/`umbracoHeight`, real `CreateDate`s and reordered keys. That diff is noise, not drift.

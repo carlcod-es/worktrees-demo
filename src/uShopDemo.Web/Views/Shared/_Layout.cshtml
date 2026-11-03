@@ -4,6 +4,7 @@
     var categories = home.Children()!.Where(c => c.ContentType.Alias == "category").ToList();
     var cartPage = home.Children()!.FirstOrDefault(c => c.ContentType.Alias == "cart");
     var section = Model.AncestorOrSelf(2);
+    var logoUrl = home.Value<IPublishedContent>("logo")?.Url();
     var branch = Config["USHOP_BRANCH"] ?? "unknown";
 }
 <!doctype html>
@@ -15,11 +16,19 @@
     <meta name="ushop-api" content="@Config["USHOP_API_URL"]">
     <link rel="stylesheet" href="/css/site.css" asp-append-version="true">
     <script type="module" src="/js/cart.js" asp-append-version="true"></script>
+    <script type="module" src="/js/gallery.js" asp-append-version="true"></script>
 </head>
 <body>
     <header class="site-header">
         <div class="wrap header-row">
-            <a class="brand" href="@home.Url()">@home.Value("siteTitle")</a>
+            @if (!string.IsNullOrEmpty(logoUrl))
+            {
+                <a class="brand" href="@home.Url()"><img src="@logoUrl" alt="@home.Value("siteTitle")"></a>
+            }
+            else
+            {
+                <a class="brand" href="@home.Url()">@home.Value("siteTitle")</a>
+            }
             <nav class="site-nav" aria-label="Categories">
                 @foreach (var c in categories)
                 {

@@ -1,10 +1,27 @@
 ﻿@using System.Globalization
 @{
     var category = Model.Parent()!;
+    var productTitle = Model.Value<string>("title");
+    var gallery = (Model.Value<IEnumerable<IPublishedContent>>("images") ?? Enumerable.Empty<IPublishedContent>())
+        .Select(m => (Url: m.Url(), AltText: m.Value<string>("altText")))
+        .Where(m => !string.IsNullOrEmpty(m.Url))
+        .Select((m, i) => (m.Url, Alt: string.IsNullOrWhiteSpace(m.AltText) ? $"{productTitle}, image {i + 1}" : m.AltText))
+        .ToList();
 }
 <p class="breadcrumb"><a href="@category.Url()">&larr; @category.Name</a></p>
 <article class="product-detail">
-    <img class="product-image" src="@Model.Value("image")" alt="@Model.Value("title")">
+    @if (gallery.Count > 0)
+    {
+        <div class="product-gallery" data-gallery>
+            <img class="product-image" data-gallery-main src="@gallery[0].Url" alt="@gallery[0].Alt">
+            <ul class="product-thumbs" aria-label="Product images">
+                @for (var i = 0; i < gallery.Count; i++)
+                {
+                    <li><a data-gallery-thumb href="@gallery[i].Url" data-alt="@gallery[i].Alt" aria-current="@(i == 0 ? "true" : null)"><img src="@gallery[i].Url" alt="@gallery[i].Alt"></a></li>
+                }
+            </ul>
+        </div>
+    }
     <div class="product-info">
         <h1>@Model.Value("title")</h1>
         <p class="sku">SKU @Model.Value("sku")</p>

@@ -98,15 +98,19 @@ src/uShopDemo.Api/            cart API: endpoints, queue and worker, sessions, E
 src/uShopDemo.Web/            Umbraco site
   Shop/                       Money.cs (price formatting)
   uSync/v18/                  content model and catalogue (uSync export)
-  Views/, wwwroot/            everything a layout branch may change
+  Views/, wwwroot/            everything a layout branch may change, except the files below
   wwwroot/js/cart.js          cart client; layout branches don't edit it
+  wwwroot/js/gallery.js       product gallery client; layout branches don't edit it
+  wwwroot/media/              seeded media (content, under ushop/); layout branches don't edit it
 tests/uShopDemo.Api.Tests/    API tests (in-process, SQLite)
 scripts/                      dev.mjs (launcher), worktrees.mjs (up|list|down)
 ```
 
-To change a layout, edit only `Views/` and `wwwroot/`, and keep the data-attribute hooks that `cart.js` binds to: see [docs/cart-hooks.md](docs/cart-hooks.md). View changes are compiled at build, so restart the launcher to see them.
+To change a layout, edit only `Views/` and `wwwroot/`, and keep the data-attribute hooks that `cart.js` and `gallery.js` bind to: see [docs/cart-hooks.md](docs/cart-hooks.md) and [docs/gallery-hooks.md](docs/gallery-hooks.md). View changes are compiled at build, so restart the launcher to see them.
 
 To change content or document types: on `main` only, edit in the backoffice, then run an export from the uSync dashboard (Settings > uSync > Export) and commit `uSync/v18`. Saves are not exported automatically (`ExportOnSave` is off, ADR-0017), so unexported edits are lost on the next fresh start. Layout worktrees never write `uSync/**`. Editing the `.config` files by hand also works.
+
+Seeded images are SVG media: uSync items in `uSync/v18/Media`, files committed under `src/uShopDemo.Web/wwwroot/media/ushop/`. Change them on `main` like other content and commit both; a backoffice upload lands in an ignored folder, so move it under `media/ushop/` and update its `umbracoFile` path before committing (ADR-0020).
 
 ## Troubleshooting
 
