@@ -4,13 +4,9 @@ Backlog for later. Not planned or scheduled. Promote an item to an OpenSpec chan
 
 Content model and catalogue live in uSync (`src/uShopDemo.Web/uSync/v18`). Change them in the backoffice on `main`, run a uSync export, then commit the exported files (ADR-0017). Layout branches change only `Views/` and `wwwroot/`.
 
-## FR-1: Block List for page content
+## FR-1: Block List for page content: moved
 
-Replace the plain textarea `description` (product) and `intro` (category) properties with a Block List. Editors then compose content from blocks such as rich text, image, feature list and quote.
-
-- Element types for each block, plus one Block List data type.
-- Views render blocks through partials under `Views/Partials/blocklist/`, so layout branches can restyle each block.
-- Move the existing seeded description HTML into rich-text blocks.
+Moved into the `add-product-blocks` change (product description only, with rich text, feature list and quote blocks, plus editor guidance on every field). Category `intro` stays plain text, and there is no image block because the product gallery covers images. See its `ushop-site` spec, requirement "Product description blocks".
 
 ## FR-2: Multiple images per product: moved
 
