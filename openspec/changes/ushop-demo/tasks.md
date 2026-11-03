@@ -1,3 +1,5 @@
+Note (2026-11-03): this change's specs were synced to `openspec/specs` before `add-cart-api` was archived on top of them. Archive this change with `openspec archive ushop-demo --skip-specs`; a normal archive would overwrite the `add-cart-api` modifications. If a spec delta here changes before archive, sync it by hand first.
+
 Note: an earlier apply pass produced uncommitted `Blog.*` code (see design.md Context). Tasks marked "(carry over)" are expected to be largely satisfied by renaming that code; verify before checking off.
 
 ## 1. Repository foundation
