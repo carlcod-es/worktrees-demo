@@ -22,7 +22,7 @@ See `proposal.md` for motivation. Current state (observed):
 
 ## Decisions
 
-ADRs: ADR-0020 (media storage and seeding), ADR-0021 (gallery script). Superseded: images clause of ADR-0006.
+ADRs: ADR-0020 (media storage and seeding), ADR-0021 (gallery script), ADR-0022 (alt text optional). Superseded: images clause of ADR-0006.
 
 **File layout.** Seeded files live under `src/uShopDemo.Web/wwwroot/media/ushop/`:
 - `products/<sku-lower>-<n>.svg`, with `n` = 1..4 in gallery order. The existing image is redrawn or reused as `-1`.
@@ -50,7 +50,7 @@ src/uShopDemo.Web/wwwroot/media/*
 Alt text describes the image, not the product's merits. Pattern: `<product name>, <view>`. Product order and image order in the manifest are the gallery order.
 
 **Content model (uSync).**
-- `umbracoMediaVectorGraphics`: add `altText` (`Umbraco.TextBox`, mandatory, label "Alt text") on its existing tab.
+- `umbracoMediaVectorGraphics`: add `altText` (`Umbraco.TextBox`, optional, label "Alt text") on its existing tab (ADR-0022; seeded items always set it).
 - Data types (new):
   - `Product Images`: `Umbraco.MediaPicker3`, multiple, allowed type Vector Graphics, min 1, no max, crops off, focal point off.
   - `SVG Image`: same, single.
@@ -67,7 +67,7 @@ Alt text describes the image, not the product's merits. Pattern: `<product name>
 
 **Reading media in views.**
 - `Model.Value<IEnumerable<IPublishedContent>>("images")` (MediaWithCrops is an `IPublishedContent`). Single pickers: `Value<IPublishedContent>("image")`.
-- URL via `.Url()`, alt via `.Value<string>("altText")`.
+- URL via `.Url()`, alt via `.Value<string>("altText")`; when empty, the gallery uses `<product title>, image <n>` (ADR-0022).
 - An empty or missing gallery renders no gallery and no broken `<img>`.
 
 **Gallery markup and script (ADR-0021).** Hooks, documented in `docs/gallery-hooks.md`:

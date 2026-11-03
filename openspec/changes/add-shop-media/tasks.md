@@ -1,4 +1,4 @@
-Order: Section 1 → Section 2 → Section 3 → Section 4 → Section 5. Section 3 can start once 1.2 has passed review: it builds against the aliases fixed in `design.md`. Its verification needs Section 2. Paths, aliases and hooks: `design.md`. Requirements: `specs/ushop-site/spec.md`, `specs/layout-variants/spec.md`. ADR-0020, ADR-0021.
+Order: Section 1 → Section 2 → Section 3 → Section 4 → Section 5. Section 3 can start once 1.2 has passed review: it builds against the aliases fixed in `design.md`. Its verification needs Section 2. Paths, aliases and hooks: `design.md`. Requirements: `specs/ushop-site/spec.md`, `specs/layout-variants/spec.md`. ADR-0020, ADR-0021, ADR-0022.
 
 ## 1. Artwork and manifest (worker-frontend; explicit assignment of `openspec/changes/add-shop-media/media-manifest.json`)
 
@@ -14,7 +14,7 @@ Order: Section 1 → Section 2 → Section 3 → Section 4 → Section 5. Sectio
 
 - [x] 3.1 `docs/gallery-hooks.md` (hooks table from `design.md`, in the style of `docs/cart-hooks.md`) and `wwwroot/js/gallery.js` (ES module, no-op without `[data-gallery]`, loaded from `_Layout` with `asp-append-version`). Verify: `dotnet build uShopDemo.slnx` succeeds. The script only references hooks listed in the doc (`grep -o "data-gallery[a-z-]*"` on both, compared).
 - [x] 3.2 `product.cshtml` gallery: main image plus thumbnail links per `design.md`. The first thumbnail has `aria-current="true"`, the main image's alt is the image's `altText`, and an empty gallery renders nothing. Verify: `dotnet build uShopDemo.slnx` succeeds. On a fresh run, `curl -sk <site>/<product-url>` contains one `data-gallery-main` and 3 or 4 `data-gallery-thumb` links whose `href` values return 200.
-- [ ] 3.3 Product cards (`Partials/productCard.cshtml`) and home category cards (`shop.cshtml`) use the first or single media image with the decorative pattern. `_Layout` brand shows the logo (alt = `siteTitle`) linked home, with a text fallback. `wwwroot/errors/500.html` and `4xx.html` brand uses `/img/logo.svg`. CSS for gallery, thumbnails, current thumbnail and logo (header height ~40px, text sizes still at least 18px). Delete `wwwroot/img/products/` and `wwwroot/img/categories/`. Verify: `dotnet build uShopDemo.slnx` succeeds, `grep -rn "Value(\"image\")\|/img/products\|/img/categories" src/uShopDemo.Web/Views src/uShopDemo.Web/wwwroot` finds nothing, and every page is free of horizontal overflow at 1280x720.
+- [x] 3.3 Product cards (`Partials/productCard.cshtml`) and home category cards (`shop.cshtml`) use the first or single media image with the decorative pattern. `_Layout` brand shows the logo (alt = `siteTitle`) linked home, with a text fallback. `wwwroot/errors/500.html` and `4xx.html` brand uses `/img/logo.svg`. CSS for gallery, thumbnails, current thumbnail and logo (header height ~40px, text sizes still at least 18px). Delete `wwwroot/img/products/` and `wwwroot/img/categories/`. Verify: `dotnet build uShopDemo.slnx` succeeds, `grep -rn "Value(\"image\")\|/img/products\|/img/categories" src/uShopDemo.Web/Views src/uShopDemo.Web/wwwroot` finds nothing, and every page is free of horizontal overflow at 1280x720.
 
 ## 4. Docs (Architect; explicit paths)
 
@@ -22,14 +22,14 @@ Order: Section 1 → Section 2 → Section 3 → Section 4 → Section 5. Sectio
 
 ## 5. Verification (Product Owner, Firefox)
 
-- [ ] 5.1 On a fresh `node scripts/dev.mjs`:
+- [x] 5.1 On a fresh `node scripts/dev.mjs`:
   - home shows category images and the header logo; the logo alt is the site title and it links home;
   - every category page shows each product's first image;
   - a 3-image and a 4-image product show the right thumbnail counts;
   - thumbnails swap the main image by click and by Tab + Enter with no reload, and the current thumbnail is marked;
   - with JavaScript disabled (`about:config` `javascript.enabled` = false), the main image shows and each thumbnail opens its image;
-  - the backoffice media section lists all images with alt text;
-  - uploading an SVG creates a media item whose URL loads;
+  - the backoffice media section lists all seeded images with alt text;
+  - uploading an SVG (drag-and-drop and via Create) without entering alt text saves the item and its URL loads; adding it to a product's images and publishing shows "<product title>, image <n>" as its alt on the product page;
   - reordering a product's images and publishing changes the page and card order;
   - removing the logo and publishing shows the text title;
   - `/errors/500.html` and `/errors/4xx.html` show the logo;

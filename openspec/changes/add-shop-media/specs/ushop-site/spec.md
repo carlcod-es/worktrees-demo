@@ -1,9 +1,9 @@
-ADRs: ADR-0020, ADR-0021 (`docs/adrs/`).
+ADRs: ADR-0020, ADR-0021, ADR-0022 (`docs/adrs/`).
 
 ## ADDED Requirements
 
 ### Requirement: Managed SVG media
-Product images, category images and the site logo SHALL be media items managed in the backoffice, stored as SVG. Each image SHALL carry its own alt text, editable in the backoffice. Editors SHALL be able to upload an SVG file as a new media item. On first boot against an empty database, every seeded media item, with its file and alt text, SHALL be created without manual steps; the import SHALL be idempotent.
+Product images, category images and the site logo SHALL be media items managed in the backoffice, stored as SVG. Each seeded image SHALL carry its own alt text. Alt text SHALL be editable in the backoffice and SHALL NOT be required to save or upload a media item (ADR-0022). When a gallery image has no alt text, the product page SHALL use `<product title>, image <n>` as its alt text. Editors SHALL be able to upload an SVG file as a new media item. On first boot against an empty database, every seeded media item, with its file and alt text, SHALL be created without manual steps; the import SHALL be idempotent.
 
 #### Scenario: Seeded media
 - **WHEN** the site starts against an empty database
