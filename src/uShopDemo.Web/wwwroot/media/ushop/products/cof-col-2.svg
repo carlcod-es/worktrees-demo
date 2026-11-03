@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Colombia Huila, coffee beans close-up">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(37 55% 42%)"/><stop offset="1" stop-color="hsl(72 60% 24%)"/></linearGradient></defs>
+<rect width="800" height="600" fill="url(#g)"/>
+<circle cx="620" cy="140" r="220" fill="#fff" fill-opacity=".06"/><circle cx="120" cy="520" r="160" fill="#fff" fill-opacity=".05"/>
+<g><defs><g id="b"><ellipse rx="34" ry="22" fill="#8a5a34" fill-opacity="1" stroke="#fff" stroke-opacity=".7" stroke-width="2"/><path d="M-30 0 q30 -14 60 0" stroke="#f0d9b0" stroke-width="5" fill="none"/></g></defs><use href="#b" transform="translate(200 170) rotate(-25) scale(2.5)"/><use href="#b" transform="translate(600 170) rotate(25) scale(2.5)"/><use href="#b" transform="translate(400 300) rotate(5) scale(2.5)"/><use href="#b" transform="translate(210 410) rotate(20) scale(2.5)"/><use href="#b" transform="translate(590 410) rotate(-20) scale(2.5)"/></g>
+<text x="40" y="540" font-family="system-ui,sans-serif" font-size="44" font-weight="700" fill="#fff">Colombia Huila</text>
+<text x="40" y="575" font-family="ui-monospace,monospace" font-size="22" fill="#fff" fill-opacity=".7">COF-COL</text>
+</svg>

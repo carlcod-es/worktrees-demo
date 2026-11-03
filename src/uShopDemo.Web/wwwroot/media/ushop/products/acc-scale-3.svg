@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Brewing Scale, in use with dripper and cup">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(342 55% 42%)"/><stop offset="1" stop-color="hsl(17 60% 24%)"/></linearGradient></defs>
+<rect width="800" height="600" fill="url(#g)"/>
+<circle cx="620" cy="140" r="220" fill="#fff" fill-opacity=".06"/><circle cx="120" cy="520" r="160" fill="#fff" fill-opacity=".05"/>
+<g><rect x="150" y="400" width="500" height="50" rx="14" fill="#fff" fill-opacity=".9"/><rect x="320" y="350" width="160" height="50" rx="8" fill="#fff" fill-opacity=".55"/><path d="M330 220 h140 l-20 120 h-100 z" fill="#fff" fill-opacity=".9"/><path d="M470 250 q70 -10 100 -60" stroke="#fff" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M400 300 V330" stroke="#fff" stroke-opacity=".8" stroke-width="8" stroke-linecap="round"/><rect x="196" y="415" width="90" height="20" rx="6" fill="hsl(17 60% 24%)"/></g>
+<text x="40" y="540" font-family="system-ui,sans-serif" font-size="44" font-weight="700" fill="#fff">Brewing Scale</text>
+<text x="40" y="575" font-family="ui-monospace,monospace" font-size="22" fill="#fff" fill-opacity=".7">ACC-SCALE</text>
+</svg>

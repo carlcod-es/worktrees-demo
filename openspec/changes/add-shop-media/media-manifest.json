@@ -1,0 +1,254 @@
+{
+  "logo": {
+    "file": "/media/ushop/logo.svg",
+    "alt": "uShop"
+  },
+  "categories": [
+    {
+      "alias": "coffee",
+      "file": "/media/ushop/categories/coffee.svg",
+      "alt": "Coffee category: a coffee bag with a bean emblem"
+    },
+    {
+      "alias": "brewers",
+      "file": "/media/ushop/categories/brewers.svg",
+      "alt": "Brewers category: a pour-over dripper above a cup"
+    },
+    {
+      "alias": "grinders",
+      "file": "/media/ushop/categories/grinders.svg",
+      "alt": "Grinders category: a hand grinder with a crank"
+    },
+    {
+      "alias": "accessories",
+      "file": "/media/ushop/categories/accessories.svg",
+      "alt": "Accessories category: a gooseneck kettle"
+    }
+  ],
+  "products": [
+    {
+      "sku": "ACC-KETTLE",
+      "images": [
+        {
+          "file": "/media/ushop/products/acc-kettle-1.svg",
+          "alt": "Gooseneck Kettle, front view"
+        },
+        {
+          "file": "/media/ushop/products/acc-kettle-2.svg",
+          "alt": "Gooseneck Kettle, side view with long spout"
+        },
+        {
+          "file": "/media/ushop/products/acc-kettle-3.svg",
+          "alt": "Gooseneck Kettle, spout close-up"
+        },
+        {
+          "file": "/media/ushop/products/acc-kettle-4.svg",
+          "alt": "Gooseneck Kettle, pouring over a dripper"
+        }
+      ]
+    },
+    {
+      "sku": "ACC-MUG",
+      "images": [
+        {
+          "file": "/media/ushop/products/acc-mug-1.svg",
+          "alt": "Stoneware Mug, front view"
+        },
+        {
+          "file": "/media/ushop/products/acc-mug-2.svg",
+          "alt": "Stoneware Mug, top-down view"
+        },
+        {
+          "file": "/media/ushop/products/acc-mug-3.svg",
+          "alt": "Stoneware Mug, with packaging"
+        }
+      ]
+    },
+    {
+      "sku": "ACC-SCALE",
+      "images": [
+        {
+          "file": "/media/ushop/products/acc-scale-1.svg",
+          "alt": "Brewing Scale, front view"
+        },
+        {
+          "file": "/media/ushop/products/acc-scale-2.svg",
+          "alt": "Brewing Scale, top-down view"
+        },
+        {
+          "file": "/media/ushop/products/acc-scale-3.svg",
+          "alt": "Brewing Scale, in use with dripper and cup"
+        }
+      ]
+    },
+    {
+      "sku": "BRW-DRIP",
+      "images": [
+        {
+          "file": "/media/ushop/products/brw-drip-1.svg",
+          "alt": "Pour-Over Dripper, front view"
+        },
+        {
+          "file": "/media/ushop/products/brw-drip-2.svg",
+          "alt": "Pour-Over Dripper, top-down view"
+        },
+        {
+          "file": "/media/ushop/products/brw-drip-3.svg",
+          "alt": "Pour-Over Dripper, ridged interior close-up"
+        },
+        {
+          "file": "/media/ushop/products/brw-drip-4.svg",
+          "alt": "Pour-Over Dripper, in use on a mug"
+        }
+      ]
+    },
+    {
+      "sku": "BRW-MOKA",
+      "images": [
+        {
+          "file": "/media/ushop/products/brw-moka-1.svg",
+          "alt": "Moka Pot 6-Cup, front view"
+        },
+        {
+          "file": "/media/ushop/products/brw-moka-2.svg",
+          "alt": "Moka Pot 6-Cup, angled view from above"
+        },
+        {
+          "file": "/media/ushop/products/brw-moka-3.svg",
+          "alt": "Moka Pot 6-Cup, on a stove"
+        }
+      ]
+    },
+    {
+      "sku": "BRW-PRESS",
+      "images": [
+        {
+          "file": "/media/ushop/products/brw-press-1.svg",
+          "alt": "French Press 1 L, front view"
+        },
+        {
+          "file": "/media/ushop/products/brw-press-2.svg",
+          "alt": "French Press 1 L, plunger and lid close-up"
+        },
+        {
+          "file": "/media/ushop/products/brw-press-3.svg",
+          "alt": "French Press 1 L, pressing coffee into a cup"
+        }
+      ]
+    },
+    {
+      "sku": "COF-COL",
+      "images": [
+        {
+          "file": "/media/ushop/products/cof-col-1.svg",
+          "alt": "Colombia Huila, bag front"
+        },
+        {
+          "file": "/media/ushop/products/cof-col-2.svg",
+          "alt": "Colombia Huila, coffee beans close-up"
+        },
+        {
+          "file": "/media/ushop/products/cof-col-3.svg",
+          "alt": "Colombia Huila, bag with a cup of coffee"
+        }
+      ]
+    },
+    {
+      "sku": "COF-ESP",
+      "images": [
+        {
+          "file": "/media/ushop/products/cof-esp-1.svg",
+          "alt": "House Espresso, bag front"
+        },
+        {
+          "file": "/media/ushop/products/cof-esp-2.svg",
+          "alt": "House Espresso, bag side view"
+        },
+        {
+          "file": "/media/ushop/products/cof-esp-3.svg",
+          "alt": "House Espresso, dark roasted beans close-up"
+        },
+        {
+          "file": "/media/ushop/products/cof-esp-4.svg",
+          "alt": "House Espresso, espresso shot in a cup"
+        }
+      ]
+    },
+    {
+      "sku": "COF-ETH",
+      "images": [
+        {
+          "file": "/media/ushop/products/cof-eth-1.svg",
+          "alt": "Ethiopia Yirgacheffe, bag front"
+        },
+        {
+          "file": "/media/ushop/products/cof-eth-2.svg",
+          "alt": "Ethiopia Yirgacheffe, bag side view"
+        },
+        {
+          "file": "/media/ushop/products/cof-eth-3.svg",
+          "alt": "Ethiopia Yirgacheffe, light roast beans close-up"
+        },
+        {
+          "file": "/media/ushop/products/cof-eth-4.svg",
+          "alt": "Ethiopia Yirgacheffe, bag beside a pour-over cup"
+        }
+      ]
+    },
+    {
+      "sku": "GRD-BLADE",
+      "images": [
+        {
+          "file": "/media/ushop/products/grd-blade-1.svg",
+          "alt": "Blade Grinder, front view"
+        },
+        {
+          "file": "/media/ushop/products/grd-blade-2.svg",
+          "alt": "Blade Grinder, top view showing blade"
+        },
+        {
+          "file": "/media/ushop/products/grd-blade-3.svg",
+          "alt": "Blade Grinder, grinding beans"
+        }
+      ]
+    },
+    {
+      "sku": "GRD-BURR",
+      "images": [
+        {
+          "file": "/media/ushop/products/grd-burr-1.svg",
+          "alt": "Electric Burr Grinder, front view"
+        },
+        {
+          "file": "/media/ushop/products/grd-burr-2.svg",
+          "alt": "Electric Burr Grinder, side view"
+        },
+        {
+          "file": "/media/ushop/products/grd-burr-3.svg",
+          "alt": "Electric Burr Grinder, conical burr close-up"
+        },
+        {
+          "file": "/media/ushop/products/grd-burr-4.svg",
+          "alt": "Electric Burr Grinder, grounds falling into a portafilter"
+        }
+      ]
+    },
+    {
+      "sku": "GRD-HAND",
+      "images": [
+        {
+          "file": "/media/ushop/products/grd-hand-1.svg",
+          "alt": "Hand Grinder, front view"
+        },
+        {
+          "file": "/media/ushop/products/grd-hand-2.svg",
+          "alt": "Hand Grinder, crank handle close-up"
+        },
+        {
+          "file": "/media/ushop/products/grd-hand-3.svg",
+          "alt": "Hand Grinder, grinding over a cup"
+        }
+      ]
+    }
+  ]
+}
