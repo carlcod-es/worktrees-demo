@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace uShopDemo.Web.Shop.Content;
 
 /// <summary>
-/// Pure functions that clamp rich-text headings to h2/h3 inside the product description Block List (ADR-0025).
+/// Pure functions that clamp rich-text headings to h2/h3 inside Block List rich text (product description, blog article main content) (ADR-0025).
 /// </summary>
 public static partial class HeadingNormaliser
 {

@@ -34,3 +34,10 @@ Non-blocking items logged during reviews, grouped by change. Promote an item to 
 - On mobile, the menu shows expanded (links stacked as 44px rows) until `nav.js` runs, then collapses. A small inline script in `<head>` that sets `data-nav-ready` early would remove the shift.
 - `site.css` uses `max-width: 48rem` for the product and checkout single-column rule, but `width < 48rem` for the nav. At exactly 768px the nav is in desktop mode while those pages are single-column. Switch the older rule to `(width < 48rem)`.
 - The global `[hidden] { display: none !important; }` in `site.css` sits under the `/* Cart script */` comment, but `nav.js` relies on it too (`docs/nav-hooks.md`). Reword the comment so layout branches keep it.
+
+## `add-blog`
+
+- No automated tests cover `Shop/Blog/BlogListing.cs` (`Clamp` edge cases, date order, the title tie-break). Seed dates are distinct, so the tie-break is checked by reading and by hand in `add-blog` task 6.1. Needs the same web test project as `HeadingNormaliser`.
+- `BlogListing` relies on `Children()` for published-only filtering, unverified in Umbraco 18. `add-blog` task 6.1 exercises it by unpublishing articles.
+- The seeded node can't be tested for duplicates on restart with `dev.mjs`, because every run gets an empty database (ADR-0005).
+- `.claude/hooks/readonly-bash.mjs` treats `>` inside quoted strings as a redirect, so reviewers can't grep for XML tags.

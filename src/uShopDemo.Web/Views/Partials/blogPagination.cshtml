@@ -1,0 +1,22 @@
+@* Model: BlogPage. The listing URL is the parent of the first article; the control only renders with articles. *@
+@inherits UmbracoViewPage<uShopDemo.Web.Shop.Blog.BlogPage>
+@{
+    var baseUrl = Model.Articles[0].Parent()!.Url();
+    string PageUrl(int n) => n <= 1 ? baseUrl : $"{baseUrl}?page={n}";
+}
+<nav class="pagination" aria-label="Blog pages">
+    <ul>
+        @if (Model.CurrentPage > 1)
+        {
+            <li><a href="@PageUrl(Model.CurrentPage - 1)" rel="prev">Previous</a></li>
+        }
+        @for (var n = 1; n <= Model.TotalPages; n++)
+        {
+            <li><a href="@PageUrl(n)" aria-label="Page @n" aria-current="@(n == Model.CurrentPage ? "page" : null)">@n</a></li>
+        }
+        @if (Model.CurrentPage < Model.TotalPages)
+        {
+            <li><a href="@PageUrl(Model.CurrentPage + 1)" rel="next">Next</a></li>
+        }
+    </ul>
+</nav>

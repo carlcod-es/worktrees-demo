@@ -1,23 +1,23 @@
 ## Purpose
 
-Defines the coffee blog: a paginated listing page in the main navigation, article pages composed from content blocks, single-author content shown on articles, and the seeded articles and images. ADRs: ADR-0027, ADR-0028, ADR-0029 (`docs/adrs/`).
+Defines the coffee blog: a paginated listing page in the main navigation, article pages composed from content blocks, single-author content shown on articles, and the seeded articles and images. ADRs: ADR-0027, ADR-0028, ADR-0029, ADR-0030 (`docs/adrs/`).
 
 ## ADDED Requirements
 
 ### Requirement: Blog navigation link
-Every Umbraco-rendered page SHALL show a "Blog" link in the main navigation, after the category links, leading to the blog listing page. The link SHALL be marked as current on the listing page and on every article page, in the same way as the current category. On narrow screens the link SHALL be inside the collapsible menu with the category links. The link SHALL NOT be shown when the blog listing page is unpublished.
+Every Umbraco-rendered page SHALL show a link to the blog listing page in the main navigation, after the category links, labelled with the listing page's name. The seeded name is "The Daily Grind" (ADR-0030). The link SHALL be marked as current on the listing page and on every article page, in the same way as the current category. On narrow screens the link SHALL be inside the collapsible menu with the category links. The link SHALL NOT be shown when the blog listing page is unpublished.
 
 #### Scenario: Link on every page
 - **WHEN** a visitor opens the home, a category, a product, the cart, checkout or a not-found page
-- **THEN** the main navigation shows "Blog" after the categories and activating it opens the blog listing page
+- **THEN** the main navigation shows "The Daily Grind" after the categories and activating it opens the blog listing page
 
 #### Scenario: Current marker
 - **WHEN** a visitor opens the blog listing page or any article
-- **THEN** the "Blog" link is marked as current and no category link is
+- **THEN** the "The Daily Grind" link is marked as current and no category link is
 
 #### Scenario: Mobile menu
 - **WHEN** a visitor at 390x844 opens the menu
-- **THEN** "Blog" is listed with the categories
+- **THEN** "The Daily Grind" is listed with the categories
 
 ### Requirement: Blog listing
 The blog listing page SHALL list every published article, ordered by publish date with the newest first. Articles with the same publish date SHALL be ordered by title. Each listed article SHALL show its title as a link to the article, publish date, summary, main image and tags. Publish dates SHALL display as day, full month name and year (for example `28 October 2026`) on the listing and on article pages. With no published articles, the page SHALL say that there are no articles yet and SHALL show no pagination control.
@@ -107,7 +107,7 @@ An article SHALL have between 0 and 3 tags, entered as short text by editors and
 - **THEN** the listing and article page show no tag area for that article
 
 ### Requirement: Article main content
-An article's main content SHALL be composed from the same block types as a product description (`ushop-site` requirement "Product description blocks"): rich text, feature list and quote, with at least one block. Rich text in an article SHALL follow the same formatting rules (`ushop-site` requirement "Rich-text formatting"), including heading levels.
+An article's main content SHALL be composed from the same block types as a product description (`ushop-site` requirement "Product description blocks"): rich text, feature list and quote, with at least one block. Rich text in an article SHALL follow the same formatting rules (`ushop-site` requirement "Rich-text formatting"), including heading levels (ADR-0025).
 
 #### Scenario: Blocks in order
 - **WHEN** an article has a rich-text block, a quote and a feature list

@@ -1,0 +1,27 @@
+@* Model: the blog node. Renders nothing when the bio is empty. *@
+@{
+    var bio = Model.Value<string>("authorBio");
+    var name = Model.Value<string>("authorName");
+    var photo = Model.Value<IPublishedContent>("authorImage");
+    var photoUrl = photo?.Url();
+}
+@if (!string.IsNullOrWhiteSpace(bio))
+{
+    <aside class="about-author" aria-labelledby="about-author-heading">
+        <h2 id="about-author-heading">About the author</h2>
+        <div class="about-author-row">
+            @if (!string.IsNullOrEmpty(photoUrl))
+            {
+                var photoAlt = photo!.Value<string>("altText");
+                <img class="about-author-photo" src="@photoUrl" alt="@(string.IsNullOrWhiteSpace(photoAlt) ? name ?? "" : photoAlt)" loading="lazy">
+            }
+            <div class="about-author-text">
+                @if (!string.IsNullOrWhiteSpace(name))
+                {
+                    <p class="about-author-name">@name</p>
+                }
+                <p class="about-author-bio">@bio</p>
+            </div>
+        </div>
+    </aside>
+}

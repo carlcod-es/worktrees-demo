@@ -1,0 +1,36 @@
+@* Model: a blogArticle node *@
+@using System.Globalization
+@{
+    var cardImage = Model.Value<IPublishedContent>("mainImage")?.Url();
+    var published = Model.Value<DateTime?>("publishDate");
+    var summary = Model.Value<string>("summary");
+    var tags = (Model.Value<IEnumerable<string>>("tags") ?? Enumerable.Empty<string>())
+        .Where(t => !string.IsNullOrWhiteSpace(t))
+        .ToList();
+}
+<article class="blog-card">
+    @if (!string.IsNullOrEmpty(cardImage))
+    {
+        <a href="@Model.Url()" tabindex="-1" aria-hidden="true"><img src="@cardImage" alt="" loading="lazy"></a>
+    }
+    <div class="blog-card-body">
+        <h2><a href="@Model.Url()">@Model.Value("title")</a></h2>
+        @if (published is { } d && d != default)
+        {
+            <p class="article-meta"><time datetime="@d.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">@d.ToString("d MMMM yyyy", CultureInfo.GetCultureInfo("en-GB"))</time></p>
+        }
+        @if (!string.IsNullOrWhiteSpace(summary))
+        {
+            <p class="summary">@summary</p>
+        }
+        @if (tags.Count > 0)
+        {
+            <ul class="tag-list" aria-label="Tags">
+                @foreach (var tag in tags)
+                {
+                    <li class="tag">@tag</li>
+                }
+            </ul>
+        }
+    </div>
+</article>

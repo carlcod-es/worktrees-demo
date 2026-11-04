@@ -3,6 +3,7 @@
     var home = Model.AncestorOrSelf(1)!;
     var categories = home.Children()!.Where(c => c.ContentType.Alias == "category").ToList();
     var cartPage = home.Children()!.FirstOrDefault(c => c.ContentType.Alias == "cart");
+    var blogPage = home.Children()!.FirstOrDefault(c => c.ContentType.Alias == "blog");
     var section = Model.AncestorOrSelf(2);
     var logoUrl = home.Value<IPublishedContent>("logo")?.Url();
     var branch = Config["USHOP_BRANCH"] ?? "unknown";
@@ -31,10 +32,14 @@
                 <a class="brand" href="@home.Url()">@home.Value("siteTitle")</a>
             }
             <button type="button" class="nav-toggle" data-nav-toggle hidden aria-expanded="false" aria-controls="site-nav"><span aria-hidden="true">☰</span> Menu</button>
-            <nav class="site-nav" id="site-nav" data-nav-menu aria-label="Categories">
+            <nav class="site-nav" id="site-nav" data-nav-menu aria-label="Main">
                 @foreach (var c in categories)
                 {
                     <a href="@c.Url()" class="@(section?.Id == c.Id ? "active" : null)">@c.Name</a>
+                }
+                @if (blogPage is not null)
+                {
+                    <a href="@blogPage.Url()" class="@(section?.Id == blogPage.Id ? "active" : null)">@blogPage.Name</a>
                 }
             </nav>
             @if (cartPage is not null)

@@ -28,6 +28,6 @@ Out of scope: comments, search, RSS, an author page, tag pages, related articles
 - Content model and seed data under `src/uShopDemo.Web/uSync/v18`: 2 new page types, 2 new templates, 2 new data types, an updated `shop` page type, 11 content items and 12 media items (a folder and 11 images).
 - Seeded files under `src/uShopDemo.Web/wwwroot/media/ushop/blog/`.
 - Views: `_Layout`, new `blog`, `blogArticle` and author partial. `wwwroot/css/site.css`.
-- Application code: a listing and paging helper in `Shop/`, and a wider heading handler. No new packages. Design: `design.md`, ADR-0027, ADR-0028, ADR-0029.
+- Application code: a listing and paging helper in `Shop/`, and a wider heading handler. No new packages. Design: `design.md`, ADR-0027, ADR-0028, ADR-0029, ADR-0030.
 - Docs: new `docs/blog.md`, plus `README.md`, `docs/content-blocks.md`, `docs/nav-hooks.md` and `docs/feature-requests.md` (FR-5 moved).
 - `ushop-demo` tasks 5.1-5.3 should wait until this change is merged.

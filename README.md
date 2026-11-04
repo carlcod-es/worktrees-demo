@@ -113,6 +113,8 @@ To change content or document types: on `main` only, edit in the backoffice, the
 
 Product descriptions are built from blocks (rich text, feature list, quote). For the block types, their markup and how a layout restyles them, see [docs/content-blocks.md](docs/content-blocks.md) (ADR-0023, ADR-0024, ADR-0025).
 
+The blog, "The Daily Grind", is at `/the-daily-grind/`: a paginated listing, articles built from the same blocks, and one author. For its content model, editor workflow, markup and what a layout may change, see [docs/blog.md](docs/blog.md).
+
 Seeded images are SVG media: uSync items in `uSync/v18/Media`, files committed under `src/uShopDemo.Web/wwwroot/media/ushop/`. Change them on `main` like other content and commit both; a backoffice upload lands in an ignored folder, so move it under `media/ushop/` and update its `umbracoFile` path before committing (ADR-0020).
 
 ## Troubleshooting

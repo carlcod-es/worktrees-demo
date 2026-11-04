@@ -46,13 +46,14 @@ Agents in `.claude/agents/`: `worker-backend`, `worker-frontend` (sonnet, implem
 3. Blockers and majors go back to the owning worker, then a fresh re-review. The Architect decides on minors and nits or logs them as follow-ups, and settles disputes. After three failed reviews of the same work, escalate.
 4. On pass, the Architect ticks the block's tasks in `tasks.md`.
 5. Once every block in the section has passed, the supervisor reviews the whole section. Fixes it requests go worker → reviewer → supervisor re-check.
-6. After supervisor approval, send the Product Owner a summary (built, deviations, deferred items, risks). Make one commit per section after their approval.
+6. After supervisor approval, send the Product Owner a summary (built, deviations, deferred items, risks). The Product Owner makes one commit per section; Claude never commits.
 
 **Escalate to the Product Owner**: missing or contradictory requirements (fix the spec via OpenSpec; don't let code drift), new technology or dependencies (ADR first), scope growth, review deadlocks, anything destructive or irreversible. Report when all sections are done, for verification and archive.
 
 ## Always
 
-- These need the Product Owner's approval first: commits, pushes, branches, new dependencies, and any technology decision made outside propose.
+- The Product Owner always makes the commits. Claude and subagents don't commit, even with approval.
+- These need the Product Owner's approval first: pushes, branches, new dependencies, and any technology decision made outside propose.
 
 ## Documentation
 

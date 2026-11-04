@@ -8,7 +8,7 @@
 - The Product Owner has confirmed the block list works, so this change doesn't re-spike or re-test block rendering, labels, editor behaviour or JSON round-trips (`add-product-blocks` task 1.1).
 - `add-mobile-nav` isn't archived yet, so its requirement isn't in the main `ushop-site` spec. The `blog` spec therefore adds its own navigation requirement.
 
-Requirements: `specs/blog/spec.md`. Motivation: `proposal.md`. ADRs: ADR-0027, ADR-0028, ADR-0029.
+Requirements: `specs/blog/spec.md`. Motivation: `proposal.md`. ADRs: ADR-0027, ADR-0028, ADR-0029, ADR-0030.
 
 ## Goals / Non-Goals
 
@@ -61,10 +61,10 @@ Seed values use the same shapes as existing content: Block List JSON as in `Cont
 
 | View | Owner of rules | Notes |
 |---|---|---|
-| `Views/Shared/_Layout.cshtml` | - | Adds the `blog` child as the last link inside `[data-nav-menu]`. `aria-label` becomes "Main". Hooks unchanged (`docs/nav-hooks.md`). |
-| `Views/blog.cshtml` | `BlogListing` | Heading, cards, pagination, empty message. |
+| `Views/Shared/_Layout.cshtml` | - | Adds the `blog` child as the last link inside `[data-nav-menu]`, labelled with its name, as category links are (ADR-0030). `aria-label` becomes "Main". Hooks unchanged (`docs/nav-hooks.md`). |
+| `Views/blog.cshtml` | `BlogListing` | Heading (`title`, falling back to the node name), cards, pagination, empty message. |
 | `Views/Partials/blogCard.cshtml` | - | One card. Image `alt=""` and a hidden link, as `productCard.cshtml`, since the title link has the name. |
-| `Views/Partials/blogPagination.cshtml` | - | `<nav aria-label="Blog pages">`, links, `aria-current="page"` on the current one. |
+| `Views/Partials/blogPagination.cshtml` | - | `<nav aria-label="Blog pages">`, links, `aria-current="page"` on the current one. Links build from the listing's `Url()`; page 1 omits the query string (ADR-0030). |
 | `Views/blogArticle.cshtml` | - | Elements in the spec's order. The main image renders first as `<img class="article-banner">`. Blocks use `Html.GetBlockListHtmlAsync` in `<div class="description article-body">`, reusing block CSS. |
 | `Views/Partials/aboutAuthor.cshtml` | - | Model: the `blog` node. `<aside aria-labelledby=...>` with an `<h2>`, or nothing when the bio is empty. |
 
@@ -91,7 +91,7 @@ public static class BlogListing
 
 ### Heading normaliser
 
-Replace the two handler constants with a small alias map: `product` to `description`, and `blogArticle` to `mainContent`. `HeadingNormaliser` doesn't change. Renaming the handler is optional and not worth churn. The comments that say "product description" get updated.
+Extends ADR-0025. Replace the two handler constants with a small alias map: `product` to `description`, and `blogArticle` to `mainContent`. `HeadingNormaliser` doesn't change. Renaming the handler is optional and not worth churn. The comments that say "product description" get updated.
 
 ### Seeded media
 
@@ -141,12 +141,12 @@ Adds a responsive card list, tag labels, a pagination row and an author panel to
 
 ## Risks / Trade-offs
 
-- [uSync may write an empty view file when it imports a template with no view (`add-blog` task 2.1)] → Delete any stub so `add-blog` task 4.1 creates the real view.
-- [Article pages return 500 until section 4 lands] → Section 2 is verified through the import results and backoffice data, not by rendering pages.
+- [uSync won't create a template whose `.cshtml` is missing: it logs `Failed to create template` and writes no stub (found in `add-blog` task 2.1)] → Minimal placeholder `Views/blog.cshtml` and `Views/blogArticle.cshtml` go in ahead of the import, and `add-blog` task 4.1 replaces them.
+- [Blog pages show only placeholder output until section 4 lands] → Section 2 is verified through the import results, then the `add-blog` task 4.2 fetch checks and `add-blog` task 6.1.
 - [`validationLimit.min` or mandatory rules apply on publish, not on save (seen in `add-product-blocks` task 1.2)] → The spec only requires rejection on publish.
 - [Long article titles overflow on phones] → Listed titles wrap with `overflow-wrap: anywhere`. Article 4 is the long-title test.
 - [Tag spelling drifts] → Accepted for display-only tags (ADR-0028).
-- [Layout branches restyle the header and could lose the Blog link] → None are cut yet. `ushop-demo` tasks 5.1-5.3 follow this merge, and `docs/blog.md` names the link.
+- [Layout branches restyle the header and could lose the blog link] → None are cut yet. `ushop-demo` tasks 5.1-5.3 follow this merge, and `docs/blog.md` names the link.
 
 ## Migration Plan
 

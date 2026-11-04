@@ -1,6 +1,6 @@
 # Product description blocks
 
-Product `description` is a Block List (ADR-0023). Editors add, reorder, repeat and remove blocks; an empty description renders nothing. Categories have no blocks: `intro` is plain text, required, at most 160 characters.
+Product `description` is a Block List (ADR-0023). Editors add, reorder, repeat and remove blocks; an empty description renders nothing. Categories have no blocks: `intro` is plain text, required, at most 160 characters. Blog article `mainContent` uses the same block types and views through its own `Article blocks` data type (`docs/blog.md`), which requires at least one block.
 
 ## Block types
 
@@ -32,6 +32,6 @@ Plain-text values are HTML-encoded. Quote line breaks are kept by CSS (`white-sp
 ## Adding a block type (on `main` only)
 
 1. In the backoffice, create an element type in the `Element types` folder, with a description on the type and every property.
-2. Add it to the `Product description blocks` data type, with an icon and a label (Umbraco Flavored Markdown, e.g. `Quote: {umbValue: quote | truncate:60}`).
-3. Add `Views/Partials/blocklist/Components/<alias>.cshtml` and its CSS. Without that view, any product using the block fails with a 500 error.
+2. Add it to both the `Product description blocks` and `Article blocks` data types, with an icon and a label (Umbraco Flavored Markdown, e.g. `Quote: {umbValue: quote | truncate:60}`).
+3. Add `Views/Partials/blocklist/Components/<alias>.cshtml` and its CSS. Without that view, any product or article using the block fails with a 500 error.
 4. Export from the uSync dashboard and commit `uSync/v18` (ADR-0017). If the block contains rich text that needs heading normalisation, extend `Shop/Content/HeadingNormaliser.cs`.

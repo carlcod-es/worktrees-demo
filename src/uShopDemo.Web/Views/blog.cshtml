@@ -1,0 +1,25 @@
+﻿@{
+    var heading = Model.Value<string>("title");
+    if (string.IsNullOrWhiteSpace(heading)) { heading = Model.Name; }
+    var listing = uShopDemo.Web.Shop.Blog.BlogListing.ForPage(Model, Context.Request.Query["page"]);
+}
+<header class="page-header">
+    <h1>@heading</h1>
+</header>
+@if (listing.Articles.Count == 0)
+{
+    <p class="empty">There are no articles yet. Check back soon.</p>
+}
+else
+{
+    <section class="blog-list" aria-label="Articles">
+        @foreach (var article in listing.Articles)
+        {
+            @await Html.PartialAsync("blogCard", article)
+        }
+    </section>
+    if (listing.TotalPages > 1)
+    {
+        @await Html.PartialAsync("blogPagination", listing)
+    }
+}
