@@ -1,1 +1,2 @@
 *.svg text eol=lf
+src/uShopDemo.Web/appsettings-schema.Umbraco.Cms.json text eol=crlf

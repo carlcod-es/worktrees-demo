@@ -40,3 +40,7 @@ Non-blocking items logged during reviews, grouped by change. Promote an item to 
 - The seeded node can't be tested for duplicates on restart with `dev.mjs`, because every run gets an empty database (ADR-0005).
 - `.claude/hooks/readonly-bash.mjs` doesn't block numbered redirects such as `2> file` or `&> file`: the pattern exempts them so that `2>&1` passes.
 - Remove `.claude/hooks/readonly-bash.mjs` before the demo. Also remove its entry in `.claude/settings.json`, update the agents paragraph in `CLAUDE.md`, and drop the numbered-redirects item above.
+
+## `ushop-demo`
+
+- The `.gitattributes` CRLF rule for `appsettings-schema.Umbraco.Cms.json` is tested on macOS only. Build in a fresh worktree on Windows and Linux and check `git status` stays clean.

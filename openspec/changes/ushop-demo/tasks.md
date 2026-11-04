@@ -51,4 +51,4 @@ Note (from `add-shop-media`, 2026-11-03): create these branches only after `add-
 
 - [ ] 6.1 Write `README.md` (what, prerequisites, quick start, demo credentials) and `docs/demo.md` (pre-talk checklist incl. image pre-pull and pre-build, manual flow, teardown); verify commands run as written
 - [ ] 6.2 Write `docs/agent-prompt.md` with the paste-ready three-shop-layouts prompt and constraints; verify by dry-running with an agent and confirming three branches and three running instances
-- [ ] 6.3 Write `docs/how-worktrees-work.md` one-pager (shared `.git`, per-worktree HEAD/index, per-worktree DB and migrations, commands used in the talk); verify it fits on one screen
+- [x] 6.3 Write `docs/how-worktrees-work.md` one-pager (shared `.git`, per-worktree HEAD/index, per-worktree DB and migrations, commands used in the talk); verify it fits on one screen

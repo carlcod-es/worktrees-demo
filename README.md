@@ -73,6 +73,8 @@ Teardown: stop each launcher with Ctrl+C (once; after a forced exit, remove the 
 node scripts/worktrees.mjs down    # removes the worktree directories, keeps the branches
 ```
 
+For the talk, see [docs/demo.md](docs/demo.md) (checklist, flow, teardown) and [docs/how-worktrees-work.md](docs/how-worktrees-work.md).
+
 ## How isolation works
 
 - **Files**: each worktree has its own checkout and HEAD, sharing one `.git` object store.
