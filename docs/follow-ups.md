@@ -14,11 +14,6 @@ Non-blocking items logged during reviews, grouped by change. Promote an item to 
   - `CorsTests` disposes a client the factory owns;
   - no test that server and client money formatting match.
 - The card-number log scan covers `Cart` only.
-- A stale EF log filter in appsettings (kept on purpose).
-- Launcher:
-  - a comment in `shutdown.mjs` wraps unevenly;
-  - the 500 ms duplicate-Ctrl+C window uses `Date.now` (`performance.now` would be steadier);
-  - label padding in `dev.mjs` output.
 
 ## `add-shop-media`
 
@@ -27,7 +22,6 @@ Non-blocking items logged during reviews, grouped by change. Promote an item to 
 - Product artwork bakes the product name and SKU into each SVG, so renaming a product leaves stale image text.
 - `gallery.js` finds the main image with `gallery.querySelector`, which can match a nested gallery's main image; thumbnails already guard against nesting. Filter by `closest('[data-gallery]') === gallery`.
 - Deleting a seeded media item (and emptying the recycle bin) or replacing its file in the backoffice deletes the tracked file under `wwwroot/media/ushop/`. Restore with `git checkout -- src/uShopDemo.Web/wwwroot/media/ushop`.
-- The first uSync export (ADR-0017) of the hand-authored media and data type files will likely add `umbracoWidth`/`umbracoHeight`, real `CreateDate`s and reordered keys. That diff is noise, not drift.
 
 ## `add-product-blocks`
 
@@ -38,6 +32,5 @@ Non-blocking items logged during reviews, grouped by change. Promote an item to 
 ## `add-mobile-nav`
 
 - On mobile, the menu shows expanded (links stacked as 44px rows) until `nav.js` runs, then collapses. A small inline script in `<head>` that sets `data-nav-ready` early would remove the shift.
-- ADR-0026 Consequences says that without script narrow screens show "the wrapped links". They show stacked under the header row. ADRs are immutable; the spec is unaffected.
 - `site.css` uses `max-width: 48rem` for the product and checkout single-column rule, but `width < 48rem` for the nav. At exactly 768px the nav is in desktop mode while those pages are single-column. Switch the older rule to `(width < 48rem)`.
 - The global `[hidden] { display: none !important; }` in `site.css` sits under the `/* Cart script */` comment, but `nav.js` relies on it too (`docs/nav-hooks.md`). Reword the comment so layout branches keep it.
