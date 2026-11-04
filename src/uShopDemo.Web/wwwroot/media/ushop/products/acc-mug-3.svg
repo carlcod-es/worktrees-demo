@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Stoneware Mug, with packaging">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(354 55% 42%)"/><stop offset="1" stop-color="hsl(29 60% 24%)"/></linearGradient></defs>
+<rect width="800" height="600" fill="url(#g)"/>
+<circle cx="620" cy="140" r="220" fill="#fff" fill-opacity=".06"/><circle cx="120" cy="520" r="160" fill="#fff" fill-opacity=".05"/>
+<g><path d="M120 250 h280 v220 h-280 z" fill="#fff" fill-opacity=".35"/><path d="M120 250 l50 -50 h280 l-50 50 z" fill="#fff" fill-opacity=".55"/><path d="M400 250 l50 -50 v220 l-50 50 z" fill="#fff" fill-opacity=".25"/><rect x="480" y="250" width="150" height="180" rx="22" fill="#fff" fill-opacity=".9"/><path d="M630 290 h25 a35 35 0 0 1 0 70 h-25" stroke="#fff" stroke-width="12" fill="none" stroke-linecap="round"/></g>
+<text x="40" y="540" font-family="system-ui,sans-serif" font-size="44" font-weight="700" fill="#fff">Stoneware Mug</text>
+<text x="40" y="575" font-family="ui-monospace,monospace" font-size="22" fill="#fff" fill-opacity=".7">ACC-MUG</text>
+</svg>

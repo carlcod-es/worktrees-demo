@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Electric Burr Grinder, conical burr close-up">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(162 55% 42%)"/><stop offset="1" stop-color="hsl(197 60% 24%)"/></linearGradient></defs>
+<rect width="800" height="600" fill="url(#g)"/>
+<circle cx="620" cy="140" r="220" fill="#fff" fill-opacity=".06"/><circle cx="120" cy="520" r="160" fill="#fff" fill-opacity=".05"/>
+<g><circle cx="400" cy="250" r="220" fill="#fff" fill-opacity=".55"/><circle cx="400" cy="250" r="150" fill="#fff" fill-opacity=".9"/><circle cx="400" cy="250" r="90" fill="hsl(197 60% 24%)"/><circle cx="400" cy="250" r="40" fill="#fff" fill-opacity=".9"/><path d="M400 100 V400 M250 250 H550 M294 144 L506 356 M506 144 L294 356" stroke="hsl(197 60% 24%)" stroke-width="8" opacity=".7"/></g>
+<text x="40" y="540" font-family="system-ui,sans-serif" font-size="44" font-weight="700" fill="#fff">Electric Burr Grinder</text>
+<text x="40" y="575" font-family="ui-monospace,monospace" font-size="22" fill="#fff" fill-opacity=".7">GRD-BURR</text>
+</svg>

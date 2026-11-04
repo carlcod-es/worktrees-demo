@@ -11,8 +11,12 @@
 <section class="category-grid">
     @foreach (var c in categories)
     {
+        var categoryImage = c.Value<IPublishedContent>("image")?.Url();
         <a class="category-card" href="@c.Url()">
-            <img src="@c.Value("image")" alt="">
+            @if (!string.IsNullOrEmpty(categoryImage))
+            {
+                <img src="@categoryImage" alt="" loading="lazy">
+            }
             <span class="category-name">@c.Name</span>
             <span class="category-intro">@c.Value("intro")</span>
         </a>

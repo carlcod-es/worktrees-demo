@@ -4,7 +4,7 @@
 
 Defines the three pre-built layout branches used for the manual (non-AI) demo and the rules that keep them comparable.
 
-ADRs: ADR-0007 (`docs/adrs/`).
+ADRs: ADR-0007, ADR-0020 (`docs/adrs/`).
 
 ## Requirements
 
@@ -16,11 +16,11 @@ The repository SHALL contain branches `layout/minimal`, `layout/catalog` and `la
 - **THEN** their home, category and product pages are distinguishable at a glance
 
 ### Requirement: Presentation-only diffs
-The diff between any layout branch and `main` SHALL touch only views (including cart, checkout and confirmation views), CSS and static assets.
+The diff between any layout branch and `main` SHALL touch only views (including cart, checkout and confirmation views), CSS and static assets. Seeded media files under `wwwroot/media/` are content, not static assets, and SHALL NOT differ from `main`.
 
 #### Scenario: Diff check
 - **WHEN** `git diff --name-only main...layout/<name>` is run
-- **THEN** every path is under the views or static asset directories
+- **THEN** every path is under the views or static asset directories, and none is under `wwwroot/media/`
 
 ### Requirement: Full flow works in every layout
 Each layout SHALL support the complete flow: browse category, view product, add to cart, checkout, confirmation.

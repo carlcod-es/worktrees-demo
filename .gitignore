@@ -6,7 +6,8 @@ node_modules/
 # Umbraco runtime data
 src/uShopDemo.Web/umbraco/Data/
 src/uShopDemo.Web/umbraco/Logs/
-src/uShopDemo.Web/wwwroot/media/
+src/uShopDemo.Web/wwwroot/media/*
+!src/uShopDemo.Web/wwwroot/media/ushop/
 src/uShopDemo.Web/App_Data/
 src/uShopDemo.Web/umbraco/models/
 src/uShopDemo.Web/Views/Partials/blockgrid/

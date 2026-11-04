@@ -1,0 +1,46 @@
+﻿@using System.Globalization
+@using Umbraco.Cms.Core.Models.Blocks
+@{
+    var blog = Model.Parent()!;
+    var articleTitle = Model.Value<string>("title");
+    var image = Model.Value<IPublishedContent>("mainImage");
+    var imageUrl = image?.Url();
+    var imageAlt = image?.Value<string>("altText");
+    if (string.IsNullOrWhiteSpace(imageAlt)) { imageAlt = articleTitle; }
+    var published = Model.Value<DateTime?>("publishDate");
+    var summary = Model.Value<string>("summary");
+    var tags = (Model.Value<IEnumerable<string>>("tags") ?? Enumerable.Empty<string>())
+        .Where(t => !string.IsNullOrWhiteSpace(t))
+        .ToList();
+    var content = Model.Value<BlockListModel>("mainContent");
+}
+@if (!string.IsNullOrEmpty(imageUrl))
+{
+    <img class="article-banner" src="@imageUrl" alt="@imageAlt">
+}
+<p class="breadcrumb"><a href="@blog.Url()">&larr; @blog.Name</a></p>
+<article class="article">
+    <h1>@articleTitle</h1>
+    @if (published is { } d && d != default)
+    {
+        <p class="article-meta"><time datetime="@d.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">@d.ToString("d MMMM yyyy", CultureInfo.GetCultureInfo("en-GB"))</time></p>
+    }
+    @if (tags.Count > 0)
+    {
+        <ul class="tag-list" aria-label="Tags">
+            @foreach (var tag in tags)
+            {
+                <li class="tag">@tag</li>
+            }
+        </ul>
+    }
+    @if (!string.IsNullOrWhiteSpace(summary))
+    {
+        <p class="summary article-summary">@summary</p>
+    }
+    @if (content?.Any() == true)
+    {
+        <div class="description article-body">@await Html.GetBlockListHtmlAsync(content)</div>
+    }
+</article>
+@await Html.PartialAsync("aboutAuthor", blog)

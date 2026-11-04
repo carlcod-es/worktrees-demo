@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Ethiopia Yirgacheffe, light roast beans close-up">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(25 55% 42%)"/><stop offset="1" stop-color="hsl(60 60% 24%)"/></linearGradient></defs>
+<rect width="800" height="600" fill="url(#g)"/>
+<circle cx="620" cy="140" r="220" fill="#fff" fill-opacity=".06"/><circle cx="120" cy="520" r="160" fill="#fff" fill-opacity=".05"/>
+<g><defs><g id="b"><ellipse rx="34" ry="22" fill="#f0d9b0" fill-opacity="1"/><path d="M-30 0 q30 -14 60 0" stroke="hsl(60 60% 24%)" stroke-width="5" fill="none"/></g></defs><use href="#b" transform="translate(400 170) rotate(-10) scale(2.5)"/><use href="#b" transform="translate(240 360) rotate(25) scale(2.5)"/><use href="#b" transform="translate(560 360) rotate(-30) scale(2.5)"/></g>
+<text x="40" y="540" font-family="system-ui,sans-serif" font-size="44" font-weight="700" fill="#fff">Ethiopia Yirgacheffe</text>
+<text x="40" y="575" font-family="ui-monospace,monospace" font-size="22" fill="#fff" fill-opacity=".7">COF-ETH</text>
+</svg>

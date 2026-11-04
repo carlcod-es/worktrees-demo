@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="House Espresso, espresso shot in a cup">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(49 55% 42%)"/><stop offset="1" stop-color="hsl(84 60% 24%)"/></linearGradient></defs>
+<rect width="800" height="600" fill="url(#g)"/>
+<circle cx="620" cy="140" r="220" fill="#fff" fill-opacity=".06"/><circle cx="120" cy="520" r="160" fill="#fff" fill-opacity=".05"/>
+<g><ellipse cx="400" cy="440" rx="230" ry="38" fill="#fff" fill-opacity=".55"/><path d="M300 280 h200 v60 a100 85 0 0 1 -200 0 z" fill="#fff" fill-opacity=".9"/><path d="M500 300 h35 a35 35 0 0 1 0 70 h-45" stroke="#fff" stroke-width="12" fill="none" stroke-linecap="round"/><ellipse cx="400" cy="282" rx="100" ry="14" fill="hsl(84 60% 24%)"/><path d="M380 250 q12 -22 0 -44 M410 250 q12 -22 0 -44" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round"/></g>
+<text x="40" y="540" font-family="system-ui,sans-serif" font-size="44" font-weight="700" fill="#fff">House Espresso</text>
+<text x="40" y="575" font-family="ui-monospace,monospace" font-size="22" fill="#fff" fill-opacity=".7">COF-ESP</text>
+</svg>

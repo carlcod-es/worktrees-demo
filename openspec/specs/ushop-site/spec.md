@@ -4,7 +4,7 @@
 
 Defines the Umbraco demo shop that is the subject of the talk: automatically installed and populated, with a working cart and dummy checkout, and presentation isolated to files that vary per layout.
 
-ADRs: ADR-0002, ADR-0006, ADR-0007, ADR-0008, ADR-0009, ADR-0015 (`docs/adrs/`).
+ADRs: ADR-0002, ADR-0006, ADR-0007, ADR-0008, ADR-0009, ADR-0015, ADR-0020, ADR-0021, ADR-0022, ADR-0023, ADR-0024, ADR-0025 (`docs/adrs/`).
 
 ## Requirements
 
@@ -16,7 +16,7 @@ The site SHALL install Umbraco against the Aspire-provided database on first boo
 - **THEN** Umbraco is installed and the backoffice accepts the documented demo credentials
 
 ### Requirement: Seeded catalogue
-On first boot against an empty database, the site SHALL import the shop content model and catalogue from uSync files (ADR-0006): at least 4 categories and at least 12 products, each with name, SKU, price, summary, description and image. The import SHALL be idempotent.
+On first boot against an empty database, the site SHALL import the shop content model and catalogue from uSync files (ADR-0006, ADR-0020): at least 4 categories and at least 12 products, each with name, SKU, price, summary, description and 3-4 images, and each category with an image and an intro. Each seeded product description SHALL contain at least one rich-text block. At least 2 seeded products SHALL also contain a feature list block and a quote block. The import SHALL be idempotent.
 
 #### Scenario: Fresh database
 - **WHEN** the site starts with an empty database
@@ -24,17 +24,40 @@ On first boot against an empty database, the site SHALL import the shop content 
 
 #### Scenario: Second start on same database
 - **WHEN** the site restarts against an already seeded database
-- **THEN** no duplicate content is created
+- **THEN** no duplicate content or media is created
+
+#### Scenario: Every block type seeded
+- **WHEN** the site starts with an empty database
+- **THEN** at least 2 product pages each show a rich-text block, a feature list and a quote
+
+### Requirement: Managed SVG media
+Product images, category images and the site logo SHALL be media items managed in the backoffice, stored as SVG. Each seeded image SHALL carry its own alt text. Alt text SHALL be editable in the backoffice and SHALL NOT be required to save or upload a media item (ADR-0022). When a gallery image has no alt text, the product page SHALL use `<product title>, image <n>` as its alt text. Editors SHALL be able to upload an SVG file as a new media item. On first boot against an empty database, every seeded media item, with its file and alt text, SHALL be created without manual steps; the import SHALL be idempotent.
+
+#### Scenario: Seeded media
+- **WHEN** the site starts against an empty database
+- **THEN** the backoffice media library contains every product, category and logo image, each with a non-empty alt text, and each image file loads
+
+#### Scenario: SVG upload
+- **WHEN** an editor uploads an SVG file in the backoffice media section
+- **THEN** a media item is created and its file is served by the site
+
+#### Scenario: Category images
+- **WHEN** a visitor opens the home page
+- **THEN** each category is shown with its managed image
 
 ### Requirement: Category listing
-Each category page SHALL list only the products in that category, with name, price, image and a link to the product.
+Each category page SHALL list only the products in that category, with name, price, the product's first image and a link to the product.
 
 #### Scenario: Browse a category
 - **WHEN** a visitor opens a category
 - **THEN** only that category's products are shown
 
+#### Scenario: Card image
+- **WHEN** a visitor opens a category or the home page
+- **THEN** each product card shows that product's first gallery image
+
 ### Requirement: Product detail
-Each product page SHALL show name, SKU, price, description, image and an add-to-cart control with quantity. Adding to cart SHALL call the cart API from the browser without reloading the page, show that the add is in progress, and update the header cart count once the add completes.
+Each product page SHALL show name, SKU, price, the description blocks (requirement "Product description blocks"), the product gallery and an add-to-cart control with quantity. Adding to cart SHALL call the cart API from the browser without reloading the page, show that the add is in progress, and update the header cart count once the add completes.
 
 #### Scenario: Add to cart
 - **WHEN** a visitor adds 2 of a product
@@ -43,6 +66,29 @@ Each product page SHALL show name, SKU, price, description, image and an add-to-
 #### Scenario: API unavailable
 - **WHEN** a visitor adds to cart while the cart API is unreachable
 - **THEN** the page shows an error message and the cart count is unchanged
+
+### Requirement: Product gallery
+Each seeded product SHALL have 3 or 4 images; the count MAY differ between products. Each image SHALL show a distinct view of the product. The product page SHALL show one main image and a thumbnail for every image, in the editor-defined order, with the first image as the initial main image. Choosing a thumbnail by pointer or keyboard SHALL make that image the main image without reloading the page and SHALL indicate the current thumbnail to sighted and assistive-technology users. The main image SHALL use the chosen image's alt text. Without script, the first image SHALL be the main image and each thumbnail SHALL link to its full image. Editors SHALL be able to add, remove and reorder a product's images in the backoffice.
+
+#### Scenario: Swap by pointer
+- **WHEN** a visitor clicks the third thumbnail on a product page
+- **THEN** the main image becomes the third image with its alt text, the third thumbnail is marked current, and the page does not reload
+
+#### Scenario: Swap by keyboard
+- **WHEN** a visitor moves focus to a thumbnail with the keyboard and activates it
+- **THEN** the main image changes to that image and focus stays on the thumbnail
+
+#### Scenario: Without script
+- **WHEN** a product page is loaded with script disabled
+- **THEN** the first image is shown as the main image and following any thumbnail opens that image
+
+#### Scenario: Varying count
+- **WHEN** products with 3 and with 4 images are opened
+- **THEN** each page shows exactly its own number of thumbnails without empty slots
+
+#### Scenario: Editor reorders
+- **WHEN** an editor moves a product's second image to first and publishes
+- **THEN** the product page and the product's card show that image first
 
 ### Requirement: Persistent cart
 The cart SHALL be identified by an id stored in the visitor's browser and held by the cart API, and SHALL be reachable only with the browser session that created it. The page SHALL obtain a session from the cart API before its first cart request. Visitors SHALL be able to add, change quantity, remove lines and see line totals and a grand total, without page reloads. The unit price SHALL be captured when the line is added. The header cart count SHALL be loaded from the cart API on every page.
@@ -75,7 +121,7 @@ Checkout SHALL collect name, email, address and a fake card number and submit th
 - **THEN** validation messages are shown on the checkout page and no order is created
 
 ### Requirement: Friendly error pages
-The site SHALL answer errors with friendly pages in every environment, including Development, and SHALL NOT show exception details in the browser. Unknown URLs SHALL return 404 with an Umbraco-managed not-found page rendered through the shared layout. Unhandled exceptions SHALL return 500 with a static error page. Other 4xx responses SHALL keep their status code and show a static error page. Adding an unknown or tampered product to the cart SHALL return 400 and change nothing. Static error pages are exempt from the branch badge. Backoffice paths (`/umbraco`) SHALL keep Umbraco's own error handling.
+The site SHALL answer errors with friendly pages in every environment, including Development, and SHALL NOT show exception details in the browser. Unknown URLs SHALL return 404 with an Umbraco-managed not-found page rendered through the shared layout. Unhandled exceptions SHALL return 500 with a static error page. Other 4xx responses SHALL keep their status code and show a static error page. Adding an unknown or tampered product to the cart SHALL return 400 and change nothing. Static error pages are exempt from the branch badge and show the static logo copy (requirement "Site logo"). Backoffice paths (`/umbraco`) SHALL keep Umbraco's own error handling.
 
 #### Scenario: Unknown URL
 - **WHEN** a visitor opens a URL that matches no content
@@ -93,12 +139,27 @@ The site SHALL answer errors with friendly pages in every environment, including
 - **WHEN** the backoffice is used after these pages are configured
 - **THEN** login and editing work and backoffice API errors are returned by Umbraco unchanged
 
+### Requirement: Site logo
+The shop root SHALL have a logo image, seeded as an SVG wordmark. Every Umbraco-rendered page header SHALL show the logo as a link to the home page with the site title as its alt text. When no logo is set, the header SHALL show the site title as text, linked to the home page. Static error pages SHALL show a static copy of the same logo artwork, linked to the home page.
+
+#### Scenario: Logo shown
+- **WHEN** a visitor opens any shop page
+- **THEN** the header shows the logo, its alt text is the site title, and activating it opens the home page
+
+#### Scenario: No logo set
+- **WHEN** an editor removes the logo from the shop root and publishes
+- **THEN** the header shows the site title as a text link to the home page
+
+#### Scenario: Static error page
+- **WHEN** a request returns the static 500 or 4xx page
+- **THEN** the page shows the logo linked to the home page
+
 ### Requirement: Presentation confined to views and static assets
-The shop's appearance SHALL be defined only by Razor views and static CSS/assets. Markup rendered from cart API data SHALL come from templates defined in the views, so layouts can change it. Content model, the cart client script, cart API, migrations and application code SHALL NOT change between layouts.
+The shop's appearance SHALL be defined only by Razor views and static CSS/assets. Markup rendered from cart API data SHALL come from templates defined in the views, so layouts can change it. Content model, seeded media files, the cart and gallery client scripts, cart API, migrations and application code SHALL NOT change between layouts.
 
 #### Scenario: Layout swap
 - **WHEN** only views and CSS differ between two checkouts
-- **THEN** both render the same catalogue and cart behaviour with different layouts
+- **THEN** both render the same catalogue, images, gallery behaviour and cart behaviour with different layouts
 
 ### Requirement: Layout identification
 Every page SHALL display the name of the current git branch in a small badge so parallel instances are distinguishable on screen.
@@ -113,3 +174,69 @@ All prices and totals SHALL display in pounds sterling in English format (`£1,2
 #### Scenario: Server and client agree
 - **WHEN** a product priced 1234.5 is shown on its product page and then added to the cart
 - **THEN** both the product page and the cart line show `£1,234.50`
+
+### Requirement: Product description blocks
+A product's description SHALL be composed by editors from blocks (Product Owner constraint: Umbraco Block List) instead of HTML typed into a text field. The block types SHALL be:
+
+- **Rich text**: formatted text. Content is required.
+- **Feature list**: an optional heading and one or more short text items.
+- **Quote**: quote text (required) and an optional attribution.
+
+Editors SHALL be able to add, edit, reorder, repeat and remove blocks, with no limit on count. The description SHALL be optional; when it has no blocks, the product page SHALL show no description area. The product page SHALL render the blocks in editor order. In the editor, each block SHALL show as a row with an icon, its block type and a snippet of its content, with no visual preview of the site styling. Each block type SHALL render separately in the views, so a layout can restyle one block type without changing the others (requirement "Presentation confined to views and static assets").
+
+#### Scenario: Compose a description
+- **WHEN** an editor adds a rich-text block, a feature list with 3 items and a quote to a product, then publishes
+- **THEN** the product page shows the three blocks in that order
+
+#### Scenario: Reorder blocks
+- **WHEN** an editor moves the quote above the rich-text block and publishes
+- **THEN** the product page shows the quote first
+
+#### Scenario: Empty description
+- **WHEN** an editor removes every block from a product and publishes
+- **THEN** the product page shows no description area and the rest of the page is unchanged
+
+#### Scenario: Required block content
+- **WHEN** an editor tries to save a quote block with no quote text, or a feature list with no items
+- **THEN** the block is rejected with a message saying what is missing
+
+#### Scenario: Editor overview
+- **WHEN** an editor opens a product with several blocks
+- **THEN** each block shows as a row with its icon, type name and a snippet of its content
+
+### Requirement: Rich-text formatting
+The rich-text block SHALL allow only bold, italic, links, bulleted and numbered lists, and two heading levels below the page title. Tables, images, embedded media, colours and font choices SHALL NOT be available, and the product page SHALL NOT render them, including when pasted in.
+
+#### Scenario: Allowed formatting
+- **WHEN** an editor writes a heading, a bulleted list, a link and bold text in a rich-text block and publishes
+- **THEN** the product page shows each with its formatting
+
+#### Scenario: Pasted disallowed formatting
+- **WHEN** an editor pastes content containing a table, an image and coloured text into a rich-text block and publishes
+- **THEN** the product page shows no table, image or colour
+
+### Requirement: Category intro
+A category's intro SHALL be required plain text of at most 160 characters. It is shown on the category page and as the category teaser on the home page. Markup typed into the intro SHALL be shown as literal text and never rendered.
+
+#### Scenario: Intro too long
+- **WHEN** an editor enters an intro longer than 160 characters and saves
+- **THEN** the save is rejected with a message giving the limit
+
+#### Scenario: Intro missing
+- **WHEN** an editor clears a category's intro and saves
+- **THEN** the save is rejected with a message that the intro is required
+
+#### Scenario: Markup in intro
+- **WHEN** an editor saves the intro `Fresh <b>beans</b>` and publishes
+- **THEN** the category page and home page show the text `Fresh <b>beans</b>` literally
+
+### Requirement: Editor field guidance
+Every page type, every property on a page type and every property on a block type SHALL have an editor description of one or two short sentences, saying where it is used on the site and what to enter (for example expected length, format or whether it is optional).
+
+#### Scenario: Property guidance
+- **WHEN** an editor opens any shop page or block in the backoffice
+- **THEN** every property shows a non-empty description
+
+#### Scenario: Page type guidance
+- **WHEN** an editor creates a new page under the shop
+- **THEN** each offered page type shows a non-empty description

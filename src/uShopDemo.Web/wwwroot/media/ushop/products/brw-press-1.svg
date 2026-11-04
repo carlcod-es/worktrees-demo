@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="French Press 1 L, front view">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(212 55% 42%)"/><stop offset="1" stop-color="hsl(247 60% 24%)"/></linearGradient></defs>
+<rect width="800" height="600" fill="url(#g)"/>
+<circle cx="620" cy="140" r="220" fill="#fff" fill-opacity=".06"/><circle cx="120" cy="520" r="160" fill="#fff" fill-opacity=".05"/>
+<g><rect x="290" y="210" width="220" height="250" rx="12" fill="#fff" fill-opacity=".3"/><rect x="290" y="210" width="220" height="250" rx="12" fill="none" stroke="#fff" stroke-width="8"/><rect x="300" y="330" width="200" height="120" fill="#fff" fill-opacity=".55"/><path d="M400 210 V110" stroke="#fff" stroke-width="12" fill="none" stroke-linecap="round"/><circle cx="400" cy="100" r="22" fill="#fff" fill-opacity=".9"/><path d="M510 250 h40 a40 40 0 0 1 0 90 h-40" stroke="#fff" stroke-width="12" fill="none" stroke-linecap="round"/></g>
+<text x="40" y="540" font-family="system-ui,sans-serif" font-size="44" font-weight="700" fill="#fff">French Press 1 L</text>
+<text x="40" y="575" font-family="ui-monospace,monospace" font-size="22" fill="#fff" fill-opacity=".7">BRW-PRESS</text>
+</svg>

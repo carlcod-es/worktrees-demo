@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="House Espresso, dark roasted beans close-up">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(49 55% 42%)"/><stop offset="1" stop-color="hsl(84 60% 24%)"/></linearGradient></defs>
+<rect width="800" height="600" fill="url(#g)"/>
+<circle cx="620" cy="140" r="220" fill="#fff" fill-opacity=".06"/><circle cx="120" cy="520" r="160" fill="#fff" fill-opacity=".05"/>
+<g><rect width="800" height="600" fill="#000" fill-opacity=".25"/><defs><g id="b"><ellipse rx="34" ry="22" fill="#3b2314" fill-opacity="1" stroke="#fff" stroke-opacity=".7" stroke-width="2"/><path d="M-30 0 q30 -14 60 0" stroke="#e8c99a" stroke-width="5" fill="none"/></g></defs><use href="#b" transform="translate(270 180) rotate(-20) scale(2.5)"/><use href="#b" transform="translate(530 190) rotate(15) scale(2.5)"/><use href="#b" transform="translate(290 385) rotate(10) scale(2.5)"/><use href="#b" transform="translate(540 385) rotate(-25) scale(2.5)"/></g>
+<text x="40" y="540" font-family="system-ui,sans-serif" font-size="44" font-weight="700" fill="#fff">House Espresso</text>
+<text x="40" y="575" font-family="ui-monospace,monospace" font-size="22" fill="#fff" fill-opacity=".7">COF-ESP</text>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Gooseneck Kettle, spout close-up">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(330 55% 42%)"/><stop offset="1" stop-color="hsl(5 60% 24%)"/></linearGradient></defs>
+<rect width="800" height="600" fill="url(#g)"/>
+<circle cx="620" cy="140" r="220" fill="#fff" fill-opacity=".06"/><circle cx="120" cy="520" r="160" fill="#fff" fill-opacity=".05"/>
+<g><path d="M100 450 q140 -40 230 -200 q50 -90 160 -110" stroke="#fff" stroke-width="64" fill="none" stroke-linecap="round" stroke-opacity=".9"/><circle cx="520" cy="160" r="38" fill="#fff" fill-opacity=".55"/><circle cx="660" cy="300" r="70" fill="#fff" fill-opacity=".15"/></g>
+<text x="40" y="540" font-family="system-ui,sans-serif" font-size="44" font-weight="700" fill="#fff">Gooseneck Kettle</text>
+<text x="40" y="575" font-family="ui-monospace,monospace" font-size="22" fill="#fff" fill-opacity=".7">ACC-KETTLE</text>
+</svg>
