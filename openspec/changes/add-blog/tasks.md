@@ -46,7 +46,7 @@ Depends on section 4.
 
 Depends on sections 1-5.
 
-- [ ] 6.1 On a fresh `node scripts/dev.mjs`, check each `blog` spec scenario that the fetch checks don't cover:
+- [x] 6.1 On a fresh `node scripts/dev.mjs`, check each `blog` spec scenario that the fetch checks don't cover:
   - Visual, at 1280x720 and 390x844: listing and articles; no clipped right edge at 390 (`body` hides overflow, so a missing scrollbar proves nothing); "The Daily Grind" in the open mobile menu; page 2 with script disabled; article banner and home banner match in width at 1280; article 4's long title at 390; every banner's subject visible at 390; the author panel at 390; the author photo reads as gender-neutral.
   - Mid widths, 768 to 1100: card images keep their subject; the header with the extra nav link on non-blog pages.
   - Seed, in the backoffice: the `Blog` media folder has 11 items with alt text and each image loads; 10 published articles with the right dates and tag counts; editor guidance text shows; `blog` has the "About the author" tab and no "Generic" tab; a read-through of the article copy.

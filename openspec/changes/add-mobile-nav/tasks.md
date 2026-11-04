@@ -18,4 +18,4 @@ Depends on 1.1.
 
 Depends on 1 and 2.
 
-- [ ] 3.1 On a fresh `node scripts/dev.mjs`, check each `ushop-site` "Mobile navigation" scenario: at 390x844 the menu is collapsed with logo, Menu and cart visible and no horizontal scroll; tap, Enter and Space open and close it; Escape closes it and focuses Menu; the current category is marked in the open menu; at 1280x720 links are inline with no button; with script disabled (`about:config` `javascript.enabled` false) links show and there's no button.
+- [x] 3.1 On a fresh `node scripts/dev.mjs`, check each `ushop-site` "Mobile navigation" scenario: at 390x844 the menu is collapsed with logo, Menu and cart visible and no horizontal scroll; tap, Enter and Space open and close it; Escape closes it and focuses Menu; the current category is marked in the open menu; at 1280x720 links are inline with no button; with script disabled (`about:config` `javascript.enabled` false) links show and there's no button.
