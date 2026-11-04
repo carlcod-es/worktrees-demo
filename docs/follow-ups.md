@@ -40,4 +40,4 @@ Non-blocking items logged during reviews, grouped by change. Promote an item to 
 - No automated tests cover `Shop/Blog/BlogListing.cs` (`Clamp` edge cases, date order, the title tie-break). Seed dates are distinct, so the tie-break is checked by reading and by hand in `add-blog` task 6.1. Needs the same web test project as `HeadingNormaliser`.
 - `BlogListing` relies on `Children()` for published-only filtering, unverified in Umbraco 18. `add-blog` task 6.1 exercises it by unpublishing articles.
 - The seeded node can't be tested for duplicates on restart with `dev.mjs`, because every run gets an empty database (ADR-0005).
-- `.claude/hooks/readonly-bash.mjs` treats `>` inside quoted strings as a redirect, so reviewers can't grep for XML tags.
+- `.claude/hooks/readonly-bash.mjs` doesn't block numbered redirects such as `2> file` or `&> file`: the pattern exempts them so that `2>&1` passes.
