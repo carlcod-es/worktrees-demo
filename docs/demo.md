@@ -57,7 +57,29 @@ git diff --name-only main demo -- . ":!openspec" ":!.claude"
 git ls-tree --name-only demo openspec .claude
 ```
 
-**5. Rehearse**
+Steps 1 to 4 and 8 run on the machine you prepare on. Steps 6 and 7 run on the Mac you'll present from.
+
+**5. Push the branches**
+
+The presenting Mac gets everything from here, so this isn't optional.
+
+```sh
+git push origin main demo theme/dark-complete theme/high-contrast-complete
+```
+
+**6. Set up the presenting Mac**
+
+Install the prerequisites in `README.md`, sign in to `claude`, then clone. The fallback needs the `-complete` branches as local branches, and a clone only creates the checked-out one.
+
+```sh
+git clone <repo-url> worktrees-demo
+cd worktrees-demo
+git branch theme/dark-complete origin/theme/dark-complete
+git branch theme/high-contrast-complete origin/theme/high-contrast-complete
+git switch demo
+```
+
+**7. Rehearse**
 
 Follow [Before the talk](#before-the-talk) and then [On stage](#on-stage) in full. Check:
 
@@ -71,27 +93,21 @@ Follow [Before the talk](#before-the-talk) and then [On stage](#on-stage) in ful
 
 Reset as described in [Before the talk](#before-the-talk) step 8.
 
-**6. Close the plan on `main`**
+**8. Close the plan on `main`**
 
-Tell Claude the rehearsal passed, on `main`, so it can tick `ushop-demo` tasks 5.4 and 5.5. Then archive and commit:
+On the machine you prepare on, tell Claude the rehearsal passed, so it can tick `ushop-demo` tasks 5.4 and 5.5. Then archive, commit and push:
 
 ```sh
 git switch main
 openspec archive ushop-demo --skip-specs
 git add openspec
 git commit -m "Archive ushop-demo"
-git switch demo
+git push origin main
 ```
 
 `demo` doesn't need this commit, because it only touches `openspec/`.
 
-**7. Back up the branches (optional)**
-
-```sh
-git push origin main demo theme/dark-complete theme/high-contrast-complete
-```
-
-If `main` changes after this in anything other than `openspec/`, merge it into `demo` and into both `-complete` branches, then repeat from step 2. Check the two theme diffs still list only `site.css`.
+If the rehearsal finds a problem, fix it on the machine you prepare on. For a change to `main` outside `openspec/`, merge it into `demo` and both `-complete` branches, repeat from step 2, then pull all three on the presenting Mac. Check the two theme diffs still list only `site.css`.
 
 ## Before the talk
 
