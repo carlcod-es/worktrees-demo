@@ -28,3 +28,9 @@ Non-blocking items logged during reviews, grouped by change. Promote an item to 
 - `gallery.js` finds the main image with `gallery.querySelector`, which can match a nested gallery's main image; thumbnails already guard against nesting. Filter by `closest('[data-gallery]') === gallery`.
 - Deleting a seeded media item (and emptying the recycle bin) or replacing its file in the backoffice deletes the tracked file under `wwwroot/media/ushop/`. Restore with `git checkout -- src/uShopDemo.Web/wwwroot/media/ushop`.
 - The first uSync export (ADR-0017) of the hand-authored media and data type files will likely add `umbracoWidth`/`umbracoHeight`, real `CreateDate`s and reordered keys. That diff is noise, not drift.
+
+## `add-product-blocks`
+
+- The rich-text block row label uses `stripHtml`, which joins paragraphs without a space ("ratios.USB-C"). Umbraco Flavored Markdown has no filter that keeps paragraph breaks.
+- No automated tests cover `Shop/Content/HeadingNormaliser.cs` (h1 to h2, h4-h6 to h3, attributes and closing-tag whitespace, object and string values, malformed JSON, no change returns null). Needs a web test project, which is a shared `*.csproj` and needs explicit assignment.
+- ADR-0025 says the normaliser runs during the uSync first-boot import. That's unverified, because no seeded markup has h1 or h4-h6.

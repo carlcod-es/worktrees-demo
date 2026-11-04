@@ -27,5 +27,5 @@ Editors write a product's description as raw HTML in a plain textarea, and the p
 - Content model and seed data under `src/uShopDemo.Web/uSync/v18`: product and category page types, guidance on all 7 page types, new block types and data types, all product content items.
 - Views: `product`, plus a per-block rendering location for layouts to override. `wwwroot/css/site.css`.
 - Docs: `docs/feature-requests.md` (FR-1 moved), and README if it describes content editing.
-- Technology choices beyond the Block List constraint are left to `/opsx:propose` (`design.md`, ADRs).
+- Application code: one content-saving handler normalises heading levels (ADR-0025), and no new packages are added. Design: `design.md`, ADR-0023, ADR-0024, ADR-0025.
 - `ushop-demo` tasks 5.1-5.3 wait until this change is merged.
