@@ -1,6 +1,6 @@
 # Cart hooks
 
-Contract between `src/uShopDemo.Web/wwwroot/js/cart.js` and the views. `cart.js` finds elements by data attribute and ignores absent ones. Layout branches may restyle and restructure freely as long as these hooks stay.
+Contract between `src/uShopDemo.Web/wwwroot/js/cart.js` and the views. `cart.js` finds elements by data attribute and ignores absent ones. Views may change freely as long as these hooks stay.
 
 ## Rules
 

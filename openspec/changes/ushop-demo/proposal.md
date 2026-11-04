@@ -1,6 +1,6 @@
 ## Why
 
-Lightning-talk demo of git worktrees and why they matter for parallel agent work. Needs a realistic app where three variants of one demo shop run side by side, each fully isolated (ports, database), so the audience sees the payoff visually: three layouts, three browser tabs, one repo.
+Lightning-talk demo of git worktrees and why they matter for parallel agent work. Needs a realistic app where three variants of one demo shop run side by side, each fully isolated (ports, database), so the audience sees the payoff visually: three themes, three browser tabs, one repo.
 
 ## What Changes
 
@@ -11,8 +11,8 @@ Lightning-talk demo of git worktrees and why they matter for parallel agent work
 - Each AppHost instance is self-contained: dynamic container names, no data volume, own SQL port, own database. Two or more AppHosts run concurrently without collisions.
 - Cross-platform Node launcher (`scripts/dev.mjs`) derives stable, collision-free ports (dashboard, OTLP, resource service, web) per worktree and starts the AppHost.
 - Node helper scripts to create/list/remove demo worktrees (`scripts/worktrees.mjs`).
-- Four git branches: `main` (baseline layout) and `layout/minimal`, `layout/catalog`, `layout/showcase`, differing only in views/CSS, for the non-AI demo.
-- Concise demo docs: setup, manual flow (3 worktrees), agent flow (prompt for 3 parallel layouts), teardown.
+- Branches: `main` (baseline), `theme/dark-complete` and `theme/high-contrast-complete` (finished themes, the stage fallback), `demo` (cut from `main` without OpenSpec tooling or project rules; the on-stage starting point, showing the current look as the light theme), and `theme/dark`, `theme/high-contrast`, created from `demo` during the talk and differing only in CSS, so they can be made live (ADR-0031, ADR-0032).
+- Concise demo docs: setup, manual flow (2 worktrees plus the main checkout), agent flow (one prompt per theme, in `docs/demo.md`), teardown.
 
 ## Capabilities
 
@@ -20,7 +20,7 @@ Lightning-talk demo of git worktrees and why they matter for parallel agent work
 - `aspire-orchestration`: AppHost topology (SQL Server, database, Umbraco) and per-instance isolation of containers, ports and data.
 - `ushop-site`: Umbraco demo shop with unattended install, seeded catalogue, cookie-keyed cart persisted via EF Core, dummy checkout, and presentation confined to swappable views/CSS.
 - `worktree-launcher`: Node scripts for deterministic per-worktree ports, starting the AppHost, and creating/removing demo worktrees.
-- `layout-variants`: The three layout branches and the constraint that they differ only in presentation files so they compare cleanly.
+- `layout-variants`: The three themes (`demo` plus two theme branches), the constraint that theme branches differ only in CSS, and the high-contrast requirements for low-vision users.
 - `demo-guide`: Documentation of the talk flow (manual and agent-driven) and prerequisites.
 
 ### Modified Capabilities

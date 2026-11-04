@@ -25,11 +25,11 @@ The launcher SHALL print the website URL, dashboard URL, branch and worktree pat
 - **THEN** the URLs are printed and the AppHost runs in the foreground until interrupted
 
 ### Requirement: Worktree management
-`scripts/worktrees.mjs` SHALL provide commands to create worktrees for the demo branches (creating missing branches), list them with their URLs, and remove them.
+`scripts/worktrees.mjs` SHALL provide commands to create worktrees for the demo branches (creating missing branches from the branch checked out in the main worktree), list them with their URLs, and remove them.
 
 #### Scenario: Create three
 - **WHEN** the `up` command is run
-- **THEN** a sibling directory exists for each of the three layout branches, checked out as worktrees
+- **THEN** a sibling directory exists for each of the two theme branches, checked out as worktrees, and new branches start from the branch checked out in the main worktree
 
 #### Scenario: Cleanup
 - **WHEN** the `down` command is run

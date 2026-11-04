@@ -15,7 +15,7 @@ Aspire randomises container name suffixes and SQL host ports and proxies project
 **Goals:**
 - Site is HTTPS-only (backoffice login requires it); the ASP.NET dev cert covers `localhost` on every port, so per-worktree ports are unchanged.
 - `node scripts/dev.mjs` in any worktree yields a working, isolated, seeded, migrated shop.
-- Layout work touches only views/CSS, so branches diff cleanly.
+- Theme work touches only CSS, so branches diff cleanly and can be made live without a restart.
 
 **Non-Goals:**
 - Real commerce: payments, stock, tax, shipping, members/login, emails, admin order UI.
@@ -24,7 +24,7 @@ Aspire randomises container name suffixes and SQL host ports and proxies project
 
 ## Decisions
 
-ADRs: ADR-0002, ADR-0003, ADR-0004, ADR-0005, ADR-0006, ADR-0007, ADR-0008, ADR-0009, ADR-0015, ADR-0017 (`docs/adrs/`). This section keeps the implementation detail.
+ADRs: ADR-0002, ADR-0003, ADR-0004, ADR-0005, ADR-0006, ADR-0007, ADR-0008, ADR-0009, ADR-0015, ADR-0017, ADR-0031 (`docs/adrs/`). This section keeps the implementation detail.
 
 **Naming.** Solution `uShopDemo.slnx`, projects `uShopDemo.AppHost` / `uShopDemo.Web`, namespaces `uShopDemo.*`, env vars `USHOP_WEB_PORT` / `USHOP_BRANCH`. Aspire generates `Projects.uShopDemo_Web`.
 
@@ -52,9 +52,9 @@ Alternatives: session cart (not persisted, user asked for DB), orders as Umbraco
 
 **Layouts live in `Views/` and `wwwroot/`.** Contract for layout branches: `wwwroot/errors/500.html`, `wwwroot/errors/4xx.html` and `Views/notFound.cshtml` keep their paths (Program.cs and the `notFound` template reference them); restyle, do not rename or move. `Shared/_Layout.cshtml`, `shop.cshtml`, `category.cshtml`, `product.cshtml`, `cart.cshtml`, `checkout.cshtml`, `orderConfirmation.cshtml`, `notFound.cshtml`, `wwwroot/errors/*.html`, partials under `Views/Partials/`, `wwwroot/css/site.css`. Branch badge reads `USHOP_BRANCH`. No demo notice banner (ADR-0019).
 
-**Layout branches.** `layout/minimal` (clean single column, text-first), `layout/catalog` (dense grid, category sidebar, filters look), `layout/showcase` (large imagery, editorial hero). Branched from `main` after the user commits the baseline. Commits are made by the user.
+**Themes.** Three: the current light look on `demo`, `theme/dark` and `theme/high-contrast`. Finished themes are built on `theme/dark-complete` and `theme/high-contrast-complete` from one `main` commit. `demo` is cut from the same commit and removes `openspec/`, `.claude/` and `CLAUDE.md`; prompts are in `docs/demo.md` (ADR-0032). A theme edits `wwwroot/css/site.css`: the `:root` colour variables, the hero gradient and the input colours, which are hard-coded; the branch badge stays as it is. Optional font and radius changes stay in CSS. Hooks need no change, but the `[hidden]` rule must stay (`docs/nav-hooks.md`). A saved CSS edit is served without a restart and the `asp-append-version` hash changes (tested in a throwaway clone). Stage flow: at the start of the talk, from `demo`, run `up` and start three instances (about 70 seconds each); one `claude` session per worktree edits only `site.css`; refresh the tabs. Alternatives and rationale: ADR-0031, ADR-0032.
 
-**Scripts.** Plain ESM Node, no dependencies. `scripts/lib/ports.mjs`, `scripts/lib/git.mjs` (branch via `symbolic-ref`, works before first commit), `dev.mjs`, `worktrees.mjs` (`up|list|down [branch...]`). Worktrees created as siblings `../<repo>.<branch-slug>`.
+**Scripts.** Plain ESM Node, no dependencies. `scripts/lib/ports.mjs`, `scripts/lib/git.mjs` (branch via `symbolic-ref`, works before first commit), `dev.mjs`, `worktrees.mjs` (`up|list|down [branch...]`). Worktrees created as siblings `../<repo>.<branch-slug>`; `up` creates missing branches from the branch checked out in the main worktree (`demo` on stage).
 
 ## Risks / Trade-offs
 
@@ -64,5 +64,8 @@ Alternatives: session cart (not persisted, user asked for DB), orders as Umbraco
 - [Docker memory with three SQL Servers (~2 GB each)] → Document Docker memory ≥ 8 GB.
 - [A migration added in one worktree only affects that worktree's DB] → Intended; call it out in the talk as a benefit.
 - [Port probe race] → Acceptable; relaunch is stable.
+- [Agent stalls on stage] → `git restore --source=theme/<name>-complete` restores the finished theme without a restart (ADR-0032).
+- [A rehearsal's theme branch would be reused by `up`] → Delete the branches after every rehearsal; docs checklist.
+- [Project rules could stall a stage run] → `demo` removes them; the rehearsal in `ushop-demo` task 5.5 confirms no prompts stall the agents.
 - [Dashboard anonymous access] → HTTPS transport, but no login token; localhost demo only, documented.
 - [Templates rewritten by Umbraco on creation (BOM)] → Content identical; `.gitattributes`/editor ignore BOM; verify `git status` clean after a run.

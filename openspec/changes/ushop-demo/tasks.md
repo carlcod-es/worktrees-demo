@@ -36,19 +36,20 @@ Note: an earlier apply pass produced uncommitted `Blog.*` code (see design.md Co
 - [x] 4.2 (carry over) `scripts/dev.mjs` with `USHOP_*` vars; verify two worktrees started from separate terminals get distinct, repeatable URLs
 - [x] 4.3 `scripts/worktrees.mjs` `up`, `list`, `down`; verify the cycle once `main` has a commit (requires the user to commit the baseline)
 
-## 5. Layout branches
+## 5. Theme branches
 
-Note (from `add-cart-api`): cart, checkout, confirmation and the header count are rendered by `wwwroot/js/cart.js` from the cart API. Layout branches 5.1-5.3 must keep the data-attribute hooks and `<template>` elements documented in `docs/cart-hooks.md`; change markup and CSS around them, not the script. Create these branches after `add-cart-api` is merged.
+Note (Product Owner decision, 2026-11-04; ADR-0031): the themes replace the former layout branches. Themes change CSS only and keep the hooks in `docs/cart-hooks.md`, `docs/gallery-hooks.md` and `docs/nav-hooks.md`. Finished themes are kept on `-complete` branches as the stage fallback; `demo` has no OpenSpec tooling or project rules (ADR-0032).
 
-Note (from `add-shop-media`, 2026-11-03): create these branches only after `add-shop-media` is merged to `main`. Layouts keep the gallery hooks in `docs/gallery-hooks.md`, don't edit `wwwroot/js/gallery.js`, and don't change `wwwroot/media/` (ADR-0020, ADR-0021).
+Order: 5.1, 5.2, 6.1, section review, Product Owner commits to `main`; then 5.3, 6.2, 5.4, 5.5.
 
-- [ ] 5.1 Create `layout/minimal` (clean single column, text-first) in a worktree; verify full flow works and `git diff --name-only main` lists only views/CSS/static assets
-- [ ] 5.2 Create `layout/catalog` (dense grid, category sidebar); same verification
-- [ ] 5.3 Create `layout/showcase` (large imagery, editorial hero); same verification
-- [ ] 5.4 Run all three worktrees concurrently via the launcher; verify three distinct shops with correct branch badges, and that an order placed in one is absent from the others' databases
+- [ ] 5.1 Launcher defaults (worker-backend; own path `scripts/**`): `DEFAULTS` in `scripts/lib/worktrees.mjs` become `theme/dark`, `theme/high-contrast`; `up` creates missing branches from the branch checked out in the main worktree instead of `main`; update `scripts/worktrees.test.mjs`; verify `npm test` passes
+- [ ] 5.2 Sync the revised `layout-variants`, `demo-guide`, `worktree-launcher` and `ushop-site` specs to `openspec/specs` (Architect; explicit paths), since this change's specs were synced earlier; verify `openspec validate --specs`
+- [ ] 5.3 Build `theme/dark-complete` and `theme/high-contrast-complete` from one `main` commit (branches created with Product Owner approval; worker-frontend, one block per theme; `site.css` only, using the palettes in `docs/demo.md`). Verify every `layout-variants` requirement: `git diff --name-only main...<branch>` lists only `site.css`; contrast pairs measured; Product Owner checks the full flow and 200% zoom in Firefox
+- [ ] 5.4 Cut `demo` from the same `main` commit and remove `openspec/`, `.claude/` and `CLAUDE.md` (Product Owner; commands in `docs/demo.md`); depends on 6.2
+- [ ] 5.5 Rehearse from `demo` by following `docs/demo.md`: `up`, start three instances, run both prompts in parallel, refresh in a browser. Time the three-instance start from unbuilt worktrees. Verify: no agent permission prompt stalls; `git status --short` lists only `site.css` in each worktree; the result matches the `-complete` branch; distinct branch badges; an order placed in one instance is absent from the others' databases; the `git restore` fallback works without a restart; the reset leaves no theme branch
 
 ## 6. Demo docs
 
-- [ ] 6.1 Write `README.md` (what, prerequisites, quick start, demo credentials) and `docs/demo.md` (pre-talk checklist incl. image pre-pull and pre-build, manual flow, teardown); verify commands run as written
-- [ ] 6.2 Write `docs/agent-prompt.md` with the paste-ready three-shop-layouts prompt and constraints; verify by dry-running with an agent and confirming three branches and three running instances
+- [ ] 6.1 Update `README.md` (what, prerequisites, quick start, demo credentials), and the examples in `docs/how-worktrees-work.md` for the themes (docs written, Product Owner request, 2026-11-04); remove `· Layout: baseline` from the footer in `Views/Shared/_Layout.cshtml` and the layout wording in the `site.css` comments, including moving `[hidden]` out from under `/* Cart script */` (worker-frontend), before 5.3 cuts branches; verify `dotnet build uShopDemo.slnx` succeeds and commands run as written during 5.5
+- [ ] 6.2 After 5.3: update the prompts in `docs/demo.md` on `main` so they reproduce the finished themes; verify by applying each to a fresh copy of `site.css` and comparing with its `-complete` branch
 - [x] 6.3 Write `docs/how-worktrees-work.md` one-pager (shared `.git`, per-worktree HEAD/index, per-worktree DB and migrations, commands used in the talk); verify it fits on one screen

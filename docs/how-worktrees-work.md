@@ -26,11 +26,11 @@ Git separates the files. Two running copies of an app still collide on ports, da
 ## Commands used in the talk
 
 ```sh
-git worktree add -b layout/minimal ../worktrees-demo.layout-minimal main   # new branch, new directory
-git worktree add ../worktrees-demo.layout-minimal layout/minimal           # existing branch
+git worktree add -b theme/dark ../worktrees-demo.theme-dark demo   # new branch, new directory
+git worktree add ../worktrees-demo.theme-dark theme/dark           # existing branch
 git worktree list
-git worktree remove ../worktrees-demo.layout-minimal                       # keeps the branch
-git worktree prune                                                         # forgets directories deleted by hand
+git worktree remove ../worktrees-demo.theme-dark                   # keeps the branch
+git worktree prune                                                 # forgets directories deleted by hand
 ```
 
-`node scripts/worktrees.mjs up|list|down` wraps these for the three layout branches. See `docs/demo.md`.
+`node scripts/worktrees.mjs up|list|down` wraps these for the two theme branches. See `docs/demo.md`.

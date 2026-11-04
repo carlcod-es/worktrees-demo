@@ -24,11 +24,6 @@ Required fields and the intro limit are enforced on publish.
 
 Plain-text values are HTML-encoded. Quote line breaks are kept by CSS (`white-space: pre-line`), not `<br>`.
 
-## Restyling in a layout branch
-
-- Change the component view(s) and `wwwroot/css/site.css`. Leave `default.cshtml` alone, so new block types keep rendering.
-- Keep the property aliases. The content model (`uSync/**`) and `Shop/**` don't change between layouts (ADR-0007).
-
 ## Adding a block type (on `main` only)
 
 1. In the backoffice, create an element type in the `Element types` folder, with a description on the type and every property.

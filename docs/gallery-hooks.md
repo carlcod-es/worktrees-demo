@@ -1,6 +1,6 @@
 # Gallery hooks
 
-Contract between `src/uShopDemo.Web/wwwroot/js/gallery.js` and the views (ADR-0021). `gallery.js` finds elements by data attribute and does nothing on pages without `[data-gallery]`. Layout branches may restyle and restructure freely as long as these hooks stay.
+Contract between `src/uShopDemo.Web/wwwroot/js/gallery.js` and the views (ADR-0021). `gallery.js` finds elements by data attribute and does nothing on pages without `[data-gallery]`. Views may change freely as long as these hooks stay.
 
 ## Rules
 
@@ -8,7 +8,7 @@ Contract between `src/uShopDemo.Web/wwwroot/js/gallery.js` and the views (ADR-00
 - Don't edit `gallery.js`.
 - Thumbnails are real links to the full image, so the page works without the script (the link opens the image).
 - The server renders the first thumbnail with `aria-current="true"`; the main image shows the same image.
-- Keep the hooks even when a layout hides thumbnails for a single image (hide with CSS or `hidden`, don't remove them).
+- Keep the hooks even when a view hides thumbnails for a single image (hide with CSS or `hidden`, don't remove them).
 - Each `[data-gallery]` is independent: a swap only touches its own main image and thumbnails.
 - Style the active thumbnail with `[aria-current="true"]`.
 

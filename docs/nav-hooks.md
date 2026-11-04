@@ -1,6 +1,6 @@
 # Navigation hooks
 
-Contract between `src/uShopDemo.Web/wwwroot/js/nav.js` and the views (ADR-0026). `nav.js` finds elements by data attribute and does nothing in a `[data-nav]` container that lacks a toggle or menu. Layout branches may restyle and restructure the header freely as long as these hooks stay.
+Contract between `src/uShopDemo.Web/wwwroot/js/nav.js` and the views (ADR-0026). `nav.js` finds elements by data attribute and does nothing in a `[data-nav]` container that lacks a toggle or menu. The header may change freely as long as these hooks stay.
 
 ## Rules
 

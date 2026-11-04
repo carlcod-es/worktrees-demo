@@ -52,19 +52,3 @@ A `page` that is missing, not a whole number (including values too large for `in
 | `Views/Partials/aboutAuthor.cshtml` | `aside.about-author[aria-labelledby]` with an `h2`, optional photo and name, and `.about-author-bio`. Model: the `blog` node. Nothing when the bio is empty. |
 
 Plain-text values go through Razor encoding, so never use `Html.Raw` on them. The bio keeps line breaks with `white-space: pre-line`. Dates are `<time datetime="yyyy-MM-dd">` displaying `d MMMM yyyy` in `en-GB`.
-
-## What a layout may change
-
-May change: `Views/blog.cshtml`, `Views/blogArticle.cshtml`, the three partials, the blog block in `wwwroot/css/site.css`, and the header around the nav link.
-
-Must keep:
-
-- A link to the `blog` node in the nav on every page. It's easy to lose when restyling the header.
-- The nav hooks (`docs/nav-hooks.md`).
-- `BlogListing.ForPage(Model, Context.Request.Query["page"])` as the only source of which articles appear where (ADR-0029). Don't sort or page in a view.
-- The author section on article pages only.
-- Pagination links at least 44px tall below 48rem, and no horizontal overflow at 390x844 or 1280x720. `body` hides overflow rather than scrolling, so check for clipped edges.
-- Query key `page`, with page 1 links omitting it.
-- Banner and card crops between about 1.28:1 and 3.4:1, which keeps the central 640x460 subject visible.
-
-Must not change between layouts: `uSync/**` and `Shop/**` (ADR-0007).

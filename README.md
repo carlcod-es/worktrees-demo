@@ -2,7 +2,7 @@
 
 Run several branches of one app side by side, each from its own git worktree with its own ports and database.
 
-The app is a small Umbraco 18 shop (catalogue, cart, dummy checkout) orchestrated by .NET Aspire, with a throwaway SQL Server container per instance. Layout branches differ only in views and CSS, so you can compare them in three browser tabs.
+The app is a small Umbraco 18 shop (catalogue, cart, dummy checkout) orchestrated by .NET Aspire, with a throwaway SQL Server container per instance. Theme branches differ only in CSS, so you can compare them in three browser tabs.
 
 Each instance runs two services: the Umbraco site and the cart API (`src/uShopDemo.Api`, ASP.NET Core minimal API). Both use one SQL Server database, `umbracoDbDSN`; site tables are Umbraco's, API tables are `ushop*`. The browser calls the API directly.
 
@@ -51,29 +51,18 @@ Run it from the repo root; it finds `src/uShopDemo.AppHost`. This uses Aspire's 
 - The site gets a random port each run. Find it on the `ushop-web` resource in the dashboard, or with `aspire describe ushop-web`. The API also gets a random port, shown as the `ushop-api` resource.
 - A second `aspire run` in the same directory stops the first instance. To run several at once, use one worktree each.
 
-## Run three layouts side by side
+## Run three themes side by side
+
+From the `demo` branch, which shows the current look:
 
 ```sh
-node scripts/worktrees.mjs up      # creates ../<repo>.layout-minimal, -catalog, -showcase
+node scripts/worktrees.mjs up      # creates ../<repo>.theme-dark and ../<repo>.theme-high-contrast
 node scripts/worktrees.mjs list    # branch, site URL, API URL, dashboard URL, path per worktree
 ```
 
-Then, in a separate terminal for each worktree (or use `aspire run` there instead):
+Start `node scripts/dev.mjs` in each directory, in its own terminal. A saved CSS edit shows on refresh, without a restart.
 
-```sh
-cd ../<repo>.layout-minimal
-node scripts/dev.mjs
-```
-
-Each instance shows its branch in a badge in the bottom-right corner. Place an order in one: it exists only in that instance's database.
-
-Teardown: stop each launcher with Ctrl+C (once; after a forced exit, remove the leftover SQL container as described under "Option A"), then
-
-```sh
-node scripts/worktrees.mjs down    # removes the worktree directories, keeps the branches
-```
-
-For the talk, see [docs/demo.md](docs/demo.md) (checklist, flow, teardown) and [docs/how-worktrees-work.md](docs/how-worktrees-work.md).
+For the full talk flow, prompts and teardown, see [docs/demo.md](docs/demo.md). For what worktrees share, see [docs/how-worktrees-work.md](docs/how-worktrees-work.md).
 
 ## How isolation works
 
@@ -92,7 +81,7 @@ For the talk, see [docs/demo.md](docs/demo.md) (checklist, flow, teardown) and [
 - CORS is limited to the site origin.
 - API docs (Development only, no session needed): `<API URL>/scalar` (Scalar UI) and `<API URL>/openapi/v1.json` (OpenAPI document).
 
-## Layout
+## Project structure
 
 ```
 src/uShopDemo.AppHost/        Aspire topology: SQL Server, database, api, web
@@ -100,22 +89,22 @@ src/uShopDemo.Api/            cart API: endpoints, queue and worker, sessions, E
 src/uShopDemo.Web/            Umbraco site
   Shop/                       Money.cs (price formatting), Content/ (heading normaliser, ADR-0025)
   uSync/v18/                  content model and catalogue (uSync export)
-  Views/, wwwroot/            everything a layout branch may change, except the files below
-  wwwroot/js/cart.js          cart client; layout branches don't edit it
-  wwwroot/js/gallery.js       product gallery client; layout branches don't edit it
-  wwwroot/js/nav.js           mobile menu toggle; layout branches don't edit it
-  wwwroot/media/              seeded media (content, under ushop/); layout branches don't edit it
+  Views/, wwwroot/            markup and static assets; themes change only wwwroot/css/site.css
+  wwwroot/js/cart.js          cart client
+  wwwroot/js/gallery.js       product gallery client
+  wwwroot/js/nav.js           mobile menu toggle
+  wwwroot/media/              seeded media (content, under ushop/)
 tests/uShopDemo.Api.Tests/    API tests (in-process, SQLite)
 scripts/                      dev.mjs (launcher), worktrees.mjs (up|list|down)
 ```
 
-To change a layout, edit only `Views/` and `wwwroot/`, and keep the data-attribute hooks that `cart.js`, `gallery.js` and `nav.js` bind to: see [docs/cart-hooks.md](docs/cart-hooks.md), [docs/gallery-hooks.md](docs/gallery-hooks.md) and [docs/nav-hooks.md](docs/nav-hooks.md). View changes are compiled at build, so restart the launcher to see them.
+When changing views, keep the data-attribute hooks that `cart.js`, `gallery.js` and `nav.js` bind to: see [docs/cart-hooks.md](docs/cart-hooks.md), [docs/gallery-hooks.md](docs/gallery-hooks.md) and [docs/nav-hooks.md](docs/nav-hooks.md). View changes are compiled at build, so restart the launcher to see them. CSS changes need no restart.
 
-To change content or document types: on `main` only, edit in the backoffice, then run an export from the uSync dashboard (Settings > uSync > Export) and commit `uSync/v18`. Saves are not exported automatically (`ExportOnSave` is off, ADR-0017), so unexported edits are lost on the next fresh start. Layout worktrees never write `uSync/**`. Editing the `.config` files by hand also works.
+To change content or document types: on `main` only, edit in the backoffice, then run an export from the uSync dashboard (Settings > uSync > Export) and commit `uSync/v18`. Saves are not exported automatically (`ExportOnSave` is off, ADR-0017), so unexported edits are lost on the next fresh start. Theme worktrees never write `uSync/**`. Editing the `.config` files by hand also works.
 
-Product descriptions are built from blocks (rich text, feature list, quote). For the block types, their markup and how a layout restyles them, see [docs/content-blocks.md](docs/content-blocks.md) (ADR-0023, ADR-0024, ADR-0025).
+Product descriptions are built from blocks (rich text, feature list, quote). For the block types and their markup, see [docs/content-blocks.md](docs/content-blocks.md) (ADR-0023, ADR-0024, ADR-0025).
 
-The blog, "The Daily Grind", is at `/the-daily-grind/`: a paginated listing, articles built from the same blocks, and one author. For its content model, editor workflow, markup and what a layout may change, see [docs/blog.md](docs/blog.md).
+The blog, "The Daily Grind", is at `/the-daily-grind/`: a paginated listing, articles built from the same blocks, and one author. For its content model, editor workflow and markup, see [docs/blog.md](docs/blog.md).
 
 Seeded images are SVG media: uSync items in `uSync/v18/Media`, files committed under `src/uShopDemo.Web/wwwroot/media/ushop/`. Change them on `main` like other content and commit both; a backoffice upload lands in an ignored folder, so move it under `media/ushop/` and update its `umbracoFile` path before committing (ADR-0020).
 

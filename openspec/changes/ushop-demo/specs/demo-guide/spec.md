@@ -12,22 +12,26 @@ Docs SHALL list prerequisites and a pre-talk checklist including pulling the SQL
 - **THEN** no image download or package restore is needed on stage
 
 ### Requirement: Manual flow
-Docs SHALL describe the manual demo: create three worktrees, start each, open all three sites, tear down.
+Docs SHALL describe the manual demo: from `demo`, create two worktrees, start them and the main checkout, open all three sites, tear down.
 
 #### Scenario: Follow the steps
 - **WHEN** the steps are followed on a prepared machine
 - **THEN** three isolated sites are running with distinct URLs
 
 ### Requirement: Agent flow
-Docs SHALL provide a ready-to-paste agent prompt that asks for three shop layouts in three parallel worktrees, including the constraints (presentation-only files, use the launcher, report URLs).
+`docs/demo.md` SHALL provide one ready-to-paste prompt per theme, each with contrast-checked CSS values and the constraints (edit `site.css` only; no builds, commands or commits), and a one-command fallback to the finished theme.
 
 #### Scenario: Agent run
-- **WHEN** the prompt is given to an agent that supports parallel worktrees
-- **THEN** it produces three branches with three running instances without touching each other's files
+- **WHEN** each prompt is given to a Claude session in its own worktree on `demo`
+- **THEN** each theme shows on refresh in its own running instance, without touching the other worktree's files
+
+#### Scenario: Agent stalls
+- **WHEN** the fallback command is run in a worktree
+- **THEN** the finished theme shows on refresh, without a restart
 
 ### Requirement: Concise
 Docs SHALL be terse and written for humans and AI readers, without filler.
 
 #### Scenario: Review
 - **WHEN** the docs are read
-- **THEN** each page fits on roughly one screen
+- **THEN** each page fits on roughly one screen, except `docs/demo.md`, which holds all the stage notes and prompts

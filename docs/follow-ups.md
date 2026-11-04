@@ -12,7 +12,7 @@ Non-blocking items logged during reviews, grouped by change. Promote an item to 
   - duplicate older 401 test;
   - `CorsTests` disposes a client the factory owns;
   - no test that server and client money formatting match.
-- The card-number log scan covers `Cart` only.
+- `CheckoutTests` checks that the card number isn't stored in `Cart` string properties. Nothing checks logs or other tables.
 
 ## `add-shop-media`
 
@@ -32,14 +32,10 @@ Non-blocking items logged during reviews, grouped by change. Promote an item to 
 
 - On mobile, the menu shows expanded (links stacked as 44px rows) until `nav.js` runs, then collapses. A small inline script in `<head>` that sets `data-nav-ready` early would remove the shift.
 - `site.css` uses `max-width: 48rem` for the product and checkout single-column rule, but `width < 48rem` for the nav. At exactly 768px the nav is in desktop mode while those pages are single-column. Switch the older rule to `(width < 48rem)`.
-- The global `[hidden] { display: none !important; }` in `site.css` sits under the `/* Cart script */` comment, but `nav.js` relies on it too (`docs/nav-hooks.md`). Reword the comment so layout branches keep it.
 
 ## `add-blog`
 
-- No automated tests cover `Shop/Blog/BlogListing.cs` (`Clamp` edge cases, date order, the title tie-break). Seed dates are distinct, so the tie-break is checked by reading and by hand in `add-blog` task 6.1. Needs the same web test project as `HeadingNormaliser`.
-- The seeded node can't be tested for duplicates on restart with `dev.mjs`, because every run gets an empty database (ADR-0005).
-- `.claude/hooks/readonly-bash.mjs` doesn't block numbered redirects such as `2> file` or `&> file`: the pattern exempts them so that `2>&1` passes.
-- Remove `.claude/hooks/readonly-bash.mjs` before the demo. Also remove its entry in `.claude/settings.json`, update the agents paragraph in `CLAUDE.md`, and drop the numbered-redirects item above.
+- No automated tests cover `Shop/Blog/BlogListing.cs` (`Clamp` edge cases, date order, the title tie-break). Seed dates are distinct, so the tie-break has only been checked by reading and by hand. Needs the same web test project as `HeadingNormaliser`.
 
 ## `ushop-demo`
 
