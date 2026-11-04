@@ -34,3 +34,10 @@ Non-blocking items logged during reviews, grouped by change. Promote an item to 
 - The rich-text block row label uses `stripHtml`, which joins paragraphs without a space ("ratios.USB-C"). Umbraco Flavored Markdown has no filter that keeps paragraph breaks.
 - No automated tests cover `Shop/Content/HeadingNormaliser.cs` (h1 to h2, h4-h6 to h3, attributes and closing-tag whitespace, object and string values, malformed JSON, no change returns null). Needs a web test project, which is a shared `*.csproj` and needs explicit assignment.
 - ADR-0025 says the normaliser runs during the uSync first-boot import. That's unverified, because no seeded markup has h1 or h4-h6.
+
+## `add-mobile-nav`
+
+- On mobile, the menu shows expanded (links stacked as 44px rows) until `nav.js` runs, then collapses. A small inline script in `<head>` that sets `data-nav-ready` early would remove the shift.
+- ADR-0026 Consequences says that without script narrow screens show "the wrapped links". They show stacked under the header row. ADRs are immutable; the spec is unaffected.
+- `site.css` uses `max-width: 48rem` for the product and checkout single-column rule, but `width < 48rem` for the nav. At exactly 768px the nav is in desktop mode while those pages are single-column. Switch the older rule to `(width < 48rem)`.
+- The global `[hidden] { display: none !important; }` in `site.css` sits under the `/* Cart script */` comment, but `nav.js` relies on it too (`docs/nav-hooks.md`). Reword the comment so layout branches keep it.

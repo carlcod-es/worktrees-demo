@@ -17,9 +17,10 @@
     <link rel="stylesheet" href="/css/site.css" asp-append-version="true">
     <script type="module" src="/js/cart.js" asp-append-version="true"></script>
     <script type="module" src="/js/gallery.js" asp-append-version="true"></script>
+    <script type="module" src="/js/nav.js" asp-append-version="true"></script>
 </head>
 <body>
-    <header class="site-header">
+    <header class="site-header" data-nav>
         <div class="wrap header-row">
             @if (!string.IsNullOrEmpty(logoUrl))
             {
@@ -29,7 +30,8 @@
             {
                 <a class="brand" href="@home.Url()">@home.Value("siteTitle")</a>
             }
-            <nav class="site-nav" aria-label="Categories">
+            <button type="button" class="nav-toggle" data-nav-toggle hidden aria-expanded="false" aria-controls="site-nav"><span aria-hidden="true">☰</span> Menu</button>
+            <nav class="site-nav" id="site-nav" data-nav-menu aria-label="Categories">
                 @foreach (var c in categories)
                 {
                     <a href="@c.Url()" class="@(section?.Id == c.Id ? "active" : null)">@c.Name</a>
