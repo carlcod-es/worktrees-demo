@@ -19,3 +19,7 @@ Moved into the `add-shop-media` change (SVG logo media picker on the `shop` root
 ## FR-4: Prices in pounds sterling: moved
 
 Moved into the `add-cart-api` change (GBP, English format, symbol only, site language stays `en-US`). See its `ushop-site` spec, requirement "Price display".
+
+## FR-5: Add a coffee themed blog
+
+Add a coffee blog for some humourous content, blocklist, listing pages and content.
