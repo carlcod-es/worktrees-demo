@@ -29,9 +29,16 @@ Docs SHALL describe the manual demo: from `demo`, create two worktrees, start th
 - **WHEN** the fallback command is run in a worktree
 - **THEN** the finished theme shows on refresh, without a restart
 
+### Requirement: Stage branch rules
+The `demo` branch SHALL have a short `CLAUDE.md`, kept on `main` as `docs/demo-claude.md`, describing the repo and the theme rules, with no project process (ADR-0033). `docs/demo.md` SHALL list the steps to cut and check `demo` after the final slice.
+
+#### Scenario: Cut demo
+- **WHEN** the steps are followed
+- **THEN** `demo` differs from `main` only by the removed `openspec/` and `.claude/` and the replaced `CLAUDE.md`
+
 ### Requirement: Concise
 Docs SHALL be terse and written for humans and AI readers, without filler.
 
 #### Scenario: Review
 - **WHEN** the docs are read
-- **THEN** each page fits on roughly one screen, except `docs/demo.md`, which holds all the stage notes and prompts
+- **THEN** each page fits on roughly one screen, except `docs/demo.md`, which holds all the stage notes and prompts, and the reference pages `docs/requirements.md` and `docs/implementation-notes.md`

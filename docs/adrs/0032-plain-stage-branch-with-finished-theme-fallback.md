@@ -1,6 +1,6 @@
 # ADR-0032: Plain `demo` branch, separate Claude sessions and finished-theme fallback
 
-- Status: Accepted
+- Status: Accepted; clause removing `CLAUDE.md` superseded by ADR-0033
 - Date: 2026-11-04
 - Source: Product Owner decision during `ushop-demo` planning revision
 - Supersedes: ADR-0031 (clauses on keeping no finished themes, and on the prompt and hints living only on `demo`)

@@ -12,32 +12,94 @@ Paths assume the repo directory is `worktrees-demo`. Prerequisites are in `READM
 
 **Why no restart:** the app serves `wwwroot/css/site.css` directly from the worktree, so a saved edit shows on the next refresh. The AppHost and database keep running.
 
-## Prepare the branches (once)
+## After the final slice
 
-Starts from a `main` that needs no more changes.
+Do this once `ushop-demo` tasks 5.1 to 6.2 are done and committed, including the two `-complete` branches.
 
-1. Build the finished themes, both from the same `main` commit: `theme/dark-complete` and `theme/high-contrast-complete`. These are the stage fallback. Each must change only `site.css`:
-   ```sh
-   git diff --name-only main...theme/dark-complete
-   git diff --name-only main...theme/high-contrast-complete
-   ```
-2. Check the snippets in [Prompts](#prompts) match the finished themes.
-3. Cut `demo` and remove the OpenSpec tooling and project rules, so stage agents get a plain repo with no process to follow:
-   ```sh
-   git switch -c demo main
-   git rm -r openspec .claude CLAUDE.md
-   git commit -m "Remove project process for the stage run"
-   ```
+**1. Check `main`**
 
-If `main` changes later, merge it into `demo` and re-cut the `-complete` branches.
+```sh
+git switch main
+git status                        # clean
+npm test
+dotnet test
+```
+
+**2. Check the finished themes**
+
+Each diff must list only `site.css`, and all three commands must print the same commit. If they don't, re-cut the `-complete` branches from `main`.
+
+```sh
+git diff --name-only main...theme/dark-complete
+git diff --name-only main...theme/high-contrast-complete
+git rev-parse main
+git merge-base main theme/dark-complete
+git merge-base main theme/high-contrast-complete
+```
+
+**3. Cut `demo`**
+
+This removes OpenSpec and the project process, and puts the short `CLAUDE.md` in place (ADR-0032, ADR-0033).
+
+```sh
+git switch -c demo main
+git rm -r -q openspec .claude CLAUDE.md
+git mv docs/demo-claude.md CLAUDE.md
+git commit -m "Prepare demo branch for the stage run"
+```
+
+**4. Check `demo`**
+
+The first command must list only `CLAUDE.md` and `docs/demo-claude.md`. The second must print nothing.
+
+```sh
+git diff --name-only main demo -- . ":!openspec" ":!.claude"
+git ls-tree --name-only demo openspec .claude
+```
+
+**5. Rehearse**
+
+Follow [Before the talk](#before-the-talk) and then [On stage](#on-stage) in full. Check:
+
+- [ ] No agent stops for a permission prompt or asks a question.
+- [ ] Agents edit only `site.css` and don't build, run or commit anything.
+- [ ] Each theme looks like its `-complete` branch.
+- [ ] Branch badges differ, and an order in one tab doesn't appear in the others.
+- [ ] Both themes work through the full flow. High contrast is usable at 200% zoom.
+- [ ] The fallback in [If something goes wrong](#if-something-goes-wrong) works with no restart.
+- [ ] You've noted how long the three instances take to start.
+
+Reset as described in [Before the talk](#before-the-talk) step 8.
+
+**6. Close the plan on `main`**
+
+Tell Claude the rehearsal passed, on `main`, so it can tick `ushop-demo` tasks 5.4 and 5.5. Then archive and commit:
+
+```sh
+git switch main
+openspec archive ushop-demo --skip-specs
+git add openspec
+git commit -m "Archive ushop-demo"
+git switch demo
+```
+
+`demo` doesn't need this commit, because it only touches `openspec/`.
+
+**7. Back up the branches (optional)**
+
+```sh
+git push origin main demo theme/dark-complete theme/high-contrast-complete
+```
+
+If `main` changes after this in anything other than `openspec/`, merge it into `demo` and into both `-complete` branches, then repeat from step 2. Check the two theme diffs still list only `site.css`.
 
 ## Before the talk
 
-Needs network. Run these from the real repo path: ports come from the path, so the bookmarks stay valid on stage.
+Needs network. Run these on the Mac you'll present from, at the real repo path: ports come from the path, so the bookmarks stay valid on stage.
 
 1. `docker pull mcr.microsoft.com/mssql/server:2022-latest`
 2. `dotnet dev-certs https --trust`, then restart the browser.
-3. Give Docker at least 8 GB of memory (each SQL Server uses ~2 GB).
+3. In Docker Desktop, under Settings > Resources, give Docker at least 8 GB of memory (each SQL Server uses ~2 GB). On Apple Silicon, the SQL Server image is `linux/amd64` and runs under emulation, so it starts more slowly and needs Docker's Rosetta or QEMU emulation left on.
 4. Check `claude` is signed in. It's the only thing that needs network on stage, so test the venue connection or have a hotspot ready.
 5. Stop anything else using the stack: `docker ps --filter name=ushop-sql` should list nothing.
 6. `git switch demo`, then `dotnet build uShopDemo.slnx`.
@@ -51,7 +113,8 @@ Needs network. Run these from the real repo path: ports come from the path, so t
 On the day, set up the screen before going on:
 
 - 5 terminals, large font, all in `worktrees-demo` on `demo`: 3 for instances, 2 for Claude.
-- Browser with the 3 bookmarked URLs. Signed in nowhere that matters, notifications off.
+- Browser with the 3 bookmarked URLs, signed in nowhere that matters.
+- Do Not Disturb on, power connected, and `caffeinate -d` running in a spare tab so the Mac doesn't sleep.
 - This page and the two prompts open somewhere you can copy from, off the shared screen.
 - `git status` clean, no `theme/*` worktrees, `docker ps --filter name=ushop-sql` empty.
 

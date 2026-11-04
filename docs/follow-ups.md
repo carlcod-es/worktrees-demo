@@ -1,6 +1,6 @@
 # Follow-ups
 
-Non-blocking items logged during reviews, grouped by change. Promote an item to an OpenSpec change or task before fixing it.
+Non-blocking items logged during reviews, grouped by change. Plan an item as a task before fixing it. Headings name the change that logged the item.
 
 ## `add-cart-api`
 

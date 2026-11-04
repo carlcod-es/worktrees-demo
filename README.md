@@ -108,6 +108,13 @@ The blog, "The Daily Grind", is at `/the-daily-grind/`: a paginated listing, art
 
 Seeded images are SVG media: uSync items in `uSync/v18/Media`, files committed under `src/uShopDemo.Web/wwwroot/media/ushop/`. Change them on `main` like other content and commit both; a backoffice upload lands in an ignored folder, so move it under `media/ushop/` and update its `umbracoFile` path before committing (ADR-0020).
 
+## Documentation
+
+- [docs/requirements.md](docs/requirements.md): what the app must do
+- [docs/implementation-notes.md](docs/implementation-notes.md): detail and findings the code doesn't explain
+- [docs/adrs/](docs/adrs/README.md): architecture decisions
+- [docs/follow-ups.md](docs/follow-ups.md): known non-blocking items
+
 ## Troubleshooting
 
 - **Stuck on startup**: check Docker is running and has enough memory; open the dashboard URL for per-resource logs.

@@ -1,6 +1,6 @@
 # Blog
 
-"The Daily Grind": a coffee blog with a paginated listing, articles built from blocks, and one author. Requirements: `blog` spec. Decisions: ADR-0027, ADR-0028, ADR-0029, ADR-0030. Seeded by uSync on first boot (ADR-0006).
+"The Daily Grind": a coffee blog with a paginated listing, articles built from blocks, and one author. Requirements: `docs/requirements.md`. Decisions: ADR-0027, ADR-0028, ADR-0029, ADR-0030. Seeded by uSync on first boot (ADR-0006).
 
 ## URLs
 
