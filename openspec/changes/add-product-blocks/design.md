@@ -82,7 +82,7 @@ Repeatable textstrings give add, remove and drag-reorder per item at no cost.
 
 - Hand-author the uSync `.config` changes. Each product's `description` value becomes Block List JSON (`layout` / `contentData` / `settingsData` / `expose`) with fixed GUID keys, and the rich-text `text` value carries the existing HTML as `markup`.
 - `add-product-blocks` task 1.1 is a spike on one product: a fresh boot imports it without failures, and a uSync export of that product round-trips to an equivalent value. The other products get converted only after the spike passes.
-- Showcase products (feature list and quote as well as rich text): Brewing Scale, Ethiopia Yirgacheffe and Hand Grinder. Copy is written to match each product, for example "What's in the box" for equipment and "Tasting notes" for coffee.
+- Every product has rich text, then a feature list, then a quote. Brewing Scale, Ethiopia Yirgacheffe and Hand Grinder were the first three; the other 9 were added at the Product Owner's request (`add-product-blocks` task 1.5). Stoneware Mug's feature list has no heading, so the seed covers that label path. Copy is written to match each product, for example "What's in the box" for equipment and "Tasting notes" for coffee.
 
 Alternative: author everything in the backoffice and export. That gives correct JSON, but it's slow and manual for 12 products, and the export adds noise (`CreateDate`, key order). Hand-authoring with a spike and a round-trip check is faster and repeatable.
 

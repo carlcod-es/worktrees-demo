@@ -9,7 +9,7 @@ Editors write a product's description as raw HTML in a plain textarea, and the p
 - Rich text is limited to bold, italic, links, lists and two heading levels. Tables, images, embeds, colours and fonts aren't allowed.
 - In the editor, each block shows as a labelled row with an icon, its type and a content snippet. There's no visual preview.
 - Each block type renders separately, so layouts can restyle one block type without touching the others.
-- Seed data: all 12 descriptions become one rich-text block each, with the same text. 2-3 products also get a feature list and a quote.
+- Seed data: all 12 descriptions become one rich-text block each, with the same text. Every product also gets a feature list and a quote (originally 2-3; widened by the Product Owner during apply).
 - Category `intro` stays plain text. It becomes required and is capped at 160 characters, and markup typed into it is shown as literal text.
 - Every page type and every property, including the block properties, gets a concise editor description saying where it is used and what to enter.
 - FR-1's category body and image block are dropped. Category pages get no blocks, and product images stay in the gallery.

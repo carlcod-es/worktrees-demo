@@ -23,6 +23,8 @@ Contract for section 2: element type and property aliases in `design.md` "Conten
   - feature list and quote values are unchanged;
   - non-product content saves are unaffected.
 
+- [x] 1.5 (Product Owner request after `add-product-blocks` task 4.1) Give the other 9 seeded products a feature list block and a quote block after their rich-text block, matching the showcase products. Copy is fixed in the Architect's brief. Stoneware Mug's feature list has no heading.
+
 ## 2. Block views and styles (worker-frontend)
 
 Depends on 1.1 (aliases and seeded Brewing Scale). Can run in parallel with 1.2 and 1.3 (disjoint files).
@@ -48,7 +50,7 @@ Depends on 2.1.
 
 ## 4. Verification (Product Owner, Firefox)
 
-- [ ] 4.1 On a fresh `node scripts/dev.mjs`:
+- [x] 4.1 (Product Owner: passed, "good enough"; the Save-path and label risks were accepted without a separate check) On a fresh `node scripts/dev.mjs`:
   - the three showcase products show rich text, a feature list and a quote, and the other 9 products show their original text;
   - in the backoffice, add, reorder and remove blocks on a product, publish, and see the product page follow;
   - block rows show a snippet: a feature list with a heading shows the heading; clear the heading of one feature list (no need to publish) and its row shows the items instead. If not, report it; the Architect switches the label to `Feature list: {umbValue: heading} {umbValue: items}`;
