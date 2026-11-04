@@ -58,11 +58,19 @@ The blog listing SHALL show 5 articles per page and SHALL render on the server, 
 - **THEN** the first three show page 1, `99` shows page 2, and each response is successful
 
 ### Requirement: Article page
-Each article SHALL have its own page showing, in order: a link back to the listing, title, publish date, tags, summary, main image, main content and the author section (requirement "About the author"). The main image SHALL use its media alt text, or the article title when it has none.
+Each article SHALL have its own page showing, in order: the main image as a banner, a link back to the listing, title, publish date, tags, summary, main content and the author section (requirement "About the author"). The banner SHALL be directly under the site header and SHALL fill the width of the page content, matching the home page banner. On narrow screens it MAY crop at the sides but SHALL keep its subject visible. The main image SHALL use its media alt text, or the article title when it has none.
 
 #### Scenario: Open an article
 - **WHEN** a visitor activates an article's title on the listing
 - **THEN** the article page shows each of these elements in that order
+
+#### Scenario: Banner at the top
+- **WHEN** a visitor opens an article at 1280x720
+- **THEN** the main image is the first thing under the site header, is wider than it is tall, and is as wide as the home page banner
+
+#### Scenario: Banner on a phone
+- **WHEN** a visitor opens an article at 390x844
+- **THEN** the banner fills the content width, its subject is visible and nothing overflows horizontally
 
 #### Scenario: Image without alt text
 - **WHEN** an editor clears the alt text of an article's main image
@@ -129,7 +137,7 @@ The blog SHALL have one author. The author's name, photo and bio SHALL be edited
 - **THEN** article pages show the name and bio with no empty image space
 
 ### Requirement: Seeded blog
-On first boot against an empty database, the site SHALL import the blog listing page, the author content and 10 published articles without manual steps. The import SHALL be idempotent. Articles SHALL be humorous and coffee themed, written in one author's voice, with distinct publish dates in the past. People and organisations named in them SHALL be fictional. Each article SHALL have a summary, a distinct main image and at least one rich-text block of at least 150 words. At least 3 articles SHALL also contain a feature list and a quote. At least one article SHALL have 1 tag and at least one SHALL have 3. Every main image and the author photo SHALL be a backoffice-managed SVG media item with its own alt text (ADR-0020).
+On first boot against an empty database, the site SHALL import the blog listing page, the author content and 10 published articles without manual steps. The import SHALL be idempotent. Articles SHALL be humorous and coffee themed, written in one author's voice, with distinct publish dates in the past. People and organisations named in them SHALL be fictional. Each article SHALL have a summary, a distinct main image and at least one rich-text block of at least 150 words. At least 3 articles SHALL also contain a feature list and a quote. At least one article SHALL have 1 tag and at least one SHALL have 3. Every main image SHALL be a wide landscape banner. The author photo SHALL show a gender-neutral coffee nerd, and the seeded author content SHALL NOT assign the author a gender. Every main image and the author photo SHALL be a backoffice-managed SVG media item with its own alt text (ADR-0020).
 
 #### Scenario: Fresh database
 - **WHEN** the site starts with an empty database

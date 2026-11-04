@@ -1,0 +1,69 @@
+{
+  "articles": [
+    {
+      "alias": "grinder-judging",
+      "file": "/media/ushop/blog/grinder-judging.svg",
+      "article": "Your Grinder Is Judging You",
+      "alt": "A hand coffee grinder with a disapproving frown and furrowed eyebrows"
+    },
+    {
+      "alias": "field-guide",
+      "file": "/media/ushop/blog/field-guide.svg",
+      "article": "A Field Guide to the Coffee Bore",
+      "alt": "An open field guide book with a coffee cup resting on its pages"
+    },
+    {
+      "alias": "bloom",
+      "file": "/media/ushop/blog/bloom.svg",
+      "article": "Bloom: Thirty Seconds of Staring at Wet Coffee",
+      "alt": "A pour-over dripper with bubbling coffee grounds above a carafe"
+    },
+    {
+      "alias": "moka-alarm",
+      "file": "/media/ushop/blog/moka-alarm.svg",
+      "article": "The Moka Pot Will Tell You When It's Done. So Will the Smoke Alarm.",
+      "alt": "A moka pot with steam rising toward a ceiling smoke alarm"
+    },
+    {
+      "alias": "too-many-mugs",
+      "file": "/media/ushop/blog/too-many-mugs.svg",
+      "article": "How Many Mugs Is Too Many Mugs?",
+      "alt": "A shelf overloaded with rows of stacked coffee mugs"
+    },
+    {
+      "alias": "tasting-notes",
+      "file": "/media/ushop/blog/tasting-notes.svg",
+      "article": "Tasting Notes, Translated",
+      "alt": "A coffee cup beside a tasting notecard and a speech bubble"
+    },
+    {
+      "alias": "press-sludge",
+      "file": "/media/ushop/blog/press-sludge.svg",
+      "article": "In Defence of French Press Sludge",
+      "alt": "A French press with a thick layer of coffee sludge at the bottom"
+    },
+    {
+      "alias": "weigh-everything",
+      "file": "/media/ushop/blog/weigh-everything.svg",
+      "article": "I Weighed My Coffee for a Month and Now I Weigh Everything",
+      "alt": "A digital kitchen scale weighing a single running shoe"
+    },
+    {
+      "alias": "gooseneck",
+      "file": "/media/ushop/blog/gooseneck.svg",
+      "article": "The Gooseneck Kettle: Pouring With Unearned Confidence",
+      "alt": "A gooseneck kettle pouring a thin arc of water into a cup"
+    },
+    {
+      "alias": "decaf",
+      "file": "/media/ushop/blog/decaf.svg",
+      "article": "Decaf: A Love Story With One Participant",
+      "alt": "A single coffee cup with a heart and a sleeping crescent moon"
+    }
+  ],
+  "author": {
+    "alias": "author",
+    "file": "/media/ushop/blog/author.svg",
+    "alt": "Stylised portrait of Perry Kolator, a coffee nerd in round glasses and a bean-print beanie, with a pencil behind the ear and a tasting spoon"
+  }
+}

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Stylised portrait of Perry Kolator, a coffee nerd in round glasses and a bean-print beanie, with a pencil behind the ear and a tasting spoon">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(22 55% 42%)"/><stop offset="1" stop-color="hsl(40 60% 24%)"/></linearGradient></defs>
+<rect width="800" height="600" fill="url(#g)"/>
+<circle cx="640" cy="130" r="220" fill="#fff" fill-opacity=".06"/><circle cx="110" cy="520" r="160" fill="#fff" fill-opacity=".05"/>
+<path d="M180 600 Q180 435 400 435 Q620 435 620 600 z" fill="#fff" fill-opacity=".8"/>
+<path d="M330 438 H470 L505 600 H295 z" fill="hsl(25 55% 20%)"/>
+<path d="M348 442 L380 395 M452 442 L420 395" stroke="hsl(25 55% 20%)" stroke-width="14" stroke-linecap="round"/>
+<rect x="368" y="350" width="64" height="88" fill="hsl(30 60% 82%)"/>
+<circle cx="310" cy="285" r="15" fill="hsl(30 60% 82%)"/><circle cx="490" cy="285" r="15" fill="hsl(30 60% 82%)"/>
+<circle cx="400" cy="275" r="92" fill="hsl(30 60% 86%)"/>
+<g transform="rotate(-18 308 290)"><rect x="303" y="245" width="10" height="70" fill="#f2b632"/><path d="M303 315 h10 l-5 12 z" fill="#f5d9b0"/><rect x="303" y="245" width="10" height="9" fill="#d9626b"/></g>
+<path d="M306 250 Q298 128 400 128 Q502 128 494 250 z" fill="hsl(25 55% 20%)"/>
+<rect x="302" y="226" width="196" height="36" rx="12" fill="hsl(40 65% 55%)"/>
+<circle cx="400" cy="118" r="18" fill="hsl(40 65% 55%)"/>
+<g transform="rotate(-30 400 180)"><ellipse cx="400" cy="180" rx="20" ry="13" fill="hsl(35 70% 88%)"/><path d="M382 180 Q400 170 418 180" fill="none" stroke="hsl(25 55% 20%)" stroke-width="4"/></g>
+<g fill="none" stroke="hsl(25 55% 20%)" stroke-width="6"><circle cx="362" cy="298" r="25"/><circle cx="438" cy="298" r="25"/><path d="M387 296 h26"/><path d="M370 342 q30 20 60 0" stroke-linecap="round"/></g>
+<circle cx="362" cy="298" r="6" fill="hsl(25 55% 20%)"/><circle cx="438" cy="298" r="6" fill="hsl(25 55% 20%)"/>
+<circle cx="372" cy="500" r="32" fill="hsl(35 70% 88%)"/><path d="M354 490 h36 v12 a18 18 0 0 1 -36 0 z" fill="hsl(25 55% 20%)"/><path d="M390 493 h6 a7 7 0 0 1 0 14 h-6" fill="none" stroke="hsl(25 55% 20%)" stroke-width="4"/><path d="M366 482 q-4 -8 0 -14 M378 482 q-4 -8 0 -14" fill="none" stroke="hsl(25 55% 20%)" stroke-width="3" stroke-linecap="round"/>
+<path d="M440 580 L470 495" stroke="hsl(35 70% 88%)" stroke-width="8" stroke-linecap="round"/><ellipse cx="474" cy="483" rx="14" ry="10" transform="rotate(20 474 483)" fill="hsl(35 70% 88%)"/>
+</svg>

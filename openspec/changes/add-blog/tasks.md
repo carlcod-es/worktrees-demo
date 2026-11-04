@@ -4,7 +4,7 @@ Block rendering, block JSON round-trips and block editor behaviour are already p
 
 Contract for section 2: `media-manifest.json`, per `design.md` "Seeded media".
 
-- [ ] 1.1 Create the 10 article SVGs and `author.svg` named in `design.md` "Seeded articles", matching the style of `wwwroot/media/ushop/categories/coffee.svg`, and write `media-manifest.json` with each file and its alt text. Verify with a Node one-liner: 11 files; each has `viewBox="0 0 800 600"` and no `<script`, `href="http` or `xlink:href`; each alt text is non-empty and distinct; every manifest path exists.
+- [ ] 1.1 Create the 10 article SVGs and `author.svg` named in `design.md` "Seeded articles", matching the style of `wwwroot/media/ushop/categories/coffee.svg`, and write `media-manifest.json` with each file and its alt text. Verify with a Node one-liner: 11 files; the 10 article files have `viewBox="0 0 1600 500"` with the subject inside the central 640x460, `author.svg` has `viewBox="0 0 800 600"`, and none has `<script`, `href="http` or `xlink:href`; each alt text is non-empty and distinct; every manifest path exists.
 
 ## 2. Content model and seed (worker-backend; explicit assignment of `src/uShopDemo.Web/uSync/**`)
 
@@ -18,7 +18,7 @@ Depends on 1.1. Contract for sections 3 and 4: `design.md` "Content model contra
 
 Depends on the aliases in `design.md` "Content model contract", not on section 2 files. Contract for section 4: `design.md` "Listing helper".
 
-- [ ] 3.1 Add `Shop/Blog/BlogListing.cs` per `design.md` "Listing helper" and ADR-0029. Verify: `dotnet build uShopDemo.slnx` succeeds; the reviewer reads `Clamp` against `null`, `""`, `abc`, `0`, `-1`, `1.5`, a value above `int.MaxValue`, 99 and zero items. Behaviour is checked through pages in task 4.2.
+- [x] 3.1 Add `Shop/Blog/BlogListing.cs` per `design.md` "Listing helper" and ADR-0029. Verify: `dotnet build uShopDemo.slnx` succeeds; the reviewer reads `Clamp` against `null`, `""`, `abc`, `0`, `-1`, `1.5`, a value above `int.MaxValue`, 99 and zero items. Behaviour is checked through pages in task 4.2.
 - [ ] 3.2 Extend the heading handler to `blogArticle.mainContent` per `design.md` "Heading normaliser". Verify: `dotnet build uShopDemo.slnx` succeeds; after section 2, on a fresh run, saving one article via the Management API with `<h1>A</h1><h4>B</h4>` in a rich-text block stores `<h2>A</h2><h3>B</h3>`. This checks the new wiring only. Depends on section 2 for the check.
 
 ## 4. Blog views (worker-frontend)
@@ -30,9 +30,9 @@ Depends on sections 2 and 3.
   - home, category, product, cart, checkout and 404 pages all have the Blog link after the categories, and none has an author section;
   - `/blog/` lists the five articles dated 2026-10-28 to 2026-09-30, in that order, with image, date, summary and tags; `/blog/?page=2` lists the other five; `aria-current="page"` is on the right link; page 1 has no previous link and page 2 has no next link;
   - `?page=abc`, `0` and `-1` return page 1, and `99` returns page 2, each with status 200;
-  - every article returns 200, with elements in the spec's order, its tags as text with no links, a non-empty image alt and one author section; the Blog nav link has `active` on the listing and articles;
+  - every article returns 200, with elements in the spec's order (the banner first, under the header), its tags as text with no links, a non-empty image alt and one author section; the Blog nav link has `active` on the listing and articles;
   - article 8 has one block type and article 1 has all three, in the seeded order;
-  - the CSS has the 44px rule for pagination links below 48rem.
+  - the CSS has the 44px rule for pagination links below 48rem, and `.article-banner` has no fixed width and uses `aspect-ratio: 16 / 7` below 48rem.
 
 ## 5. Docs (Architect; explicit paths)
 

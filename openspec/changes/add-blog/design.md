@@ -65,7 +65,7 @@ Seed values use the same shapes as existing content: Block List JSON as in `Cont
 | `Views/blog.cshtml` | `BlogListing` | Heading, cards, pagination, empty message. |
 | `Views/Partials/blogCard.cshtml` | - | One card. Image `alt=""` and a hidden link, as `productCard.cshtml`, since the title link has the name. |
 | `Views/Partials/blogPagination.cshtml` | - | `<nav aria-label="Blog pages">`, links, `aria-current="page"` on the current one. |
-| `Views/blogArticle.cshtml` | - | Elements in the spec's order. Blocks use `Html.GetBlockListHtmlAsync` in `<div class="description article-body">`, reusing block CSS. |
+| `Views/blogArticle.cshtml` | - | Elements in the spec's order. The main image renders first as `<img class="article-banner">`. Blocks use `Html.GetBlockListHtmlAsync` in `<div class="description article-body">`, reusing block CSS. |
 | `Views/Partials/aboutAuthor.cshtml` | - | Model: the `blog` node. `<aside aria-labelledby=...>` with an `<h2>`, or nothing when the bio is empty. |
 
 Dates render as `<time datetime="yyyy-MM-dd">` with `d MMMM yyyy` and an explicit `en-GB` culture, since the site language remains `en-US`. Plain-text values are output through Razor encoding. The bio keeps line breaks with `white-space: pre-line`.
@@ -95,11 +95,11 @@ Replace the two handler constants with a small alias map: `product` to `descript
 
 ### Seeded media
 
-Follows ADR-0020. Files live in `wwwroot/media/ushop/blog/`, 800x600 like the category art, with shapes only and no scripts or external references. uSync media items go in a new `Blog` root folder (`SortOrder` 3). `umbracoBytes` matches each file's real size. `openspec/changes/add-blog/media-manifest.json` lists each file with its alt text, as `add-shop-media` did, and is the contract between `add-blog` tasks sections 1 and 2.
+Follows ADR-0020. Files live in `wwwroot/media/ushop/blog/`, with shapes only and no scripts or external references. Article banners are 1600x500, with the subject inside the central 640x460 so that crops keep it visible, and background decoration across the rest of the width. `author.svg` stays 800x600, because it displays small and isn't a banner. It shows a gender-neutral, centred coffee nerd. uSync media items go in a new `Blog` root folder (`SortOrder` 3). `umbracoBytes` matches each file's real size. `openspec/changes/add-blog/media-manifest.json` lists each file with its alt text, as `add-shop-media` did, and is the contract between `add-blog` tasks sections 1 and 2.
 
 ### Seeded articles
 
-Newest first. Page 1 holds the first five. Slugs follow from the node name. Author: Perry Kolator, a fictional coffee obsessive with a dry voice.
+Newest first. Page 1 holds the first five. Slugs follow from the node name. Author: Perry Kolator, a fictional coffee obsessive with a dry voice. The bio and any first-person copy give Perry no gender and use no gendered pronouns.
 
 | # | Title | Publish date | Tags | Image | Extra blocks |
 |---|---|---|---|---|---|
@@ -130,14 +130,14 @@ Required by `ushop-site` "Editor field guidance".
 | Blog article (type) | A blog post. Has its own page and a card on the blog listing. |
 | Article `title` | Article name. Shown as the page heading and on its listing card. |
 | Article `publishDate` | Sets the listing order, newest first, and is shown with the article. Not changed by later edits. |
-| Article `summary` | One or two sentences of plain text. Shown on the listing card and above the main image. |
-| Article `mainImage` | SVG image shown on the listing card and on the article page. |
+| Article `summary` | One or two sentences of plain text. Shown on the listing card and under the article heading. |
+| Article `mainImage` | Wide SVG banner, 1600x500, with its subject in the centre. Shown at the top of the article and cropped on the listing card. |
 | Article `tags` | Optional. Up to 3 short labels, shown on the card and article. They don't link anywhere. |
-| Article `mainContent` | Blocks shown below the main image, in this order. Add at least one. |
+| Article `mainContent` | Blocks shown below the summary, in this order. Add at least one. |
 
 ### Styling
 
-Adds a responsive card list, tag labels, a pagination row and an author panel to `site.css`, using the existing custom properties and `(width < 48rem)` breakpoint. Listing cards are full-width rows with the image to the left of the text on wide screens and above it on narrow screens, because a card's summary needs more reading width than a product card. Article text is capped at about 42rem for reading comfort. `.article-body` removes the `.description` top border.
+Adds a responsive card list, tag labels, a pagination row and an author panel to `site.css`, using the existing custom properties and `(width < 48rem)` breakpoint. Listing cards are full-width rows with the image to the left of the text on wide screens and above it on narrow screens, because a card's summary needs more reading width than a product card. The article banner is the first element in `.site-main`, at the full `.wrap` content width with `--radius` corners, matching `.hero`. It shows at 1600:500 on wide screens. Below 48rem it uses `aspect-ratio: 16 / 7` with `object-fit: cover`, because 1600:500 would be only about 110px tall on a phone. Listing card images use `object-fit: cover` at 4:3, showing the central subject. Article text is capped at about 42rem for reading comfort. `.article-body` removes the `.description` top border.
 
 ## Risks / Trade-offs
 
