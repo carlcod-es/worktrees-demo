@@ -8,7 +8,6 @@ Non-blocking items logged during reviews, grouped by change. Promote an item to 
 - Tests:
   - `Origin: null` → 403;
   - null check on the Scalar redirect `Location`;
-  - the no-body check on error responses also passes on an empty body object;
   - duplicate wait helper in `SessionTests`;
   - duplicate older 401 test;
   - `CorsTests` disposes a client the factory owns;
@@ -41,3 +40,4 @@ Non-blocking items logged during reviews, grouped by change. Promote an item to 
 - `BlogListing` relies on `Children()` for published-only filtering, unverified in Umbraco 18. `add-blog` task 6.1 exercises it by unpublishing articles.
 - The seeded node can't be tested for duplicates on restart with `dev.mjs`, because every run gets an empty database (ADR-0005).
 - `.claude/hooks/readonly-bash.mjs` doesn't block numbered redirects such as `2> file` or `&> file`: the pattern exempts them so that `2>&1` passes.
+- Remove `.claude/hooks/readonly-bash.mjs` before the demo. Also remove its entry in `.claude/settings.json`, update the agents paragraph in `CLAUDE.md`, and drop the numbered-redirects item above.
