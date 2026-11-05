@@ -1,7 +1,8 @@
 /* Root 20px keeps body text >= 18px on a projector. */
 :root {
-  --fg: #1d2330; --muted: #5b6475; --bg: #f6f7f9; --card: #fff; --line: #e2e5ea;
-  --accent: #b5542a; --accent-fg: #fff; --notice: #fff4d6; --notice-fg: #6b4d00; --error: #b3261e;
+  color-scheme: dark;
+  --fg: #fff; --muted: #fff; --bg: #000; --card: #000; --line: #fff;
+  --accent: #ffe600; --accent-fg: #000; --notice: #000; --notice-fg: #fff; --error: #ffb3ad;
   --radius: .5rem;
   font-size: 20px;
 }
@@ -189,3 +190,13 @@ button[aria-busy="true"], button:disabled { opacity: .6; cursor: progress; }
   .about-author-row { flex-direction: column; }
   .pagination a { min-height: 44px; min-width: 44px; }
 }
+a:not(.button) { text-decoration: underline !important; }
+.hero { background: #000; border: 2px solid #fff; }
+.hero p { opacity: 1; }
+input, textarea { background: #000; border: 2px solid #fff; }
+:focus-visible { outline: 3px solid #ffe600; outline-offset: 2px; }
+.cart-status:not(:empty) { border: 2px solid #fff; font-weight: 700; }
+.field-error:not(:empty)::before { content: "Error: "; font-weight: 700; }
+.input-validation-error, [aria-invalid="true"] { border-width: 4px; border-style: dashed; }
+button[aria-busy="true"], button:disabled { opacity: 1; }
+.site-nav a.active { font-weight: 800; text-decoration-thickness: 4px !important; }
