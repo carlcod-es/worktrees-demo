@@ -44,8 +44,9 @@ Detail and findings that the code doesn't explain. Decisions are in `docs/adrs/`
 | GET | `/orders/{orderNumber}` | | 200 `{ status, ... }` or 404 |
 | GET | `/health` | | 200 when the database is reachable |
 
+- **Flow:** writes (add, update, remove) are validated, queued in-process and answered 202 with an operation id. The page polls the operation, then re-reads the cart. Checkout returns an order number at once; the order reads `pending`, then `confirmed` or `rejected`, and the confirmation page polls it.
 - **Line keys:** lines are keyed by product key, because the browser knows it before the add is processed.
-- **Sessions:** stateless, with no table and no write on issue. Middleware resolves the session before body binding, so a missing session is reported before any 415 or 400. Write endpoints carry "any content type" metadata so routing doesn't return its own 415 first. Keys are in `ushopDataProtectionKeys`, one set per instance.
+- **Sessions:** a signed HttpOnly cookie `__Host-ushop-session-<apiPort>`, lasting 30 days. Stateless, with no table and no write on issue. Middleware resolves the session before body binding, so a missing session is reported before any 415 or 400. Write endpoints carry "any content type" metadata so routing doesn't return its own 415 first. Keys are in `ushopDataProtectionKeys`, one set per instance.
 - **Cookies on `localhost`:** browsers don't separate cookies by port, so the port is in the name. Site and API ports count as same-site, so SameSite=Strict cookies are still sent on the page's `fetch` calls.
 - **Ownership:** the worker re-checks each command's session. Inserting a cart that another session just created hits the primary key and fails the operation, which settles the race. Rejecting a foreign write with 404 reveals that the id is in use, which is acceptable for random GUIDs.
 - **Queue:** one bounded channel (capacity 1000, waits when full) with a single reader, so commands apply in acceptance order without locks. Each runs in a fresh DI scope. A failed command marks its operation failed, and the worker continues.

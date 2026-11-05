@@ -8,133 +8,23 @@ One shop, three themes, three browser tabs, one repo. Two Claude sessions restyl
 | 2 | `theme/dark` | `worktrees-demo.theme-dark` | Dark |
 | 3 | `theme/high-contrast` | `worktrees-demo.theme-high-contrast` | High contrast |
 
-Paths assume the repo directory is `worktrees-demo`. Prerequisites are in `README.md`.
+Paths assume the repo directory is `worktrees-demo`.
 
 **Why no restart:** the app serves `wwwroot/css/site.css` directly from the worktree, so a saved edit shows on the next refresh. The AppHost and database keep running.
 
-## After the final slice
+## Prerequisites
 
-Do this once `ushop-demo` tasks 5.1, 5.2, 5.3, 6.1 and 6.2 are done and committed, including the two `-complete` branches.
-
-**1. Check `main`**
-
-```sh
-git switch main
-git status                        # clean
-npm test
-dotnet test
-```
-
-**2. Check the finished themes**
-
-Task 5.3 cut the `-complete` branches from `main`, and later commits (`ushop-demo` tasks 3.16 and 6.2, task ticks) moved `main` on. After the last `main` commit, remove their worktrees if they still exist (git refuses to rebase a branch checked out in another worktree), rebase both onto it and return to `main`. A rebase rewrites the branches, so if they're already pushed, push them with `git push --force-with-lease origin theme/dark-complete theme/high-contrast-complete`.
-
-```sh
-node scripts/worktrees.mjs down theme/dark-complete theme/high-contrast-complete
-git rebase main theme/dark-complete
-git rebase main theme/high-contrast-complete
-git switch main
-```
-
-Each diff must list only `site.css`, and all three commands must print the same commit.
-
-```sh
-git diff --name-only main...theme/dark-complete
-git diff --name-only main...theme/high-contrast-complete
-git rev-parse main
-git merge-base main theme/dark-complete
-git merge-base main theme/high-contrast-complete
-```
-
-**3. Cut `demo`**
-
-This removes OpenSpec and the project process, and puts the short `CLAUDE.md` in place (ADR-0032, ADR-0033).
-
-```sh
-git switch -c demo main
-git rm -r -q openspec .claude CLAUDE.md
-git mv docs/demo-claude.md CLAUDE.md
-git commit -m "Prepare demo branch for the stage run"
-```
-
-**4. Check `demo`**
-
-The first command must list only `CLAUDE.md` and `docs/demo-claude.md`. The second must print nothing.
-
-```sh
-git diff --name-only main demo -- . ":!openspec" ":!.claude"
-git ls-tree --name-only demo openspec .claude
-```
-
-Steps 1 to 4 and 8 run on the machine you prepare on. Steps 6 and 7 run on the Mac you'll present from.
-
-**5. Push the branches**
-
-The presenting Mac gets everything from here, so this isn't optional.
-
-```sh
-git push origin main demo theme/dark-complete theme/high-contrast-complete
-```
-
-**6. Set up the presenting Mac**
-
-Install the prerequisites in `README.md`, sign in to `claude`, then clone. The fallback needs the `-complete` branches as local branches, and a clone only creates the checked-out one.
-
-```sh
-git clone <repo-url> worktrees-demo
-cd worktrees-demo
-git branch theme/dark-complete origin/theme/dark-complete
-git branch theme/high-contrast-complete origin/theme/high-contrast-complete
-git switch demo
-```
-
-**7. Rehearse**
-
-Follow [Before the talk](#before-the-talk) and then [On stage](#on-stage) in full. Check:
-
-- [ ] No agent stops for a permission prompt or asks a question.
-- [ ] Agents edit only `site.css` and don't build, run or commit anything.
-- [ ] Each theme looks like its `-complete` branch.
-- [ ] Branch badges differ, and an order in one tab doesn't appear in the others.
-- [ ] Each dashboard shows logs, traces and metrics from its own instance only.
-- [ ] Both themes work through the full flow. High contrast is usable at 200% zoom.
-- [ ] The fallback in [If something goes wrong](#if-something-goes-wrong) works with no restart.
-- [ ] You've noted how long the three instances take to start.
-
-Reset as described in [Before the talk](#before-the-talk) step 8.
-
-**8. Close the plan on `main`**
-
-On the machine you prepare on, tell Claude the rehearsal passed, so it can tick `ushop-demo` tasks 5.4 and 5.5. Then archive, commit and push:
-
-```sh
-git switch main
-openspec archive ushop-demo --skip-specs
-git add openspec
-git commit -m "Archive ushop-demo"
-git push origin main
-```
-
-`demo` doesn't need this commit, because it only touches `openspec/`.
-
-If the rehearsal finds a problem, fix it on the machine you prepare on, and commit to `main`. Merge `main` into each `-complete` branch (`git switch <branch>`, then `git merge --no-edit main`). Then merge it into `demo` with the commands below, which keep the short `CLAUDE.md` and leave out the project process, whatever `main` changed. On `demo`, conflict messages from the merge are expected, including after the step 8 archive commit.
-
-```sh
-git switch demo
-git merge --no-commit --no-ff main
-git rm -r -f -q --ignore-unmatch openspec .claude docs/demo-claude.md
-git checkout HEAD -- CLAUDE.md
-git commit -m "Merge main into demo"
-git switch main
-```
-
-A change to `docs/demo-claude.md` doesn't carry over, so apply it to `CLAUDE.md` on `demo` by hand.
-
-Then repeat from step 1, without the step 2 rebase and without step 3: `demo` already exists, and the merges keep the `-complete` branches based on `main`, so the step 2 checks still hold. Push with step 5, then pull all three on the presenting Mac. Check the two theme diffs still list only `site.css`.
+- .NET 10 SDK
+- Aspire CLI 13.6+: `dotnet tool install -g Aspire.Cli`
+- Docker, with at least 8 GB of memory for three instances
+- Node.js 20+
+- git 2.23+
+- Claude Code CLI (`claude`), signed in
+- A trusted ASP.NET dev certificate (see [Before the talk](#before-the-talk))
 
 ## Before the talk
 
-Needs network. Run these on the Mac you'll present from, at the real repo path: ports come from the path, so the bookmarks stay valid on stage.
+Needs network. Run these on the Mac you'll present from, at the real repo path: ports come from the path, so the bookmarks stay valid on stage. On a new machine, first do steps 5 and 6 of [After the final slice](#after-the-final-slice).
 
 1. `docker pull mcr.microsoft.com/mssql/server:2022-latest`
 2. `dotnet dev-certs https --trust`, then restart the browser.
@@ -178,7 +68,7 @@ cd ../worktrees-demo.theme-dark && node scripts/dev.mjs
 cd ../worktrees-demo.theme-high-contrast && node scripts/dev.mjs
 ```
 
-**3. Open the three tabs.** Same look in all of them; the badge at the bottom right shows each branch.
+**3. Open the three tabs.** Same look in all of them; the badge at the bottom right shows each branch. Each terminal prints its URLs, and `node scripts/worktrees.mjs list` shows all of them. Backoffice login for every instance: `/umbraco`, `admin@demo.local` / `Demo-Password-1234!`.
 
 **4. Show the isolation.** Add a product to the cart in one tab and check out. The cart count in the other two doesn't change.
 
@@ -279,6 +169,129 @@ Edit only that file. Don't build, start or stop anything, don't run any commands
 | Instance won't start | Check Docker is running and has the memory. Ctrl+C once, then `node scripts/dev.mjs` again; it starts with a new database. |
 | Theme already applied on `up` | A rehearsal branch was left behind. Run `down --force`, then `git branch -D` both theme branches, then `up`. |
 | SQL container left behind | `docker rm -f <name>` |
+| Ports differ from the bookmarks | Something held a port, so the launcher moved to the next free block. Use the URLs it printed. |
+| Certificate warning or backoffice login loop | `dotnet dev-certs https --trust`, then restart the browser. |
+| "Could not reach the cart service" | The API is down or unhealthy. Check the `ushop-api` resource on that instance's dashboard. |
+
+## After the final slice
+
+One-off preparation, done before the first rehearsal: `demo` exists only after step 3. Do it once `main` and the two `-complete` branches are committed.
+
+**1. Check `main`**
+
+```sh
+git switch main
+git status                        # clean
+npm test
+dotnet test
+```
+
+**2. Check the finished themes**
+
+The `-complete` branches must sit on the last `main` commit. After any new `main` commit, remove their worktrees if they still exist (git refuses to rebase a branch checked out in another worktree), rebase both onto it and return to `main`. A rebase rewrites the branches, so if they're already pushed, push them with `git push --force-with-lease origin theme/dark-complete theme/high-contrast-complete`.
+
+```sh
+node scripts/worktrees.mjs down theme/dark-complete theme/high-contrast-complete
+git rebase main theme/dark-complete
+git rebase main theme/high-contrast-complete
+git switch main
+```
+
+Each diff must list only `site.css`, and all three commands must print the same commit.
+
+```sh
+git diff --name-only main...theme/dark-complete
+git diff --name-only main...theme/high-contrast-complete
+git rev-parse main
+git merge-base main theme/dark-complete
+git merge-base main theme/high-contrast-complete
+```
+
+**3. Cut `demo`**
+
+This removes OpenSpec and the project process, and puts the short `CLAUDE.md` in place (ADR-0032, ADR-0033).
+
+```sh
+git switch -c demo main
+git rm -r -q openspec .claude CLAUDE.md
+git mv docs/demo-claude.md CLAUDE.md
+git commit -m "Prepare demo branch for the stage run"
+```
+
+**4. Check `demo`**
+
+The first command must list only `CLAUDE.md` and `docs/demo-claude.md`. The second must print nothing.
+
+```sh
+git diff --name-only main demo -- . ":!openspec" ":!.claude"
+git ls-tree --name-only demo openspec .claude
+```
+
+Steps 1 to 4 and 8 run on the machine you prepare on. Steps 6 and 7 run on the Mac you'll present from.
+
+**5. Push the branches**
+
+The presenting Mac gets everything from here, so this isn't optional.
+
+```sh
+git push origin main demo theme/dark-complete theme/high-contrast-complete
+```
+
+**6. Set up the presenting Mac**
+
+Install the [prerequisites](#prerequisites), sign in to `claude`, then clone. The fallback needs the `-complete` branches as local branches, and a clone only creates the checked-out one.
+
+```sh
+git clone <repo-url> worktrees-demo
+cd worktrees-demo
+git branch theme/dark-complete origin/theme/dark-complete
+git branch theme/high-contrast-complete origin/theme/high-contrast-complete
+git switch demo
+```
+
+**7. Rehearse**
+
+Follow [Before the talk](#before-the-talk) and then [On stage](#on-stage) in full. Check:
+
+- [ ] No agent stops for a permission prompt or asks a question.
+- [ ] Agents edit only `site.css` and don't build, run or commit anything.
+- [ ] Each theme looks like its `-complete` branch.
+- [ ] Branch badges differ, and an order in one tab doesn't appear in the others.
+- [ ] Each dashboard shows logs, traces and metrics from its own instance only.
+- [ ] Both themes work through the full flow. High contrast is usable at 200% zoom.
+- [ ] The fallback in [If something goes wrong](#if-something-goes-wrong) works with no restart.
+- [ ] You've noted how long the three instances take to start.
+
+Reset as described in [Before the talk](#before-the-talk) step 8.
+
+**8. Close the plan on `main`**
+
+On the machine you prepare on, tell Claude the rehearsal passed, so it can tick `ushop-demo` tasks 5.4 and 5.5. Then archive, commit and push:
+
+```sh
+git switch main
+openspec archive ushop-demo --skip-specs
+git add openspec
+git commit -m "Archive ushop-demo"
+git push origin main
+```
+
+`demo` doesn't need this commit, because it only touches `openspec/`.
+
+If the rehearsal finds a problem, fix it on the machine you prepare on, and commit to `main`. Merge `main` into each `-complete` branch (`git switch <branch>`, then `git merge --no-edit main`). Then merge it into `demo` with the commands below, which keep the short `CLAUDE.md` and leave out the project process, whatever `main` changed. On `demo`, conflict messages from the merge are expected, including after the step 8 archive commit.
+
+```sh
+git switch demo
+git merge --no-commit --no-ff main
+git rm -r -f -q --ignore-unmatch openspec .claude docs/demo-claude.md
+git checkout HEAD -- CLAUDE.md
+git commit -m "Merge main into demo"
+git switch main
+```
+
+A change to `docs/demo-claude.md` doesn't carry over, so apply it to `CLAUDE.md` on `demo` by hand.
+
+Then repeat from step 1, without the step 2 rebase and without step 3: `demo` already exists, and the merges keep the `-complete` branches based on `main`, so the step 2 checks still hold. Push with step 5, then pull all three on the presenting Mac. Check the two theme diffs still list only `site.css`.
 
 ## See also
 

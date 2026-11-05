@@ -38,7 +38,7 @@ A `page` that is missing, not a whole number (including values too large for `in
 - **Images:** upload an SVG to the `Blog` media folder with alt text. Banners are 1600x500 with the subject in the central 640x460, because narrow screens and listing cards crop the sides.
 - **Tags:** display-only text, not links. Spelling isn't enforced (ADR-0028).
 - **Author:** edit the "About the author" tab on The Daily Grind and publish. Every article picks it up without being republished.
-- **Keeping changes:** the database is empty on each run (ADR-0005), so backoffice changes are lost unless exported to uSync. See `README.md` (ADR-0017, ADR-0020).
+- **Keeping changes:** the database is empty on each run (ADR-0005), so backoffice changes are lost unless exported to uSync. See `docs/development.md` (ADR-0017, ADR-0020).
 
 ## Markup contract
 

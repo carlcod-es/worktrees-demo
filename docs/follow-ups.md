@@ -39,6 +39,8 @@ Non-blocking items logged during reviews, grouped by change. Plan an item as a t
 
 ## `ushop-demo`
 
+- `site.css` has rules for `.form-errors` and `.input-validation-error`, and no view or script uses either class. The high-contrast prompt in `docs/demo.md` and `theme/high-contrast-complete` also name `.input-validation-error`, so remove it from all three together.
+- When the OpenSpec skills and tools are deleted from `main` (Product Owner, 2026-11-05), rewrite `CLAUDE.md` on `main` in the same change, because nothing on `main` will refer to them any more. Not before: `main` keeps the current `CLAUDE.md` until then. It's also the time to drop `src/uShopDemo.Web/Migrations/**` from the ownership table, as that path doesn't exist.
 - The `.gitattributes` CRLF rule for `appsettings-schema.Umbraco.Cms.json` is tested on macOS only. Build in a fresh worktree on Windows and Linux and check `git status` stays clean.
 - Telemetry (`ushop-demo` task 2.3, ADR-0034):
   - The site's OTLP sub-logger has no `MinimumLevel`, so it stays at Information if Umbraco's level is lowered. Fix: `.MinimumLevel.Verbose()` in `Extensions.cs`.

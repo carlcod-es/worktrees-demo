@@ -37,6 +37,7 @@ dotnet test                           # API tests; needs no Docker
 ## Docs
 
 - `README.md`: running the app, project structure and limitations
+- `docs/development.md`: launcher detail, changing the app, troubleshooting
 - `docs/requirements.md`: what the app must do
 - `docs/implementation-notes.md`: detail and findings the code doesn't explain
 - `docs/how-worktrees-work.md`: what worktrees share and what they don't

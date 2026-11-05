@@ -17,11 +17,11 @@ Git separates the files. Two running copies of an app still collide on ports, da
 
 | Resource | Isolation |
 |---|---|
-| Ports | `scripts/dev.mjs` derives a port block from the worktree path |
-| Database | A new SQL Server container per run, no volume (ADR-0005) |
-| Schema | Migrations run at startup, so a migration on one branch reaches only that worktree's database |
-| Content | uSync files are imported into each new database (ADR-0006) |
-| Cookies | The API port is part of the session cookie name |
+| Ports | `scripts/dev.mjs` derives a port block (15000-15999) from the worktree path, so a worktree gets the same URLs every run. If a port is taken, it moves to the next free block. Every endpoint is HTTPS, and the dev certificate is issued to `localhost` without a port, so one certificate covers every worktree. |
+| Database | A new SQL Server container per run, no volume, with one database shared by the site and API. Stopping the launcher removes it, and the next start is a clean install (ADR-0005). |
+| Schema | The API's EF Core migrations (history in `__ushopMigrationsHistory`) run at startup, so a migration on one branch reaches only that worktree's database. |
+| Content | The files in `src/uShopDemo.Web/uSync/v18` are imported into each new database on first boot (`ImportOnFirstBoot`, ADR-0006). |
+| Cookies and carts | The API port is part of the session cookie name. `localStorage` is per origin, so carts don't mix. |
 
 ## Commands used in the talk
 
