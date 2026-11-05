@@ -32,6 +32,10 @@ test('parseWorktrees handles branch, detached, bare-ish and prunable entries', (
   assert.deepEqual(wts.map((w) => w.prunable), [false, false, true]);
 });
 
+test('DEFAULTS are the theme branches', () => {
+  assert.deepEqual(DEFAULTS, ['theme/dark', 'theme/high-contrast']);
+});
+
 test('parseArgs treats --force as a flag, not a branch', () => {
   assert.deepEqual(parseArgs(['down', '--force']), { cmd: 'down', branches: DEFAULTS, force: true, unknown: [] });
   assert.deepEqual(parseArgs(['down', 'a/b', '--force', 'c']).branches, ['a/b', 'c']);
@@ -83,18 +87,22 @@ test('up / list / down cycle in a temp repo', (t) => {
   git(['commit', '-m', 'baseline'], repo);
   const baseline = git(['rev-parse', 'main'], repo);
 
-  // Move the main checkout off main: new branches must still come from main.
+  // Move the main checkout off main: new branches must come from its checked-out branch.
   git(['checkout', '-b', 'feature'], repo);
   writeFileSync(path.join(repo, 'f.txt'), 'f\n');
   git(['add', '.'], repo);
   git(['commit', '-m', 'feature'], repo);
+  const featureTip = git(['rev-parse', 'feature'], repo);
+  assert.notEqual(featureTip, baseline);
 
   const a = path.join(parent, 'repo.layout-a');
   const b = path.join(parent, 'repo.layout-b');
   r = wt(repo, 'up', 'layout/a', 'layout/b');
   assert.equal(r.status, 0, r.stderr);
   assert.ok(existsSync(a) && existsSync(b));
-  assert.equal(git(['rev-parse', 'layout/a'], repo), baseline);
+  assert.equal(git(['rev-parse', 'layout/a'], repo), featureTip);
+  assert.notEqual(git(['rev-parse', 'layout/a'], repo), git(['rev-parse', 'main'], repo));
+  assert.match(r.stdout, /new branch from feature/);
   assert.match(r.stdout, /dev\.mjs/);
 
   // Re-run is idempotent; running from a linked worktree builds siblings from the main one.
@@ -103,6 +111,18 @@ test('up / list / down cycle in a temp repo', (t) => {
   assert.match(r.stdout, /exists\s+layout\/a/);
   assert.ok(existsSync(path.join(parent, 'repo.layout-c')));
   assert.ok(!existsSync(path.join(parent, 'repo.layout-a.layout-c')));
+
+  // Make the linked worktree's HEAD differ, then create from it: base is still the main worktree's branch.
+  git(['config', 'user.name', 'Test'], a);
+  writeFileSync(path.join(a, 'a.txt'), 'a\n');
+  git(['add', '.'], a);
+  git(['commit', '-m', 'linked'], a);
+  assert.notEqual(git(['rev-parse', 'HEAD'], a), featureTip);
+  r = wt(a, 'up', 'layout/f');
+  assert.equal(r.status, 0, r.stderr);
+  assert.equal(git(['rev-parse', 'layout/f'], repo), featureTip);
+  assert.match(r.stdout, /new branch from feature/);
+  git(['worktree', 'remove', path.join(parent, 'repo.layout-f')], repo);
 
   r = wt(repo, 'list');
   assert.equal(r.status, 0, r.stderr);
@@ -143,4 +163,27 @@ test('up / list / down cycle in a temp repo', (t) => {
   r = wt(repo, 'down', 'layout/c');
   assert.equal(r.status, 0, r.stderr);
   assert.match(r.stdout, /removed/);
+});
+
+test('up with a detached main worktree: existing branches work, new ones fail clearly', (t) => {
+  const parent = realpathSync(mkdtempSync(path.join(os.tmpdir(), 'wt-detached-')));
+  t.after(() => rmSync(parent, { recursive: true, force: true }));
+  const repo = path.join(parent, 'repo');
+  mkdirSync(repo);
+  git(['init', '-b', 'main'], repo);
+  git(['config', 'user.name', 'Test'], repo);
+  git(['config', 'user.email', 'test@example.invalid'], repo);
+  git(['config', 'commit.gpgsign', 'false'], repo);
+  writeFileSync(path.join(repo, 'README.md'), 'x\n');
+  git(['add', '.'], repo);
+  git(['commit', '-m', 'baseline'], repo);
+  git(['branch', 'layout/existing'], repo);
+  git(['checkout', '--detach'], repo);
+
+  const r = wt(repo, 'up', 'layout/new', 'layout/existing');
+  assert.equal(r.status, 1);
+  assert.match(r.stderr, /failed\s+layout\/new: .*main worktree has no branch checked out/);
+  assert.equal(git(['branch', '--list', 'layout/new'], repo), '');
+  assert.ok(!existsSync(path.join(parent, 'repo.layout-new')));
+  assert.ok(existsSync(path.join(parent, 'repo.layout-existing')), 'existing branch still processed');
 });

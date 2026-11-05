@@ -165,7 +165,7 @@ The shop's appearance SHALL be defined only by Razor views and static CSS/assets
 Every page SHALL display the name of the current git branch in a small badge so parallel instances are distinguishable on screen.
 
 #### Scenario: Three tabs open
-- **WHEN** three layout instances are open side by side
+- **WHEN** three instances are open side by side
 - **THEN** each shows its own branch name
 
 ### Requirement: Price display

@@ -1,4 +1,4 @@
-/* Baseline layout. Root 20px keeps body text >= 18px on a projector. */
+/* Root 20px keeps body text >= 18px on a projector. */
 :root {
   --fg: #1d2330; --muted: #5b6475; --bg: #f6f7f9; --card: #fff; --line: #e2e5ea;
   --accent: #b5542a; --accent-fg: #fff; --notice: #fff4d6; --notice-fg: #6b4d00; --error: #b3261e;
@@ -23,6 +23,8 @@ h2 { font-size: 1.25rem; margin: 2rem 0 .75rem; }
 .cart-link { text-decoration: none; font-weight: 600; color: var(--fg); }
 .cart-count { display: inline-block; min-width: 1.6em; text-align: center; background: var(--accent); color: var(--accent-fg); border-radius: 1rem; padding: 0 .4em; font-size: .9rem; }
 
+/* Scripts and the mobile nav toggle elements with [hidden]; keep this in every theme. */
+[hidden] { display: none !important; }
 /* Mobile nav (ADR-0026). Hooks: [data-nav], [data-nav-toggle], [data-nav-menu]. No script: toggle stays [hidden], menu shows. */
 .nav-toggle { font: inherit; font-weight: 600; color: var(--fg); background: var(--card); border: 2px solid var(--fg); border-radius: var(--radius); padding: .25rem .75rem; min-height: 44px; cursor: pointer; }
 .nav-toggle:hover { background: var(--bg); }
@@ -118,14 +120,13 @@ input[type=number] { width: 4.5rem; }
 }
 
 /* Cart script */
-[hidden] { display: none !important; }
 .cart-status { margin: 0 0 1rem; padding: .5rem .8rem; border-radius: .35rem; background: var(--notice); color: var(--notice-fg); }
 /* Stays rendered when empty so screen readers keep the live region; only the visible styling goes. */
 .cart-status:empty { margin: 0; padding: 0; background: none; }
 [aria-invalid="true"] { border-color: var(--error); }
 button[aria-busy="true"], button:disabled { opacity: .6; cursor: progress; }
 
-/* Product description blocks (baseline; layouts restyle). */
+/* Product description blocks. */
 .description { overflow-wrap: anywhere; }
 .description .block { margin: 1.25rem 0; }
 .description h2 { font-size: 1.25rem; margin: 1.5rem 0 .5rem; }
@@ -144,7 +145,7 @@ button[aria-busy="true"], button:disabled { opacity: .6; cursor: progress; }
 .block-quote figcaption { margin-top: .5rem; color: var(--muted); }
 .block-quote figcaption::before { content: "\2014\00a0"; }
 
-/* Blog (add-blog). Layouts may restyle; markup contract in docs/blog.md. */
+/* Blog. Markup contract in docs/blog.md. */
 .blog-list { display: flex; flex-direction: column; gap: 1rem; }
 .blog-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
 .blog-card > a { display: block; min-width: 0; align-self: start; }

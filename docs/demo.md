@@ -14,7 +14,7 @@ Paths assume the repo directory is `worktrees-demo`. Prerequisites are in `READM
 
 ## After the final slice
 
-Do this once `ushop-demo` tasks 5.1 to 6.2 are done and committed, including the two `-complete` branches.
+Do this once `ushop-demo` tasks 5.1, 5.2, 5.3, 6.1 and 6.2 are done and committed, including the two `-complete` branches.
 
 **1. Check `main`**
 
@@ -27,7 +27,15 @@ dotnet test
 
 **2. Check the finished themes**
 
-Each diff must list only `site.css`, and all three commands must print the same commit. If they don't, re-cut the `-complete` branches from `main`.
+Task 5.3 cut the `-complete` branches from `main`, and later commits (task 6.2, task ticks) moved `main` on. After the last `main` commit, rebase both onto it and return to `main`. A rebase rewrites the branches, so if they're already pushed, push them with `git push --force-with-lease origin theme/dark-complete theme/high-contrast-complete`.
+
+```sh
+git rebase main theme/dark-complete
+git rebase main theme/high-contrast-complete
+git switch main
+```
+
+Each diff must list only `site.css`, and all three commands must print the same commit.
 
 ```sh
 git diff --name-only main...theme/dark-complete
@@ -107,7 +115,20 @@ git push origin main
 
 `demo` doesn't need this commit, because it only touches `openspec/`.
 
-If the rehearsal finds a problem, fix it on the machine you prepare on. For a change to `main` outside `openspec/`, merge it into `demo` and both `-complete` branches, repeat from step 2, then pull all three on the presenting Mac. Check the two theme diffs still list only `site.css`.
+If the rehearsal finds a problem, fix it on the machine you prepare on, and commit to `main`. Merge `main` into each `-complete` branch (`git switch <branch>`, then `git merge --no-edit main`). Then merge it into `demo` with the commands below, which keep the short `CLAUDE.md` and leave out the project process, whatever `main` changed. On `demo`, conflict messages from the merge are expected, including after the step 8 archive commit.
+
+```sh
+git switch demo
+git merge --no-commit --no-ff main
+git rm -r -f -q --ignore-unmatch openspec .claude docs/demo-claude.md
+git checkout HEAD -- CLAUDE.md
+git commit -m "Merge main into demo"
+git switch main
+```
+
+A change to `docs/demo-claude.md` doesn't carry over, so apply it to `CLAUDE.md` on `demo` by hand.
+
+Then repeat from step 1, without the step 2 rebase and without step 3: `demo` already exists, and the merges keep the `-complete` branches based on `main`, so the step 2 checks still hold. Push with step 5, then pull all three on the presenting Mac. Check the two theme diffs still list only `site.css`.
 
 ## Before the talk
 

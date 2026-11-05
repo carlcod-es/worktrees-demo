@@ -34,7 +34,7 @@ The `demo` branch SHALL have a short `CLAUDE.md`, kept on `main` as `docs/demo-c
 
 #### Scenario: Cut demo
 - **WHEN** the steps are followed
-- **THEN** `demo` differs from `main` only by the removed `openspec/` and `.claude/` and the replaced `CLAUDE.md`
+- **THEN** `demo` differs from `main` only by the removed `openspec/` and `.claude/`, the replaced `CLAUDE.md` and the moved `docs/demo-claude.md`
 
 ### Requirement: Concise
 Docs SHALL be terse and written for humans and AI readers, without filler.

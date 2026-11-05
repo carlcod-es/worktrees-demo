@@ -22,7 +22,7 @@ On a `theme/*` branch:
 
 ```sh
 node scripts/dev.mjs                  # run this worktree's stack; prints its URLs
-node scripts/worktrees.mjs up         # create the theme worktrees from the current branch
+node scripts/worktrees.mjs up         # create the theme worktrees from the main worktree's branch
 node scripts/worktrees.mjs list       # show each worktree's URLs
 node scripts/worktrees.mjs down       # remove the worktrees, keep the branches
 npm test                              # launcher tests

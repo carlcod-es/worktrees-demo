@@ -2,7 +2,7 @@
 
 Defines the three themes shown on stage: the current look on the `demo` branch, plus two theme branches made live in parallel worktrees, and the rules that keep them quick to make and comparable.
 
-ADRs: ADR-0007, ADR-0031, ADR-0032 (`docs/adrs/`).
+ADRs: ADR-0007, ADR-0020, ADR-0031, ADR-0032, ADR-0033 (`docs/adrs/`).
 
 ## ADDED Requirements
 
@@ -42,7 +42,7 @@ Each theme SHALL render usably at laptop and projector resolutions with text rea
 - **THEN** body text is at least 18px equivalent and nothing overflows horizontally
 
 ### Requirement: High contrast for low vision
-The `theme/high-contrast` theme SHALL give all text a contrast ratio of at least 7:1 against its background, and borders, form controls and focus outlines at least 3:1. Links SHALL be underlined, text SHALL NOT sit on a gradient, and status and error messages SHALL NOT rely on colour alone. This requirement covers the theme only: it is not a claim that the site conforms to WCAG. Text baked into seeded product images is out of scope, because seeded media can't differ.
+The `theme/high-contrast` theme SHALL give all text a contrast ratio of at least 7:1 against its background, and borders, form controls and focus outlines at least 3:1. Links SHALL be underlined, text SHALL NOT sit on a gradient, and status and error messages SHALL NOT rely on colour alone. This requirement covers the theme only: it is not a claim that the site conforms to WCAG. Text baked into seeded images, including the logo, is out of scope, because seeded media can't differ.
 
 #### Scenario: Contrast check
 - **WHEN** the theme's colour pairs are measured

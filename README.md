@@ -14,7 +14,8 @@ Demo only: no payments, nothing is charged or shipped.
 - Aspire CLI 13.6+: `dotnet tool install -g Aspire.Cli` (required: it supplies the dashboard and orchestrator)
 - Docker, with at least 8 GB memory if running three instances (each SQL Server uses ~2 GB)
 - Node.js 20+
-- git 2.5+
+- git 2.23+
+- Claude Code CLI (`claude`), signed in: needed only for the agent flow in the talk
 - A trusted ASP.NET dev certificate: `dotnet dev-certs https --trust` (the site and API are HTTPS-only; the backoffice login needs it). The certificate covers the API port too, so nothing extra needs trusting
 
 Works on Windows, macOS and Linux.

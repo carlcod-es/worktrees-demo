@@ -1,8 +1,7 @@
 import path from 'node:path';
 import { realpathSync } from 'node:fs';
 
-export const DEFAULTS = ['layout/minimal', 'layout/catalog', 'layout/showcase'];
-export const BASE_BRANCH = 'main';
+export const DEFAULTS = ['theme/dark', 'theme/high-contrast'];
 
 /** Branch name -> directory-safe suffix. Anything outside [A-Za-z0-9._-] becomes "-". */
 export const slug = (branch) => branch.replace(/[^A-Za-z0-9._-]/g, '-');

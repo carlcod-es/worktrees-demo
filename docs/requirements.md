@@ -152,7 +152,7 @@ ADR-0027 to ADR-0030. Content model and markup are in `docs/blog.md`.
 
 ## `layout-variants`: themes
 
-ADR-0007, ADR-0031, ADR-0032, ADR-0033. The name dates from when these were page layouts.
+ADR-0007, ADR-0020, ADR-0031, ADR-0032, ADR-0033. The name dates from when these were page layouts.
 
 - `demo` keeps the current light look. `theme/dark` and `theme/high-contrast` render the same catalogue, cart and checkout with a visibly different theme. Both are created from `demo` during the talk. Finished versions stay on `theme/dark-complete` and `theme/high-contrast-complete`, which meet every rule here and share a `main` commit with `demo`.
 - A theme's diff touches only CSS files under `src/uShopDemo.Web/wwwroot/css/`. Views, scripts, seeded media, content and application code don't differ.
@@ -165,7 +165,7 @@ High contrast, for low-vision users:
 - All text is at least 7:1 against its background. Borders, form controls and focus outlines are at least 3:1.
 - Links are underlined, no text sits on a gradient, and status and error messages don't rely on colour alone.
 - Content and controls stay reachable and usable at 200% zoom from 1280x720.
-- This covers the theme only and isn't a claim of WCAG conformance. Text baked into seeded images is out of scope.
+- This covers the theme only and isn't a claim of WCAG conformance. Text baked into seeded images, including the logo, is out of scope.
 
 ## `demo-guide`
 

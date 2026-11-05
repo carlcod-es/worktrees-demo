@@ -11,7 +11,7 @@ Contract between `src/uShopDemo.Web/wwwroot/js/nav.js` and the views (ADR-0026).
 - CSS decides visibility by breakpoint; the script never reads the viewport. Below the breakpoint, hide the menu only under `[data-nav-ready]:not([data-nav-open])`. At and above it, hide the toggle and always show the menu, so a resize never leaves the menu stuck closed.
 - Keep the toggle's accessible name "Menu": visible text, or an icon plus visually hidden text.
 - Keep `[hidden] { display: none !important; }` (in `site.css`), or set `display` on the toggle only under `:not([hidden])`. Otherwise the toggle shows without script and does nothing.
-- Keep the current-item marker (`.active` in the baseline) visible in the open menu.
+- Keep the current-item marker (`.active` in `site.css` or similar) visible in the open menu.
 
 ## Hooks
 

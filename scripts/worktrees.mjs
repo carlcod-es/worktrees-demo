@@ -5,7 +5,7 @@ import { existsSync, realpathSync } from 'node:fs';
 import path from 'node:path';
 import { git } from './lib/git.mjs';
 import { slotFor, blockPorts } from './lib/ports.mjs';
-import { BASE_BRANCH, DEFAULTS, parseArgs, parseWorktrees, siblingPath, normPath, isInside } from './lib/worktrees.mjs';
+import { DEFAULTS, parseArgs, parseWorktrees, siblingPath, normPath, isInside } from './lib/worktrees.mjs';
 
 const USAGE = 'usage: node scripts/worktrees.mjs <up|list|down> [--force] [branch...]\n' +
   'default branches: ' + DEFAULTS.join(', ') + '\n' +
@@ -16,6 +16,7 @@ const errText = (e) => (e.stderr?.toString().trim() || e.message);
 const worktrees = () => parseWorktrees(git(['worktree', 'list', '--porcelain'], cwd));
 // First porcelain entry is always the main worktree, whichever checkout we run from.
 const mainPath = () => worktrees()[0].path;
+const mainBranch = () => worktrees()[0].branch;
 const branchExists = (b) => {
   try { git(['rev-parse', '--verify', '--quiet', `refs/heads/${b}`], cwd); return true; } catch { return false; }
 };
@@ -36,10 +37,13 @@ function up({ branches }) {
         git(['worktree', 'add', dir, b], cwd);
         console.log(`created  ${b} -> ${dir}`);
       } else {
-        try { git(['rev-parse', '--verify', '--quiet', `${BASE_BRANCH}^{commit}`], cwd); }
-        catch { throw new Error(`branch '${BASE_BRANCH}' has no commit; commit the baseline first`); }
-        git(['worktree', 'add', '-b', b, dir, BASE_BRANCH], cwd);
-        console.log(`created  ${b} -> ${dir} (new branch from ${BASE_BRANCH})`);
+        // New branches start from whatever the main worktree has checked out.
+        const base = mainBranch();
+        if (!base) throw new Error('the main worktree has no branch checked out (detached HEAD); check out a branch there first');
+        try { git(['rev-parse', '--verify', '--quiet', `${base}^{commit}`], cwd); }
+        catch { throw new Error(`branch '${base}' has no commit; make a first commit`); }
+        git(['worktree', 'add', '-b', b, dir, base], cwd);
+        console.log(`created  ${b} -> ${dir} (new branch from ${base})`);
       }
       ready.push(dir);
     } catch (e) {
