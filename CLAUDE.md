@@ -28,7 +28,7 @@ Agents in `.claude/agents/`: `worker-backend`, `worker-frontend` (sonnet, implem
 
 | Owner | Paths |
 |---|---|
-| worker-backend | `src/uShopDemo.Web/{Program.cs,Shop/**,Migrations/**}`, `src/uShopDemo.Api/**`, `tests/uShopDemo.Api.Tests/**`, `src/uShopDemo.AppHost/*.cs`, `scripts/**` |
+| worker-backend | `src/uShopDemo.Web/{Program.cs,Shop/**,Migrations/**}`, `src/uShopDemo.Api/**`, `src/uShopDemo.ServiceDefaults/**`, `tests/uShopDemo.Api.Tests/**`, `src/uShopDemo.AppHost/*.cs`, `scripts/**` |
 | worker-frontend | `src/uShopDemo.Web/{Views/**,wwwroot/**}` |
 | Shared: explicit assignment only | root config, `**/*.csproj`, `**/appsettings*.json`, `*-schema*.json`, `aspire.config.json`, `uSync/**`, manifests, lockfiles, CI, Docker, API contracts (design.md endpoint tables), e2e tests, `README.md`, `docs/**`, `openspec/**`, `.claude/**` |
 

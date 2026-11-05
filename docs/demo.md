@@ -96,6 +96,7 @@ Follow [Before the talk](#before-the-talk) and then [On stage](#on-stage) in ful
 - [ ] Agents edit only `site.css` and don't build, run or commit anything.
 - [ ] Each theme looks like its `-complete` branch.
 - [ ] Branch badges differ, and an order in one tab doesn't appear in the others.
+- [ ] Each dashboard shows logs, traces and metrics from its own instance only.
 - [ ] Both themes work through the full flow. High contrast is usable at 200% zoom.
 - [ ] The fallback in [If something goes wrong](#if-something-goes-wrong) works with no restart.
 - [ ] You've noted how long the three instances take to start.

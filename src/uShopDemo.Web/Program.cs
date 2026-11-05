@@ -1,5 +1,9 @@
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+// ADR-0034: telemetry. The OTLP log sink is picked up by Umbraco's Serilog pipeline.
+builder.AddServiceDefaults();
+builder.AddSerilogOtlpSink();
+
 builder.CreateUmbracoBuilder()
     .AddBackOffice()
     .AddWebsite()

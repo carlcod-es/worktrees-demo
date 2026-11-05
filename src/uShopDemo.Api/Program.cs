@@ -8,6 +8,8 @@ using uShopDemo.Api.Sessions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddServiceDefaults();
+
 builder.AddSqlServerDbContext<CartDbContext>(
     "umbracoDbDSN",
     configureDbContextOptions: options => options.UseSqlServer(CartDbContext.ConfigureSqlServer));

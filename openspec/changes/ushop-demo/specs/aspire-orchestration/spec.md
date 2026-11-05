@@ -41,3 +41,18 @@ When started by the launcher, the dashboard, website and every Aspire endpoint S
 #### Scenario: Any worktree
 - **WHEN** AppHosts run from several worktrees on different port blocks
 - **THEN** each site and dashboard is served over HTTPS with the same trusted certificate
+
+### Requirement: Telemetry in the dashboard
+When started by an AppHost, the site and the cart API SHALL send logs, traces and metrics to that AppHost's dashboard (ADR-0034). With no OTLP endpoint configured, they SHALL export nothing.
+
+#### Scenario: Open the dashboard
+- **WHEN** pages are browsed and an item is added to the cart in a running instance
+- **THEN** that instance's dashboard shows structured logs, traces and metrics for both `ushop-web` and `ushop-api`
+
+#### Scenario: Other instances
+- **WHEN** several instances run at once
+- **THEN** each dashboard shows telemetry from its own instance only
+
+#### Scenario: No endpoint
+- **WHEN** the API tests run with no OTLP endpoint
+- **THEN** nothing is exported and the tests pass

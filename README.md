@@ -87,6 +87,7 @@ For the full talk flow, prompts and teardown, see [docs/demo.md](docs/demo.md). 
 ```
 src/uShopDemo.AppHost/        Aspire topology: SQL Server, database, api, web
 src/uShopDemo.Api/            cart API: endpoints, queue and worker, sessions, EF Core context and migrations
+src/uShopDemo.ServiceDefaults/ logs, traces and metrics for the site and API (ADR-0034)
 src/uShopDemo.Web/            Umbraco site
   Shop/                       Money.cs (price formatting), Content/ (heading normaliser, ADR-0025)
   uSync/v18/                  content model and catalogue (uSync export)

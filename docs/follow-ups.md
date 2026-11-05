@@ -40,3 +40,13 @@ Non-blocking items logged during reviews, grouped by change. Plan an item as a t
 ## `ushop-demo`
 
 - The `.gitattributes` CRLF rule for `appsettings-schema.Umbraco.Cms.json` is tested on macOS only. Build in a fresh worktree on Windows and Linux and check `git status` stays clean.
+- Telemetry (`ushop-demo` task 2.3, ADR-0034):
+  - The site's OTLP sub-logger has no `MinimumLevel`, so it stays at Information if Umbraco's level is lowered. Fix: `.MinimumLevel.Verbose()` in `Extensions.cs`.
+  - `AddServiceDefaults` also adds `Logging.AddOpenTelemetry` to the site, unused because Serilog replaces the logger factory. If that ever changes, site logs would appear twice.
+  - `CartWorker` SQL spans have no recorded parent and are dropped, so an add-to-cart trace ends at the 202. An `ActivitySource` span around command handling would keep them; that also puts the checkout write's query text in traces.
+  - `/umbraco/management` isn't excluded from traces, so an open backoffice adds noise.
+  - API tests would export if the shell has `OTEL_EXPORTER_OTLP_ENDPOINT` set; `UseSetting` in `ApiFactory` closes that. No test asserts the "No endpoint" scenario, and `AddSerilogOtlpSink` has no coverage.
+  - The API has no log config, so EF command and `/health` request logs reach Structured Logs at Information. The site sets the EF category to Warning.
+  - The exporter-log filter is on the OTLP sub-logger only, so `System.Net.Http.HttpClient.Otlp*` lines still reach the site's console and file logs. An `Override` in `appsettings.json` would replace it.
+  - `aspire otel` printed `[]` for a launcher-started run; the dashboard's `/api/telemetry` endpoints returned data.
+- Kestrel logs `Unexpected exception in TimingPipeFlusher.FlushAsync` (`Win32Exception (14): Bad address`) on some HTTPS responses on macOS. Umbraco logs show it from 2026-11-01, before telemetry. Not investigated.

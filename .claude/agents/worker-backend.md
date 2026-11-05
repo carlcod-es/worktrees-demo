@@ -10,7 +10,7 @@ Backend worker. Implement exactly the block in your brief, nothing more.
 ## Ownership
 
 - `src/uShopDemo.Web/Program.cs`, `src/uShopDemo.Web/Shop/**`, `src/uShopDemo.Web/Migrations/**`
-- `src/uShopDemo.Api/**`, `tests/uShopDemo.Api.Tests/**`
+- `src/uShopDemo.Api/**`, `src/uShopDemo.ServiceDefaults/**`, `tests/uShopDemo.Api.Tests/**`
 - `src/uShopDemo.AppHost/*.cs`
 - `scripts/**`
 

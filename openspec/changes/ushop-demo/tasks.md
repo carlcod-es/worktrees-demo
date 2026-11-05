@@ -11,6 +11,7 @@ Note: an earlier apply pass produced uncommitted `Blog.*` code (see design.md Co
 
 - [x] 2.1 (carry over) AppHost: SQL Server (no volume), `umbracoDbDSN` database, `web` project with reference/WaitFor, provider name env, `USHOP_WEB_PORT`, `USHOP_BRANCH`; verify the site responds on the configured port and `docker ps` shows one `sql-*` container for the instance
 - [x] 2.2 Verify two AppHosts started from different directories run concurrently with separate SQL containers and separate databases
+- [ ] 2.3 (added by Product Owner decision, 2026-11-05; ADR-0034) Telemetry (worker-backend; explicit assignment of `uShopDemo.slnx`, `src/uShopDemo.ServiceDefaults/**` and the Web and API `.csproj`): service defaults project; site logs through `Serilog.Sinks.OpenTelemetry`, API logs through the OpenTelemetry logging provider; verify `dotnet build uShopDemo.slnx` has no warnings, `dotnet test` passes, no vulnerable packages, and the Product Owner sees logs, traces and metrics for `ushop-web` and `ushop-api` in the dashboard on `main`
 
 ## 3. Umbraco shop
 

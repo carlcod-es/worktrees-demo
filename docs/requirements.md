@@ -15,6 +15,7 @@ ADR-0003, ADR-0004, ADR-0005.
 - Each instance has its own SQL container and database, with no volume. A restart recreates the database empty and re-seeds it.
 - No port is fixed across worktrees. Dashboard, OTLP, resource service, site and API ports can be configured; the SQL port is dynamic.
 - Started by the launcher, every endpoint uses HTTPS on `localhost` with the trusted dev certificate, in every worktree. No endpoint accepts plain HTTP. The dashboard opens without a login token.
+- Started by an AppHost, the site and API send logs, traces and metrics to that AppHost's dashboard, so each dashboard shows only its own instance (ADR-0034). With no OTLP endpoint they export nothing.
 
 ## `worktree-launcher`
 
