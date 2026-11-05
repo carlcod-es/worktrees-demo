@@ -1,7 +1,8 @@
 /* Root 20px keeps body text >= 18px on a projector. */
 :root {
-  --fg: #1d2330; --muted: #5b6475; --bg: #f6f7f9; --card: #fff; --line: #e2e5ea;
-  --accent: #b5542a; --accent-fg: #fff; --notice: #fff4d6; --notice-fg: #6b4d00; --error: #b3261e;
+  color-scheme: dark;
+  --fg: #f2f4f7; --muted: #b4bcc8; --bg: #14171c; --card: #1f242c; --line: #3d4551;
+  --accent: #f4a672; --accent-fg: #14171c; --notice: #3a2f12; --notice-fg: #ffe08a; --error: #ff9c94;
   --radius: .5rem;
   font-size: 20px;
 }
@@ -189,3 +190,6 @@ button[aria-busy="true"], button:disabled { opacity: .6; cursor: progress; }
   .about-author-row { flex-direction: column; }
   .pagination a { min-height: 44px; min-width: 44px; }
 }
+.hero { background: linear-gradient(135deg, #2a1a12, #7a3a1e); }
+input, textarea { background: var(--bg); border-color: #8a93a1; }
+button[aria-busy="true"], button:disabled { opacity: .7; }
