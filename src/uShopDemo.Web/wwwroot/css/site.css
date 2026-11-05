@@ -92,6 +92,7 @@ input[type=number] { width: 4.5rem; }
 .cart-table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: var(--radius); overflow: hidden; }
 .cart-table th, .cart-table td { text-align: left; padding: .6rem .8rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
 .cart-table .num { text-align: right; white-space: nowrap; }
+.cart-table .sku { display: block; }
 .cart-table tfoot th { font-size: 1.1rem; }
 .inline-form { display: flex; align-items: center; gap: .25rem; margin: 0; }
 .actions { text-align: right; }

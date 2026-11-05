@@ -27,9 +27,10 @@ dotnet test
 
 **2. Check the finished themes**
 
-Task 5.3 cut the `-complete` branches from `main`, and later commits (task 6.2, task ticks) moved `main` on. After the last `main` commit, rebase both onto it and return to `main`. A rebase rewrites the branches, so if they're already pushed, push them with `git push --force-with-lease origin theme/dark-complete theme/high-contrast-complete`.
+Task 5.3 cut the `-complete` branches from `main`, and later commits (`ushop-demo` tasks 3.16 and 6.2, task ticks) moved `main` on. After the last `main` commit, remove their worktrees if they still exist (git refuses to rebase a branch checked out in another worktree), rebase both onto it and return to `main`. A rebase rewrites the branches, so if they're already pushed, push them with `git push --force-with-lease origin theme/dark-complete theme/high-contrast-complete`.
 
 ```sh
+node scripts/worktrees.mjs down theme/dark-complete theme/high-contrast-complete
 git rebase main theme/dark-complete
 git rebase main theme/high-contrast-complete
 git switch main
@@ -226,7 +227,7 @@ This is a git worktree on branch theme/dark, and the site is already running fro
 
 Apply a dark theme by editing src/uShopDemo.Web/wwwroot/css/site.css:
 
-1. In the existing :root rule, change only these values, and keep --radius and font-size:
+1. In the existing :root rule, add the color-scheme line first and change only these values, and keep --radius and font-size:
    color-scheme: dark;
    --fg: #f2f4f7; --muted: #b4bcc8; --bg: #14171c; --card: #1f242c; --line: #3d4551;
    --accent: #f4a672; --accent-fg: #14171c; --notice: #3a2f12; --notice-fg: #ffe08a; --error: #ff9c94;
@@ -234,6 +235,7 @@ Apply a dark theme by editing src/uShopDemo.Web/wwwroot/css/site.css:
 2. Add this at the end of the file:
    .hero { background: linear-gradient(135deg, #2a1a12, #7a3a1e); }
    input, textarea { background: var(--bg); border-color: #8a93a1; }
+   button[aria-busy="true"], button:disabled { opacity: .7; }
 
 Edit only that file. Don't build, start or stop anything, don't run any commands, and don't commit. When you've finished, say so in one line.
 ````
@@ -245,7 +247,7 @@ This is a git worktree on branch theme/high-contrast, and the site is already ru
 
 Apply a high-contrast theme for low-vision users by editing src/uShopDemo.Web/wwwroot/css/site.css:
 
-1. In the existing :root rule, change only these values, and keep --radius and font-size:
+1. In the existing :root rule, add the color-scheme line first and change only these values, and keep --radius and font-size:
    color-scheme: dark;
    --fg: #fff; --muted: #fff; --bg: #000; --card: #000; --line: #fff;
    --accent: #ffe600; --accent-fg: #000; --notice: #000; --notice-fg: #fff; --error: #ffb3ad;
@@ -260,6 +262,7 @@ Apply a high-contrast theme for low-vision users by editing src/uShopDemo.Web/ww
    .field-error:not(:empty)::before { content: "Error: "; font-weight: 700; }
    .input-validation-error, [aria-invalid="true"] { border-width: 4px; border-style: dashed; }
    button[aria-busy="true"], button:disabled { opacity: 1; }
+   .site-nav a.active { font-weight: 800; text-decoration-thickness: 4px !important; }
 
 Edit only that file. Don't build, start or stop anything, don't run any commands, and don't commit. When you've finished, say so in one line.
 ````
